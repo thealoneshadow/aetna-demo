@@ -1,0 +1,48 @@
+.navbar-container {
+  font-family: Arial, sans-serif;
+  border: 1px solid #ccc;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.categories {
+  display: flex;
+}
+
+.category {
+  cursor: pointer;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #f0f0f0;
+}
+
+.category.active {
+  background-color: #ddd;
+}
+
+.departments {
+  display: flex;
+}
+
+.department {
+  cursor: pointer;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: #f0f0f0;
+}
+
+.department.active {
+  background-color: #ddd;
+}
+
+.data-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.data-list li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #f0f0f0;
+}
