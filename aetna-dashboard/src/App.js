@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 function App({ instance }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
+  const [viz, setViz] = useState(null);
   const ref = useRef(null);
   const categories = ["Category 1", "Category 2", "Category 3", "Category 4"];
   const departments = [
@@ -40,36 +41,34 @@ function App({ instance }) {
     setSelectedDepartment(index);
   };
 
-  let url = data[0].data;
-  let viz = null;
-
-  const initViz = async () => {
+  const initViz = async (url) => {
     if (viz) {
       viz.dispose();
     }
 
-    const vizUrl = url;
     ref.current.innerHTML = "";
     const options = {
       hideTabs: true,
       width: "100%",
       height: "90vh",
     };
-    viz = new window.tableau.Viz(ref.current, vizUrl, options);
+    const newViz = new window.tableau.Viz(ref.current, url, options);
+    setViz(newViz);
   };
 
   const changeDash = (newUrl) => {
-    url = newUrl;
-    initViz();
+    initViz(newUrl);
   };
+
   useEffect(() => {
-    initViz();
+    initViz(data[0].data);
+
     return () => {
       if (viz) {
         viz.dispose();
       }
     };
-  }, [url, ref]);
+  }, []);
 
   return (
     <>
