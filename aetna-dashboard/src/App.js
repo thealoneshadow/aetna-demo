@@ -15,19 +15,19 @@ function App({ instance }) {
   ];
   const data = [
     {
-      name: "data1",
+      name: "Department 1",
       data: "https://public.tableau.com/views/TableauServerAdminInsights2024/SUMMARY?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
     },
     {
-      name: "data2",
+      name: "Department 2",
       data: "https://public.tableau.com/views/PathwaysoutofPoverty_17101806671470/ConqueringPoverty?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
     },
     {
-      name: "data3",
+      name: "Department 3",
       data: "https://public.tableau.com/views/IMDBTopMovies_17101706981570/IMDbMovies?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
     },
     {
-      name: "data4",
+      name: "Department 4",
       data: "https://public.tableau.com/views/TaylorSwift-SpotifyAudioFeaturesBack2VizBasics/Spotify?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
     },
   ];
@@ -73,35 +73,17 @@ function App({ instance }) {
   return (
     <>
       <div className="navbar-container">
-        <h1>Navbar</h1>
         <ul className="category-list">
           {categories.map((category, index) => (
             <li
               key={index}
               onClick={() => handleCategoryClick(index)}
-              className={selectedCategory === index ? "active" : ""}
+              className={
+                selectedCategory === index ? "active dropdown" : "dropdown"
+              }
             >
               {category}
-            </li>
-          ))}
-        </ul>
-        {selectedCategory !== null && (
-          <div>
-            <h2>Departments</h2>
-            <ul className="department-list">
-              {departments.map((department, index) => (
-                <li
-                  key={index}
-                  onClick={() => handleDepartmentClick(index)}
-                  className={selectedDepartment === index ? "active" : ""}
-                >
-                  {department}
-                </li>
-              ))}
-            </ul>
-            {selectedDepartment !== null && (
-              <div>
-                <h3>Data</h3>
+              {selectedCategory === index && (
                 <ul className="data-list">
                   {data.map((item, index) => (
                     <li key={index} onClick={() => changeDash(item.data)}>
@@ -109,10 +91,14 @@ function App({ instance }) {
                     </li>
                   ))}
                 </ul>
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </li>
+          ))}
+        </ul>
+        <img
+          className="img"
+          src="https://www.cvshealth.com/content/dam/enterprise/cvs-enterprise/logos/CVS_Health_logo.svg"
+        />
       </div>
       <div ref={ref}></div>
     </>
