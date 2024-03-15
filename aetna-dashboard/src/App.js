@@ -1,5 +1,7 @@
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
+import React from "react";
+import Dropdown from "rsuite/Dropdown";
 
 function App({ instance }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -17,18 +19,22 @@ function App({ instance }) {
     {
       name: "Department 1",
       data: "https://public.tableau.com/views/TableauServerAdminInsights2024/SUMMARY?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
+      years: ["2021", "2020", "2019", "2018"],
     },
     {
       name: "Department 2",
       data: "https://public.tableau.com/views/PathwaysoutofPoverty_17101806671470/ConqueringPoverty?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
+      years: ["2021", "2020", "2019", "2018"],
     },
     {
       name: "Department 3",
       data: "https://public.tableau.com/views/IMDBTopMovies_17101706981570/IMDbMovies?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
+      years: ["2021", "2020", "2019", "2018"],
     },
     {
       name: "Department 4",
       data: "https://public.tableau.com/views/TaylorSwift-SpotifyAudioFeaturesBack2VizBasics/Spotify?:language=en-US&:sid=&:display_count=n&:origin=viz_share_link",
+      years: ["2021", "2020", "2019", "2018"],
     },
   ];
 
@@ -72,7 +78,28 @@ function App({ instance }) {
 
   return (
     <>
-      <div className="navbar-container">
+      <div className="navbar-container-new ">
+        {categories.map((category, index) => (
+          <Dropdown title={category} className=" category-list-new" key={index}>
+            {data.map((department, index) => (
+              <div>
+                <Dropdown.Menu title={department.name}>
+                  {department.years.map((year) => (
+                    <Dropdown.Item onClick={() => changeDash(department.data)}>
+                      {year}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </div>
+            ))}
+          </Dropdown>
+        ))}
+        <img
+          className="img-new"
+          src="https://www.cvshealth.com/content/dam/enterprise/cvs-enterprise/logos/CVS_Health_logo.svg"
+        />
+      </div>
+      {/* <div className="navbar-container">
         <ul className="category-list">
           {categories.map((category, index) => (
             <li
@@ -99,7 +126,7 @@ function App({ instance }) {
           className="img"
           src="https://www.cvshealth.com/content/dam/enterprise/cvs-enterprise/logos/CVS_Health_logo.svg"
         />
-      </div>
+      </div> */}
       <div ref={ref}></div>
     </>
   );

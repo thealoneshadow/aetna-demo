@@ -1,7 +1,9 @@
+@import "rsuite/dist/rsuite.min.css";
 .App {
   text-align: center;
 }
-
+@base-color: # cc0000;
+@color: #fff;
 .login-button {
   background-color: #007bff; /* Blue background color */
   color: #fff; /* White text color */
@@ -45,6 +47,84 @@
   padding: 10px;
   cursor: pointer;
   position: relative;
+}
+.rs-btn::selection {
+  background-color: #cc0000;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px;
+}
+
+.rs-btn {
+  background-color: #cc0000;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px;
+}
+
+.rs-btn:hover {
+  background-color: #cc0000;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px;
+}
+
+.navbar-container-new {
+  display: flex;
+  align-items: center;
+  padding: 6px;
+  background-color: #cc0000;
+  color: #fff;
+}
+
+.category-list-new {
+  list-style: none;
+  display: inline-block;
+  background-color: #cc0000;
+  color: #fff;
+  position: relative;
+  margin-right: 10px;
+}
+
+.rs-dropdown-item {
+  background-color: #cc0000;
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px;
+}
+
+.img-new {
+  align-items: flex-end;
+  right: 0;
+  margin-left: auto;
+  border-radius: 2px;
+  background-color: white;
+  width: 15%;
+  height: 15%;
 }
 
 .dropdown ul {
