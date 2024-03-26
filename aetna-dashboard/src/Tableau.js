@@ -69,26 +69,28 @@ const AuthenticatedTableauVisualization = React.forwardRef(({ url }, ref) => {
 });
 
 <div className="search-container">
-  <div
-    className="search-icon"
-    onMouseEnter={() => setIsHovered(true)}
-    onMouseLeave={() => setIsHovered(false)}
-  >
-    <Search size={20} />
-  </div>
-  {isHovered && (
-    <input
-      type="text"
-      className="search-input"
-      value={inputValue}
-      onChange={handleInputChange}
-      placeholder="Search..."
-      onBlur={() => setIsHovered(false)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          handleSearch();
-        }
-      }}
-    />
-  )}
+  <form onSubmit={handleSearch}>
+    <div className="search-icon" onClick={toggleOpen}>
+      <Search size={20} />
+    </div>
+    {isOpen && (
+      <div className="dropdown">
+        <input
+          type="text"
+          className="search-input"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Search..."
+        />
+        <button type="submit" className="search-button">
+          <Search size={20} />
+        </button>
+        <ul>
+          {searchResults.map((result, index) => (
+            <li key={index}>{result}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </form>
 </div>;

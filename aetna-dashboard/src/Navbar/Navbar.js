@@ -7,8 +7,8 @@ function Navbar() {
   const departments = [
     "Department 1",
     "Department 2",
-    "Department 3",
-    "Department 4",
+    "Department 3 e ",
+    "Department cvxcv rg wer4",
   ];
   const data = [
     {
