@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Js Implementation</title>
+  </head>
+  <body>
+    <h1>OOPS Inheritance Implementation</h1>
+    <script>
+      class Person {
+        constructor(fname, lname) {
+          this.firstName = fname;
+          this.lastName = lname;
+        }
+        get getFullName() {
+          return `${this.firstName} ${this.lastName}`;
+        }
+      }
+      class Employee extends Person {
+        constructor(fname, lname, salary) {
+          super(fname, lname); //pass to parent construtor
+          this.salary = salary;
+        }
+        getFullDetails() {
+          return `${super.getFullName} got ${this.salary} per month`;
+        }
+      }
+      const obj = new Employee("anil", "singh", 67000);
+      console.log(obj.getFullDetails());
+    </script>
+  </body>
+</html>

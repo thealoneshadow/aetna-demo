@@ -67,3 +67,28 @@ const AuthenticatedTableauVisualization = React.forwardRef(({ url }, ref) => {
 
   return <div ref={ref}></div>;
 });
+
+<div className="search-container">
+  <div
+    className="search-icon"
+    onMouseEnter={() => setIsHovered(true)}
+    onMouseLeave={() => setIsHovered(false)}
+  >
+    <Search size={20} />
+  </div>
+  {isHovered && (
+    <input
+      type="text"
+      className="search-input"
+      value={inputValue}
+      onChange={handleInputChange}
+      placeholder="Search..."
+      onBlur={() => setIsHovered(false)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handleSearch();
+        }
+      }}
+    />
+  )}
+</div>;

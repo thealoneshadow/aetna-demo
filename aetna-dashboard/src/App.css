@@ -156,3 +156,26 @@
   width: 15%;
   height: 15%;
 }
+
+/* SearchIcon.css */
+.search-container {
+  position: relative;
+  display: inline-block;
+}
+
+.search-icon {
+  cursor: pointer;
+}
+
+.search-input {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 200px; /* Adjust width as needed */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
