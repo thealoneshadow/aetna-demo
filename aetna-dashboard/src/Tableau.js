@@ -68,29 +68,30 @@ const AuthenticatedTableauVisualization = React.forwardRef(({ url }, ref) => {
   return <div ref={ref}></div>;
 });
 
-<div className="search-container">
-  <form onSubmit={handleSearch}>
-    <div className="search-icon" onClick={toggleOpen}>
-      <Search size={20} />
-    </div>
-    {isOpen && (
-      <div className="dropdown">
-        <input
-          type="text"
-          className="search-input"
-          value={inputValue}
-          onChange={handleInputChange}
-          placeholder="Search..."
-        />
-        <button type="submit" className="search-button">
-          <Search size={20} />
-        </button>
-        <ul>
-          {searchResults.map((result, index) => (
-            <li key={index}>{result}</li>
-          ))}
-        </ul>
-      </div>
-    )}
-  </form>
-</div>;
+<Card className="p-3">
+  <Card.Body>
+    <Card.Title>My Form Card</Card.Title>
+    <Form>
+      <Form.Group controlId="formBasicEmail">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control type="email" placeholder="Enter email" />
+        <Form.Text className="text-muted">
+          We'll never share your email with anyone else.
+        </Form.Text>
+      </Form.Group>
+
+      <Form.Group controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control type="password" placeholder="Password" />
+      </Form.Group>
+
+      <Form.Group controlId="formBasicCheckbox">
+        <Form.Check type="checkbox" label="Check me out" />
+      </Form.Group>
+
+      <Button variant="primary" type="submit" className="w-100">
+        Submit
+      </Button>
+    </Form>
+  </Card.Body>
+</Card>;
