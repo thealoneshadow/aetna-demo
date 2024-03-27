@@ -201,3 +201,32 @@ li {
   cursor: pointer;
   padding: 0;
 }
+
+.app-container {
+  /* Styles for the entire app container */
+}
+
+.navbar {
+  /* Styles for the navbar */
+}
+
+.content-wrapper {
+  display: flex;
+}
+
+.links-container {
+  width: 30%; /* Set the width of links container */
+}
+
+.links-container ul {
+  list-style: none;
+  padding: 0;
+}
+
+.links-container ul li {
+  margin-bottom: 10px;
+}
+
+.main-content {
+  width: 70%; /* Set the width of main content */
+}

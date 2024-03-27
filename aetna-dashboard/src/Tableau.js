@@ -68,30 +68,55 @@ const AuthenticatedTableauVisualization = React.forwardRef(({ url }, ref) => {
   return <div ref={ref}></div>;
 });
 
-<Card className="p-3">
-  <Card.Body>
-    <Card.Title>My Form Card</Card.Title>
-    <Form>
-      <Form.Group controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
-      </Form.Group>
 
-      <Form.Group controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
-      </Form.Group>
 
-      <Form.Group controlId="formBasicCheckbox">
-        <Form.Check type="checkbox" label="Check me out" />
-      </Form.Group>
+import React from 'react';
+import './App.css'; // Assuming you have a CSS file for styling
 
-      <Button variant="primary" type="submit" className="w-100">
-        Submit
-      </Button>
-    </Form>
-  </Card.Body>
-</Card>;
+// Navbar component
+const Navbar = () => {
+  return (
+    <nav>
+      {/* Navbar content */}
+    </nav>
+  );
+};
+
+// Links component
+const Links = () => {
+  return (
+    <div className="links-container">
+      <ul>
+        <li><a href="#">Link 1</a></li>
+        <li><a href="#">Link 2</a></li>
+        <li><a href="#">Link 3</a></li>
+        <li><a href="#">Link 4</a></li>
+        <li><a href="#">Link 5</a></li>
+      </ul>
+    </div>
+  );
+};
+
+// Main content component
+const MainContent = () => {
+  return (
+    <div className="main-content">
+      {/* Content goes here */}
+    </div>
+  );
+};
+
+// Main app component
+const App = () => {
+  return (
+    <div className="app-container">
+      <Navbar />
+      <div className="content-wrapper">
+        <Links />
+        <MainContent />
+      </div>
+    </div>
+  );
+};
+
+export default App;
