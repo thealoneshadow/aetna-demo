@@ -45,3 +45,23 @@
   background-color: black;
   margin: 0 20px;
 }
+
+.container {
+  display: flex;
+  align-items: center;
+  background-color: #f0f0f0; /* Background color for the heading */
+  padding-left: 20px; /* Padding on the left side */
+}
+
+.heading {
+  white-space: nowrap; /* Ensure heading stays on one line */
+  margin: 0; /* Remove default margin */
+}
+
+.content {
+  padding-right: 20px; /* Padding on the right side */
+}
+
+.content p {
+  margin: 5px 0; /* Add some space between lines of content */
+}
