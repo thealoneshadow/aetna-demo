@@ -1,44 +1,29 @@
 <div class="container">
-  <div class="row">
-    <div class="column">
-      <h2 class="heading">Heading 1</h2>
-      <p>This is content for column 1</p>
-    </div>
-    <div class="column">
-      <h2 class="heading">Heading 2</h2>
-      <p>This is content for column 2</p>
-    </div>
-    <div class="column">
-      <h2 class="heading">Heading 3</h2>
-      <p>This is content for column 3</p>
-    </div>
-    <div class="column">
-      <h2 class="heading">Heading 4</h2>
-      <p>This is content for column 4</p>
-    </div>
-  </div>
-  
+  <div class="heading">Heading 1</div>
+  <div class="heading">Heading 2</div>
+  <div class="heading">Heading 3</div>
+  <div class="heading">Heading 4</div>
+
+  <div class="content">Content 1</div>
+  <div class="content">Content 2</div>
+  <div class="content">Content 3</div>
+  <div class="content">Content 4</div>
 </div>
+
 
 .container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  grid-template-columns: auto auto; /* Two columns */
   gap: 10px; /* Gap between grid items */
+  transform: rotate(-90deg); /* Rotate the grid by -90 degrees */
 }
 
-.row {
-  display: flex;
-}
-
-.column {
-  background-color: #f0f0f0; /* Background color for the heading */
+.heading, .content {
   padding: 10px;
+  border: 1px solid #000; /* Border for demonstration */
 }
 
 .heading {
-  margin: 0; /* Remove default margin */
-}
-
-.content p {
-  margin: 5px 0; /* Add some space between lines of content */
+  writing-mode: vertical-rl; /* Vertical writing mode */
+  transform: rotate(180deg); /* Rotate back the heading text */
 }
