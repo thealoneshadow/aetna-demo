@@ -1,232 +1,47 @@
-@import "rsuite/dist/rsuite.min.css";
-.App {
-  text-align: center;
-}
-@base-color: # cc0000;
-@color: #fff;
-.login-button {
-  background-color: #007bff; /* Blue background color */
-  color: #fff; /* White text color */
-  align-items: center;
-  justify-content: center;
-  border: none; /* Remove border */
-  border-radius: 5px; /* Rounded corners */
-  padding: 10px 20px; /* Padding */
-  font-size: 16px; /* Font size */
-  cursor: pointer; /* Cursor style */
-  transition: background-color 0.3s ease;
-  margin: 20px;
+.accordion {
+  width: 100%;
+  height: 525px;
 }
 
-.login-button:hover {
-  background-color: #0056b3; /* Darker blue color on hover */
-}
-
-/* Optional: Disable button when in progress */
-.login-button[disabled] {
-  opacity: 0.5; /* Reduce opacity */
-  cursor: not-allowed; /* Change cursor */
-}
-.navbar-container {
+.accordion-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #cc0000;
-  color: #fff;
-  padding: 10px;
 }
 
-.category-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.category-list li {
-  display: inline-block;
-  padding: 10px;
-  cursor: pointer;
-  position: relative;
-}
-.rs-btn::selection {
-  background-color: #cc0000;
-  color: #fff;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 10px;
-}
-
-.rs-btn {
-  background-color: #cc0000;
-  color: #fff;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 10px;
-}
-
-.rs-btn:hover {
-  background-color: #cc0000;
-  color: #fff;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 10px;
-}
-
-.navbar-container-new {
+.header-left {
   display: flex;
   align-items: center;
-  padding: 6px;
-  background-color: #cc0000;
-  color: #fff;
 }
 
-.category-list-new {
-  list-style: none;
-  display: inline-block;
-  background-color: #cc0000;
-  color: #fff;
-  position: relative;
-  margin-right: 10px;
-}
-
-.rs-dropdown-item {
-  background-color: #cc0000;
-  color: #fff;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin: 10px;
-}
-
-.img-new {
-  align-items: flex-end;
-  right: 0;
-  margin-left: auto;
-  border-radius: 2px;
-  background-color: white;
-  width: 15%;
-  height: 15%;
-}
-
-.dropdown ul {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: #cc0000;
-  padding: 10px;
-}
-
-.dropdown:hover ul {
-  display: block;
-}
-
-.data-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.data-list li {
-  padding: 5px;
-  cursor: pointer;
-}
-
-.img {
-  background-color: white;
-  width: 15%;
-  height: 15%;
-}
-
-/* SearchIcon.css */
-.search-container {
-  position: relative;
-  display: inline-block;
-}
-
-.search-icon {
-  cursor: pointer;
-}
-
-.dropdown {
-  position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-}
-
-.search-input {
-  width: 200px; /* Adjust width as needed */
-  margin-right: 8px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-li {
-  padding: 8px 0;
-  border-top: 1px solid #ccc;
-}
-
-.search-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.app-container {
-  /* Styles for the entire app container */
-}
-
-.navbar {
-  /* Styles for the navbar */
-}
-
-.content-wrapper {
+.header-right {
   display: flex;
 }
 
-.links-container {
-  width: 30%; /* Set the width of links container */
+.line {
+  width: 20px;
+  height: 2px;
+  background-color: black;
+  margin: 0 5px;
 }
 
-.links-container ul {
-  list-style: none;
-  padding: 0;
+.accordion-content {
+  display: flex;
+  justify-content: space-between;
+  height: calc(100% - 50px); /* Adjust height as per your requirement */
 }
 
-.links-container ul li {
-  margin-bottom: 10px;
+.kpi-container {
+  display: flex;
+  width: 100%;
 }
 
-.main-content {
-  width: 70%; /* Set the width of main content */
+.kpi-left,
+.kpi-right {
+  width: 50%;
+}
+
+.kpi-divider {
+  width: 2px;
+  background-color: black;
+  margin: 0 20px;
 }

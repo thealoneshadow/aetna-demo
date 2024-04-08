@@ -1,0 +1,36 @@
+.background {
+  align-self: stretch;
+  width: 337.2px;
+  position: relative;
+  display: none;
+  max-width: 100%;
+}
+.background,
+.cardTotalRevenue {
+  border-radius: var(--br-sm);
+  background-color: var(--theme-color-white);
+  box-shadow: var(--shadow01);
+}
+.cardTotalOrderParent,
+.cardTotalRevenue,
+.errorCollector {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  max-width: 100%;
+}
+.cardTotalOrderParent {
+  flex: 1;
+  overflow-x: auto;
+  gap: var(--gap-20xl-7);
+}
+.errorCollector {
+  width: 1478.3px;
+  padding: 0 var(--padding-8xs);
+  box-sizing: border-box;
+  text-align: left;
+  font-size: var(--font-size-27xl);
+  color: var(--theme-color-grey-body);
+  font-family: var(--heading-heading-4);
+}
