@@ -1,62 +1,37 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./styles.css"; // Import your CSS file
+import React, { useEffect, useRef } from "react";
 
-const Dropdown = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+const TableauDashboard = () => {
+  const iframeRef = useRef(null);
 
   useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
+    const handleMessage = (event) => {
+      if (event.origin !== "https://your-tableau-server.com") {
+        return; // Ensure the message is from the Tableau server
+      }
+
+      if (event.data.type === "tableauHeight") {
+        // Update the height of the iframe based on the received height
+        iframeRef.current.style.height = event.data.height + "px";
       }
     };
 
-    document.addEventListener("click", handleOutsideClick);
+    window.addEventListener("message", handleMessage);
 
     return () => {
-      document.removeEventListener("click", handleOutsideClick);
+      window.removeEventListener("message", handleMessage);
     };
   }, []);
 
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleItemClick = (item) => {
-    // Handle item click
-    console.log("Item clicked:", item);
-  };
-
   return (
-    <div className="dropdown" ref={dropdownRef}>
-      <button className="dropdown-toggle" onClick={toggleDropdown}>
-        Toggle Dropdown
-      </button>
-      {isOpen && (
-        <div className="dropdown-menu">
-          <div
-            className="dropdown-item"
-            onClick={() => handleItemClick("Item 1")}
-          >
-            Item 1
-          </div>
-          <div
-            className="dropdown-item"
-            onClick={() => handleItemClick("Item 2")}
-          >
-            Item 2
-          </div>
-          <div
-            className="dropdown-item"
-            onClick={() => handleItemClick("Item 3")}
-          >
-            Item 3
-          </div>
-        </div>
-      )}
-    </div>
+    <iframe
+      ref={iframeRef}
+      title="Tableau Dashboard"
+      src="https://your-tableau-server.com/dashboard-url"
+      width="100%"
+      height="600" // Initial height, you can adjust as needed
+      frameBorder="0"
+    />
   );
 };
 
-export default Dropdown;
+export default TableauDashboard;
