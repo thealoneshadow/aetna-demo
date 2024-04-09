@@ -1,29 +1,53 @@
-<div class="container">
-  <div class="heading">Heading 1</div>
-  <div class="heading">Heading 2</div>
-  <div class="heading">Heading 3</div>
-  <div class="heading">Heading 4</div>
+import React, { useState } from "react";
 
-  <div class="content">Content 1</div>
-  <div class="content">Content 2</div>
-  <div class="content">Content 3</div>
-  <div class="content">Content 4</div>
-</div>
+const Navbar = () => {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
 
-.container {
-  display: grid;
-  grid-template-columns: auto auto; /* Two columns */
-  gap: 10px; /* Gap between grid items */
-  transform: rotate(-90deg); /* Rotate the grid by -90 degrees */
-}
+  const NavbarItem = ({ title, children }) => {
+    const [subDropdownOpen, setSubDropdownOpen] = useState(false);
 
-.heading, .content {
-  padding: 10px;
-  border: 1px solid #000; /* Border for demonstration */
-}
+    const toggleSubDropdown = () => {
+      setSubDropdownOpen(!subDropdownOpen);
+    };
 
-.heading {
-  writing-mode: vertical-rl; /* Vertical writing mode */
-  transform: rotate(180deg); /* Rotate back the heading text */
-}
+    return (
+      <li className="navbar-item">
+        <div onClick={toggleSubDropdown} className="navbar-item-title">
+          {title}
+        </div>
+        {subDropdownOpen && (
+          <ul className="sub-dropdown">
+            {children.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  };
+
+  return (
+    <nav className="navbar">
+      <ul className="navbar-list">
+        <NavbarItem title="Item 1">
+          {["Sub Item 1", "Sub Item 2", "Sub Item 3"]}
+        </NavbarItem>
+        <NavbarItem title="Item 2">
+          {["Sub Item 1", "Sub Item 2", "Sub Item 3"]}
+        </NavbarItem>
+        <NavbarItem title="Item 3">
+          {["Sub Item 1", "Sub Item 2", "Sub Item 3"]}
+        </NavbarItem>
+        <NavbarItem title="Item 4">
+          {["Sub Item 1", "Sub Item 2", "Sub Item 3"]}
+        </NavbarItem>
+      </ul>
+    </nav>
+  );
+};
+
+export default Navbar;
