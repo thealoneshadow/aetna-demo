@@ -35,3 +35,4 @@ const TableauDashboard = () => {
 };
 
 export default TableauDashboard;
+https://help.tableau.com/current/api/embedding_api/en-us/docs/embedding_api_event.html#supported-events
