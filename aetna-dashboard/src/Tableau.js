@@ -1,43 +1,62 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState, useRef, useEffect } from "react";
+import "./styles.css"; // Import your CSS file
 
-// Define your styled component
-const StyledButton = styled.button`
-  /* Your default styles here */
-  background-color: ${(props) => (props.selected ? "blue" : "green")};
-  color: white;
-  padding: 10px;
-  margin: 5px;
-  border: none;
-  cursor: pointer;
+const Dropdown = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
-  &:hover {
-    background-color: ${(props) => (props.selected ? "darkblue" : "darkgreen")};
-  }
-`;
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
 
-const ButtonList = () => {
-  const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
+    document.addEventListener("click", handleOutsideClick);
 
-  const handleButtonClick = (index) => {
-    setSelectedButtonIndex(index);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleItemClick = (item) => {
+    // Handle item click
+    console.log("Item clicked:", item);
   };
 
   return (
-    <div>
-      {[0, 1, 2, 3].map((index) => (
-        <StyledButton
-          key={index}
-          className={
-            selectedButtonIndex === index ? "rs-btn selected" : "rs-btn"
-          }
-          onClick={() => handleButtonClick(index)}
-        >
-          Button {index + 1}
-        </StyledButton>
-      ))}
+    <div className="dropdown" ref={dropdownRef}>
+      <button className="dropdown-toggle" onClick={toggleDropdown}>
+        Toggle Dropdown
+      </button>
+      {isOpen && (
+        <div className="dropdown-menu">
+          <div
+            className="dropdown-item"
+            onClick={() => handleItemClick("Item 1")}
+          >
+            Item 1
+          </div>
+          <div
+            className="dropdown-item"
+            onClick={() => handleItemClick("Item 2")}
+          >
+            Item 2
+          </div>
+          <div
+            className="dropdown-item"
+            onClick={() => handleItemClick("Item 3")}
+          >
+            Item 3
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ButtonList;
+export default Dropdown;
