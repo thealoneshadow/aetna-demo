@@ -36,3 +36,8 @@ const TableauDashboard = () => {
 
 export default TableauDashboard;
 https://help.tableau.com/current/api/embedding_api/en-us/docs/embedding_api_event.html#supported-events
+
+const viz = document.querySelector("tableau-viz");
+const viz = document.getElementById('tableauViz');
+let sheet = viz.workbook.activeSheet;
+sheet.applyFilterAsync("Container", "Boxes", FilterUpdateType.Replace);
