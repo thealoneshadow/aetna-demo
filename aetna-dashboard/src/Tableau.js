@@ -1,43 +1,57 @@
-import React, { useEffect, useRef } from "react";
+<!DOCTYPE html>
+<html lang="en">
 
-const TableauDashboard = () => {
-  const iframeRef = useRef(null);
+<head>
+    <meta charset="UTF-8">
+    <title>Get Data</title>
 
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.origin !== "https://your-tableau-server.com") {
-        return; // Ensure the message is from the Tableau server
-      }
+    <script type="module">
+        // TableauEventType represents the type of Tableau embedding event that can be listened for.
+        import { TableauEventType } from "https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js";
 
-      if (event.data.type === "tableauHeight") {
-        // Update the height of the iframe based on the received height
-        iframeRef.current.style.height = event.data.height + "px";
-      }
-    };
+        async function handleFirstInteractive(e) {
+            const getDataButton = document.getElementById("getData");
 
-    window.addEventListener("message", handleMessage);
+            // Get data from a specified sheet.
+            getDataButton.onclick = async () => {
+                const sheet = viz.workbook.activeSheet.worksheets.find(sheet => sheet.name === "Storm Map Sheet");
 
-    return () => {
-      window.removeEventListener("message", handleMessage);
-    };
-  }, []);
+                const tables = await sheet.getUnderlyingTablesAsync();
+                const options = {
+                    maxRows: 10, // Max rows to return. Use 0 to return all rows.
+                    ignoreAliases: false,
+                    ignoreSelection: true,
+                    includeAllColumns: false
+                };
+                const underlyingTableData = await sheet.getUnderlyingTableDataAsync(tables[0].id, options);
 
-  return (
-    <iframe
-      ref={iframeRef}
-      title="Tableau Dashboard"
-      src="https://your-tableau-server.com/dashboard-url"
-      width="100%"
-      height="600" // Initial height, you can adjust as needed
-      frameBorder="0"
-    />
-  );
-};
+                // Add data to HTML element.
+                const target = document.getElementById("dataTarget");
+                target.innerHTML = `<h4>Underlying Data:</h4><p>${JSON.stringify(underlyingTableData.data)}</p>`;
+            };
+        }
 
-export default TableauDashboard;
-https://help.tableau.com/current/api/embedding_api/en-us/docs/embedding_api_event.html#supported-events
+        const viz = document.getElementById("tableauViz");
 
-const viz = document.querySelector("tableau-viz");
-const viz = document.getElementById('tableauViz');
-let sheet = viz.workbook.activeSheet;
-sheet.applyFilterAsync("Container", "Boxes", FilterUpdateType.Replace);
+        // Event fired when a viz first becomes interactive.
+        viz.addEventListener(TableauEventType.FirstInteractive, handleFirstInteractive);
+    </script>
+</head>
+
+<body>
+    <div>
+        <h1>Get Data Example</h1>
+        <p>Click the "Get Data" button to get underlying data for the viz.</p>
+        <button id="getData">Get Data</button>
+    </div>
+    <div style="width:800px; height:700px;">
+        <!-- Initialization of the Tableau visualization. -->
+        <tableau-viz id="tableauViz" src="https://public.tableau.com/views/RegionalSampleWorkbook/Storms"
+            toolbar="bottom" hide-tabs>
+        </tableau-viz>
+    </div>
+    <!-- Placeholder for the Underlying Data.  -->
+    <div id="dataTarget"></div>
+</body>
+
+</html>
