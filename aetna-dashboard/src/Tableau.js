@@ -100,4 +100,18 @@ viz.getWorkbook().activateSheetAsync("Sheet 4").then(function (sheet) {
         console.log("Error getting filter information: " + error.toString());
     });
 
-    // Apply the filters to the
+    // Apply the filters to the dashboard
+    var filterOptions = {
+      "Product Type": "Coffee"
+    };
+    dashboard.setActiveWorksheet("Sheet 4");
+    dashboard.applyDashboardFiltersAsync(filterOptions).then(function() {
+      console.log("Filter applied");
+    }).catch(function (error) { console.log("Error applying filter: " + error.toString()); } );
+});
+
+<script src="https://xxx.xxx/javascripts/api/tableau-2.0.0.min.js"></script>
+
+<script src="https://xxx.xxx/javascripts/api/tableau-2.min.js"></script>
+
+<script src="https://xxx.xxx/ie-sp-embed-javascripts/api/tableau-2.0.0.min.js"></script>
