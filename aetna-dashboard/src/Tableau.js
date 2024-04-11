@@ -1,57 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
+pip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainpip install langchainvar worksheet;
 
-<head>
-    <meta charset="UTF-8">
-    <title>Get Data</title>
+viz.getWorkbook().activateSheetAsync("Sheet 4").then(function (sheet) {
+  worksheet = sheet;
+})
+// Single value
+.then(function () {
+  return worksheet.applyFilterAsync("Product Type", "Coffee",
+    tableau.FilterUpdateType.REPLACE);
+})
+// Multiple values
+.then(function () {
+  return worksheet.applyFilterAsync(
+    "Product Type", ["Coffee", "Tea"],
+    tableau.FilterUpdateType.REPLACE);
+})
+// Multiple Values - adding and removing
+.then(function () {
+  return worksheet.applyFilterAsync("Product", ["Lemon", "Mint"],
+    tableau.FilterUpdateType.ADD);
+})
+.then(function () {
+  return worksheet.applyFilterAsync("Product", ["Caffe Latte", "Green Tea"],
+    tableau.FilterUpdateType.REMOVE);
+})
+// All values
+.then(function () {
+  return worksheet.applyFilterAsync("Product Type", "",
+    tableau.FilterUpdateType.ALL);
+})
+// Date Range
+.then(function () {
+  return worksheet.applyRangeFilterAsync("Date", {
+    min: new Date(Date.UTC(2010, 3, 1)),
+    max: new Date(Date.UTC(2010, 12, 31))
+  });
+})
+// Clearing a Filter
+.then(function () {
+  return worksheet.clearFilterAsync("Date");
+})
+// Relative Date
+.then(function () {
+  return worksheet.applyRelativeDateFilterAsync("Date", {
+    anchorDate: new Date(Date.UTC(2011, 5, 1)),
+    periodType: tableau.PeriodType.YEAR,
+    rangeType: tableau.DateRangeType.LASTN,
+    rangeN: 1
+  });
+})
+// Quantitative Filters
+// SUM(Sales) > 2000 and SUM(Sales) < 4000
+.then(function () {
+  return worksheet.applyRangeFilterAsync("SUM(Sales)", {
+    min: 2000,
+    max: 4000
+  });
+})
+// SUM(Sales) > 1000
+.then(function () {
+  return worksheet.applyRangeFilterAsync("SUM(Sales)", {
+    min: 1000
+  });
+})
+// SUM(Sales) < 1000, excluding null values
+.then(function () {
+  return worksheet.applyRangeFilterAsync("SUM(Sales)", {
+    max: 1000,
+    nullOption: tableauSoftware.NullOption.NON_NULL_VALUES
+  });
+})
+// Hierarchical Filters - selecting all on a level
+.then(function () {
+  return worksheet.applyHierarchicalFilterAsync("[Product].[Product Categories]", {
+    levels: [0, 1]
+  }, tableau.FilterUpdateType.ADD);
+}, function (err) { /* ignore errors */ })
+// Hierarchical Filters - adding one item
+.then(function () {
+  return worksheet.applyHierarchicalFilterAsync(
+    "[Product].[Product Categories].[Product Name]",
+    "Accessories.Bike Racks.Hitch Rack - 4-Bike",
+    tableau.FilterUpdateType.REPLACE);
+}, function (err) { /* ignore errors */ })
+// Hierarchical Filters - adding multiple items
+.then(function () {
+  return worksheet.applyHierarchicalFilterAsync(
+  "[Product].[Product Categories].[
 
-    <script type="module">
-        // TableauEventType represents the type of Tableau embedding event that can be listened for.
-        import { TableauEventType } from "https://public.tableau.com/javascripts/api/tableau.embedding.3.latest.js";
 
-        async function handleFirstInteractive(e) {
-            const getDataButton = document.getElementById("getData");
+    https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api_ref_workbooks_and_views.htm#list_custom_views:~:text=REST%20API.-,filter%2Dexpression,-(Optional)%20An%20expression
 
-            // Get data from a specified sheet.
-            getDataButton.onclick = async () => {
-                const sheet = viz.workbook.activeSheet.worksheets.find(sheet => sheet.name === "Storm Map Sheet");
+    // get tableau dashboards filters applied and apply them when i want in js
+    // get tableau dashboards filters applied and apply them when i want in js
+    var activeFilters = dashboard.getFiltersAsync();
+    activeFilters.then(function(filters) {
+      console.log(JSON.stringify(filters));
+    }).catch(function (error) {
+        // Handle error here.
+        console.log("Error getting filter information: " + error.toString());
+    });
 
-                const tables = await sheet.getUnderlyingTablesAsync();
-                const options = {
-                    maxRows: 10, // Max rows to return. Use 0 to return all rows.
-                    ignoreAliases: false,
-                    ignoreSelection: true,
-                    includeAllColumns: false
-                };
-                const underlyingTableData = await sheet.getUnderlyingTableDataAsync(tables[0].id, options);
-
-                // Add data to HTML element.
-                const target = document.getElementById("dataTarget");
-                target.innerHTML = `<h4>Underlying Data:</h4><p>${JSON.stringify(underlyingTableData.data)}</p>`;
-            };
-        }
-
-        const viz = document.getElementById("tableauViz");
-
-        // Event fired when a viz first becomes interactive.
-        viz.addEventListener(TableauEventType.FirstInteractive, handleFirstInteractive);
-    </script>
-</head>
-
-<body>
-    <div>
-        <h1>Get Data Example</h1>
-        <p>Click the "Get Data" button to get underlying data for the viz.</p>
-        <button id="getData">Get Data</button>
-    </div>
-    <div style="width:800px; height:700px;">
-        <!-- Initialization of the Tableau visualization. -->
-        <tableau-viz id="tableauViz" src="https://public.tableau.com/views/RegionalSampleWorkbook/Storms"
-            toolbar="bottom" hide-tabs>
-        </tableau-viz>
-    </div>
-    <!-- Placeholder for the Underlying Data.  -->
-    <div id="dataTarget"></div>
-</body>
-
-</html>
+    // Apply the filters to the
