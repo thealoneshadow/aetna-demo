@@ -110,8 +110,18 @@ viz.getWorkbook().activateSheetAsync("Sheet 4").then(function (sheet) {
     }).catch(function (error) { console.log("Error applying filter: " + error.toString()); } );
 });
 
-<script src="https://xxx.xxx/javascripts/api/tableau-2.0.0.min.js"></script>
-
-<script src="https://xxx.xxx/javascripts/api/tableau-2.min.js"></script>
-
-<script src="https://xxx.xxx/ie-sp-embed-javascripts/api/tableau-2.0.0.min.js"></script>
+function trimString(url) {
+    // Find the index of the last occurrence of '/'
+    const lastSlashIndex = url.lastIndexOf('/');
+    
+    // Find the index of '?' if it exists
+    const questionMarkIndex = url.indexOf('?');
+    
+    // If '?' exists and occurs after the last '/', extract the substring between '/' and '?'
+    if (questionMarkIndex !== -1 && questionMarkIndex > lastSlashIndex) {
+      return url.substring(lastSlashIndex + 1, questionMarkIndex);
+    }
+    
+    // If '?' does not exist or occurs before the last '/', return the substring after the last '/'
+    return url.substring(lastSlashIndex + 1);
+  }
