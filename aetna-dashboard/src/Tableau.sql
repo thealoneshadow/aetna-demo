@@ -75,3 +75,27 @@ CREATE TABLE Controls (
 
 
 
+CREATE TABLE DashboardHistory (
+    DashboardId STRING(255),
+    Name STRING(255),
+    Description STRING(MAX),
+    Use STRING(MAX),
+    Impact STRING(MAX),
+    URL STRING(MAX),
+    UserBase STRING(MAX),
+    KPI ARRAY<STRUCT<Key STRING(255), Value STRING(MAX)>>,
+    Path STRING(MAX),
+    InsertUserId STRING(MAX) NOT NULL,
+    CreateDateTime TIMESTAMP NOT NULL,
+    DeletedDateTime TIMESTAMP NOT NULL,
+) PRIMARY KEY (Id);
+
+CREATE TABLE ContentHistory (
+    ContentId STRING(255),
+    TextContent STRING(MAX),
+    ImageContent BLOB,
+    InsertUserId STRING(MAX) NOT NULL,
+    CreateDateTime TIMESTAMP NOT NULL,
+    EditedDateTime TIMESTAMP NOT NULL,
+) PRIMARY KEY (ContentId);
+
