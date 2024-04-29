@@ -123,3 +123,78 @@ CREATE TABLE FavouriteDashboards (
     CreateDateTime TIMESTAMP NOT NULL,
     UpdateDateTime TIMESTAMP,
 ) PRIMARY KEY (FavouriteDashboardId);
+
+
+import React, { useState } from 'react';
+import { styled } from '@mui/material/styles';
+import Chip from '@mui/material/Chip';
+import Paper from '@mui/material/Paper';
+import TagFacesIcon from '@mui/icons-material/TagFaces';
+import TextField from '@mui/material/TextField';
+
+const ListItem = styled('li')(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
+
+export default function ChipsArray() {
+  const [chipData, setChipData] = useState([
+    { key: 0, label: 'Angular' },
+    { key: 1, label: 'jQuery' },
+    { key: 2, label: 'Polymer' },
+    { key: 3, label: 'React' },
+    { key: 4, label: 'Vue.js' },
+  ]);
+
+  const [newChipLabel, setNewChipLabel] = useState('');
+
+  const handleDelete = (chipToDelete) => () => {
+    setChipData((chips) => chips.filter((chip) => chip.key !== chipToDelete.key));
+  };
+
+  const handleAddChip = () => {
+    if (newChipLabel.trim()) {
+      setChipData((chips) => [
+        ...chips,
+        { key: Date.now(), label: newChipLabel.trim() },
+      ]);
+      setNewChipLabel('');
+    }
+  };
+
+  return (
+    <Paper
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        listStyle: 'none',
+        p: 0.5,
+        m: 0,
+      }}
+      component="ul"
+    >
+      {chipData.map((data) => (
+        <ListItem key={data.key}>
+          <Chip
+            icon={data.label === 'React' ? <TagFacesIcon /> : undefined}
+            label={data.label}
+            onDelete={data.label === 'React' ? undefined : handleDelete(data)}
+          />
+        </ListItem>
+      ))}
+      <ListItem>
+        <TextField
+          label="Add a new chip"
+          variant="outlined"
+          value={newChipLabel}
+          onChange={(e) => setNewChipLabel(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleAddChip();
+            }
+          }}
+        />
+      </ListItem>
+    </Paper>
+  );
+}
