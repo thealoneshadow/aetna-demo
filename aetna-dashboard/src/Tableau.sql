@@ -223,3 +223,11 @@ function App() {
 }
 
 export default App;
+
+
+const isValidURL = (string) => {
+  var res = string.match(
+    /^(https?:\/\/)?([a-z\d.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
+  );
+  return res !== null;
+};
