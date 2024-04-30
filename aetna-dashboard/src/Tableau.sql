@@ -174,3 +174,52 @@ function App() {
 }
 
 export default App;
+import React, { useState } from 'react';
+
+function App() {
+  const [state, setState] = useState({
+    vertical: '',
+    type: '',
+    path: [],
+    url: '',
+    use: '',
+    flow: '',
+    impact: '',
+    usecase: '',
+    kpis: [],
+  });
+
+  const validateState = () => {
+    for (let key in state) {
+      if (key === 'path' && state[key].length === 0) {
+        return false;
+      }
+      if (key === 'kpis') {
+        continue;
+      }
+      if (key === 'url' && !isValidURL(state[key])) {
+        return false;
+      }
+      if (typeof state[key] === 'string' && state[key].trim() === '') {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const isValidURL = (string) => {
+    var res = string.match(
+      /^(https?:\/\/)?(((a-z\d*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i
+    );
+    return res !== null;
+  };
+
+  return (
+    <div>
+      {/* Your component code here */}
+      <button onClick={validateState}>Validate</button>
+    </div>
+  );
+}
+
+export default App;
