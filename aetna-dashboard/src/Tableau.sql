@@ -134,7 +134,6 @@ let result = originalData.reduce((acc, curr) => {
         temp[item.path[i]] = {};
       }
       if (i === item.path.length - 1) {
-        // if this path already exists and it's the last element, combine the dashboardInfos
         if (temp[item.path[i]].dashboardInfo) {
           if (Array.isArray(temp[item.path[i]].dashboardInfo)) {
             temp[item.path[i]].dashboardInfo.push(item.dashboardInfo);
@@ -152,4 +151,26 @@ let result = originalData.reduce((acc, curr) => {
   return acc;
 }, {});
 
-console.log(result);
+
+function createDropdown(data, title) {
+  return (
+    <Dropdown title={title}>
+      {Object.keys(data).map(key => {
+        if (key === 'dashboardInfo') {
+          // Add your function here
+          return null;
+        } else {
+          return createDropdown(data[key], key);
+        }
+      })}
+    </Dropdown>
+  );
+}
+
+function Navbar() {
+  return (
+    <div>
+      {Object.keys(data).map(vertical => createDropdown(data[vertical], vertical))}
+    </div>
+  );
+}
