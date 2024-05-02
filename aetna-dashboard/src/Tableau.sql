@@ -126,25 +126,29 @@ CREATE TABLE FavouriteDashboards (
 
 
 let result = originalData.reduce((acc, curr) => {
-  let temp = acc;
-  for (let i = 0; i < curr.path.length; i++) {
-    if (!temp[curr.path[i]]) {
-      temp[curr.path[i]] = {};
-    }
-    if (i === curr.path.length - 1) {
-      // if this path already exists and it's the last element, combine the dashboardInfos
-      if (temp[curr.path[i]].dashboardInfo) {
-        if (Array.isArray(temp[curr.path[i]].dashboardInfo)) {
-          temp[curr.path[i]].dashboardInfo.push(curr.dashboardInfo);
-        } else {
-          temp[curr.path[i]].dashboardInfo = [temp[curr.path[i]].dashboardInfo, curr.dashboardInfo];
-        }
-      } else {
-        temp[curr.path[i]].dashboardInfo = [curr.dashboardInfo];
+  let vertical = {};
+  curr.data.forEach((item) => {
+    let temp = vertical;
+    for (let i = 0; i < item.path.length; i++) {
+      if (!temp[item.path[i]]) {
+        temp[item.path[i]] = {};
       }
+      if (i === item.path.length - 1) {
+        // if this path already exists and it's the last element, combine the dashboardInfos
+        if (temp[item.path[i]].dashboardInfo) {
+          if (Array.isArray(temp[item.path[i]].dashboardInfo)) {
+            temp[item.path[i]].dashboardInfo.push(item.dashboardInfo);
+          } else {
+            temp[item.path[i]].dashboardInfo = [temp[item.path[i]].dashboardInfo, item.dashboardInfo];
+          }
+        } else {
+          temp[item.path[i]].dashboardInfo = [item.dashboardInfo];
+        }
+      }
+      temp = temp[item.path[i]];
     }
-    temp = temp[curr.path[i]];
-  }
+  });
+  acc[curr.vertical] = vertical;
   return acc;
 }, {});
 
