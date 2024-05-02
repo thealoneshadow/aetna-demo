@@ -125,109 +125,27 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
-import React, { useState } from 'react';
-
-function App() {
-  const [state, setState] = useState({
-    vertical: '',
-    type: '',
-    path: [],
-    url: '',
-    use: '',
-    flow: '',
-    impact: '',
-    usecase: '',
-    kpis: [],
-  });
-
-  const validateState = () => {
-    for (let key in state) {
-      if (key === 'path' && state[key].length === 0) {
-        return false;
-      }
-      if (key === 'kpis') {
-        continue;
-      }
-      if (key === 'url' && !isValidURL(state[key])) {
-        return false;
-      }
-      if (typeof state[key] === 'string' && state[key].trim() === '') {
-        return false;
+let result = originalData.reduce((acc, curr) => {
+  let temp = acc;
+  for (let i = 0; i < curr.path.length; i++) {
+    if (!temp[curr.path[i]]) {
+      temp[curr.path[i]] = {};
+    }
+    if (i === curr.path.length - 1) {
+      // if this path already exists and it's the last element, combine the dashboardInfos
+      if (temp[curr.path[i]].dashboardInfo) {
+        if (Array.isArray(temp[curr.path[i]].dashboardInfo)) {
+          temp[curr.path[i]].dashboardInfo.push(curr.dashboardInfo);
+        } else {
+          temp[curr.path[i]].dashboardInfo = [temp[curr.path[i]].dashboardInfo, curr.dashboardInfo];
+        }
+      } else {
+        temp[curr.path[i]].dashboardInfo = [curr.dashboardInfo];
       }
     }
-    return true;
-  };
+    temp = temp[curr.path[i]];
+  }
+  return acc;
+}, {});
 
-  const isValidURL = (string) => {
-    var res = string.match(
-      /^(https?:\/\/)?(((a-z\d*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i
-    );
-    return res !== null;
-  };
-
-  return (
-    <div>
-      {/* Your component code here */}
-      <button onClick={validateState}>Validate</button>
-    </div>
-  );
-}
-
-export default App;
-import React, { useState } from 'react';
-
-function App() {
-  const [state, setState] = useState({
-    vertical: '',
-    type: '',
-    path: [],
-    url: '',
-    use: '',
-    flow: '',
-    impact: '',
-    usecase: '',
-    kpis: [],
-  });
-
-  const validateState = () => {
-    for (let key in state) {
-      if (key === 'path' && state[key].length === 0) {
-        return false;
-      }
-      if (key === 'kpis') {
-        continue;
-      }
-      if (key === 'url' && !isValidURL(state[key])) {
-        return false;
-      }
-      if (typeof state[key] === 'string' && state[key].trim() === '') {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const isValidURL = (string) => {
-    var res = string.match(
-      /^(https?:\/\/)?(((a-z\d*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?$/i
-    );
-    return res !== null;
-  };
-
-  return (
-    <div>
-      {/* Your component code here */}
-      <button onClick={validateState}>Validate</button>
-    </div>
-  );
-}
-
-export default App;
-
-
-const isValidURL = (string) => {
-  var res = string.match(
-    /^(https?:\/\/)?([a-z\d.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/
-  );
-  return res !== null;
-};
+console.log(result);
