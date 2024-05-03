@@ -125,52 +125,40 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
-let result = originalData.reduce((acc, curr) => {
-  let vertical = {};
-  curr.data.forEach((item) => {
-    let temp = vertical;
-    for (let i = 0; i < item.path.length; i++) {
-      if (!temp[item.path[i]]) {
-        temp[item.path[i]] = {};
-      }
-      if (i === item.path.length - 1) {
-        if (temp[item.path[i]].dashboardInfo) {
-          if (Array.isArray(temp[item.path[i]].dashboardInfo)) {
-            temp[item.path[i]].dashboardInfo.push(item.dashboardInfo);
-          } else {
-            temp[item.path[i]].dashboardInfo = [temp[item.path[i]].dashboardInfo, item.dashboardInfo];
-          }
-        } else {
-          temp[item.path[i]].dashboardInfo = [item.dashboardInfo];
-        }
-      }
-      temp = temp[item.path[i]];
-    }
-  });
-  acc[curr.vertical] = vertical;
-  return acc;
-}, {});
-
-
-function createDropdown(data, title) {
-  return (
-    <Dropdown title={title}>
-      {Object.keys(data).map(key => {
-        if (key === 'dashboardInfo') {
-          // Add your function here
-          return null;
-        } else {
-          return createDropdown(data[key], key);
-        }
-      })}
-    </Dropdown>
-  );
+ <!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Hide the default arrow */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: url('path-to-your-icon.png') no-repeat right center;
+  background-size: contain;
+  padding-right: 15px; /* Space for the icon */
 }
 
-function Navbar() {
-  return (
-    <div>
-      {Object.keys(data).map(vertical => createDropdown(data[vertical], vertical))}
-    </div>
-  );
+/* Add a custom arrow (using a Unicode character) */
+.select-wrapper::after {
+  content: '▼';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
+</style>
+</head>
+<body>
+
+<div class="select-wrapper">
+  <select>
+    <option>Option 1</option>
+    <option>Option 2</option>
+    <option>Option 3</option>
+  </select>
+</div>
+
+</body>
+</html>
