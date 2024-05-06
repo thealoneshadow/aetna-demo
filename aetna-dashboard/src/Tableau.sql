@@ -126,33 +126,30 @@ CREATE TABLE FavouriteDashboards (
 
 
 import React, { useState } from 'react';
-import Checkbox from '@mui/material/Checkbox';
-import FormControlLabel from '@mui/material/FormControlLabel';
 
-function CheckboxList() {
-  const [checked, setChecked] = useState(Array(50).fill(false));
+const App = () => {
+  const data = new Array(50).fill().map((_, i) => ({ id: i, name: `Item ${i}` }));
+  const [isChecked, setIsChecked] = useState(new Array(data.length).fill(false));
 
   const handleChange = (index) => {
-    setChecked(checked.map((value, i) => (i === index ? !value : value)));
+    const newIsChecked = [...isChecked];
+    newIsChecked[index] = !newIsChecked[index];
+    setIsChecked(newIsChecked);
   };
 
   return (
-    <>
-      {checked.map((value, index) => (
-        <FormControlLabel
-          key={index}
-          control={
-            <Checkbox
-              checked={value}
-              onChange={() => handleChange(index)}
-              color="primary"
-            />
-          }
-          label={`Item ${index + 1}`}
-        />
+    <div>
+      {data.map((item, index) => (
+        <div key={item.id} onClick={() => handleChange(index)}>
+          <div style={{ display: 'inline-block' }}>
+            {isChecked[index] ? <img src="checked_image_url" alt="Checked" /> : <img src="unchecked_image_url" alt="Unchecked" />}
+          </div>
+          <p style={{ display: 'inline-block' }}>{item.name}</p>
+        </div>
       ))}
-    </>
+    </div>
   );
-}
+};
 
-export default CheckboxList;
+export default App;
+
