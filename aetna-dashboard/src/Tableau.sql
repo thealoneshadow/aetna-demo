@@ -125,40 +125,34 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
- <!DOCTYPE html>
-<html>
-<head>
-<style>
-/* Hide the default arrow */
-select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: url('path-to-your-icon.png') no-repeat right center;
-  background-size: contain;
-  padding-right: 15px; /* Space for the icon */
+import React, { useState } from 'react';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
+function CheckboxList() {
+  const [checked, setChecked] = useState(Array(50).fill(false));
+
+  const handleChange = (index) => {
+    setChecked(checked.map((value, i) => (i === index ? !value : value)));
+  };
+
+  return (
+    <>
+      {checked.map((value, index) => (
+        <FormControlLabel
+          key={index}
+          control={
+            <Checkbox
+              checked={value}
+              onChange={() => handleChange(index)}
+              color="primary"
+            />
+          }
+          label={`Item ${index + 1}`}
+        />
+      ))}
+    </>
+  );
 }
 
-/* Add a custom arrow (using a Unicode character) */
-.select-wrapper::after {
-  content: '▼';
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-</style>
-</head>
-<body>
-
-<div class="select-wrapper">
-  <select>
-    <option>Option 1</option>
-    <option>Option 2</option>
-    <option>Option 3</option>
-  </select>
-</div>
-
-</body>
-</html>
+export default CheckboxList;
