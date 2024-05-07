@@ -125,31 +125,16 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
-import React, { useState } from 'react';
+let newData = data1.map(obj1 => {
+  // Find the object in data2 that has the same dashboardName
+  let obj2 = data2.find(obj2 => obj2.info.dashboardName === obj1.info.dashboardName);
 
-const App = () => {
-  const data = new Array(50).fill().map((_, i) => ({ id: i, name: `Item ${i}` }));
-  const [isChecked, setIsChecked] = useState(new Array(data.length).fill(false));
+  // If such an object is found, replace obj1's info with obj2's info
+  if (obj2) {
+    return { ...obj1, info: obj2.info };
+  }
 
-  const handleChange = (index) => {
-    const newIsChecked = [...isChecked];
-    newIsChecked[index] = !newIsChecked[index];
-    setIsChecked(newIsChecked);
-  };
-
-  return (
-    <div>
-      {data.map((item, index) => (
-        <div key={item.id} onClick={() => handleChange(index)}>
-          <div style={{ display: 'inline-block' }}>
-            {isChecked[index] ? <img src="checked_image_url" alt="Checked" /> : <img src="unchecked_image_url" alt="Unchecked" />}
-          </div>
-          <p style={{ display: 'inline-block' }}>{item.name}</p>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default App;
+  // If no such object is found, return obj1 as is
+  return obj1;
+});
 
