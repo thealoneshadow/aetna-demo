@@ -125,16 +125,68 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
-let newData = data1.map(obj1 => {
-  // Find the object in data2 that has the same dashboardName
-  let obj2 = data2.find(obj2 => obj2.info.dashboardName === obj1.info.dashboardName);
+<!-- HTML -->
+<div class="custom-select" style="width:200px;">
+  <select>
+    <option value="0">Select car:</option>
+    <option value="1">Audi</option>
+    <option value="2">BMW</option>
+    <!-- ... more options -->
+  </select>
+</div>
 
-  // If such an object is found, replace obj1's info with obj2's info
-  if (obj2) {
-    return { ...obj1, info: obj2.info };
-  }
+<!-- CSS -->
+<style>
+.custom-select {
+  position: relative;
+  font-family: Arial;
+}
 
-  // If no such object is found, return obj1 as is
-  return obj1;
-});
+.custom-select select {
+  display: none; /* Hide original SELECT element */
+}
+
+.select-selected {
+  background-color: DodgerBlue;
+}
+
+.select-selected:after {
+  position: absolute;
+  content: "";
+  top: 14px;
+  right: 10px;
+  border: 6px solid transparent;
+  border-color: #fff transparent transparent transparent;
+}
+
+.select-selected.select-arrow-active:after {
+  border-color: transparent transparent #fff transparent;
+  top: 7px;
+}
+
+.select-items div,.select-selected {
+  color: #ffffff;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
+  cursor: pointer;
+}
+
+.select-items {
+  position: absolute;
+  background-color: DodgerBlue;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+.select-hide {
+  display: none;
+}
+
+.select-items div:hover, .same-as-selected {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+</style>
 
