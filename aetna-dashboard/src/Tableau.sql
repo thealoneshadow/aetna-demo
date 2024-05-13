@@ -125,68 +125,35 @@ CREATE TABLE FavouriteDashboards (
 ) PRIMARY KEY (FavouriteDashboardId);
 
 
-<!-- HTML -->
-<div class="custom-select" style="width:200px;">
-  <select>
-    <option value="0">Select car:</option>
-    <option value="1">Audi</option>
-    <option value="2">BMW</option>
-    <!-- ... more options -->
-  </select>
-</div>
+const axios = require('axios');
+const qs = require('querystring');
 
-<!-- CSS -->
-<style>
-.custom-select {
-  position: relative;
-  font-family: Arial;
+async function getToken() {
+  const tokenEndpoint = 'https://example.com/oauth/token'; // Replace with your token endpoint
+  const clientId = 'your_client_id'; // Replace with your client ID
+  const clientSecret = 'your_client_secret'; // Replace with your client secret
+
+  const config = {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    auth: {
+      username: clientId,
+      password: clientSecret
+    }
+  };
+
+  const data = qs.stringify({
+    grant_type: 'client_credentials'
+  });
+
+  try {
+    const response = await axios.post(tokenEndpoint, data, config);
+    return response.data.access_token;
+  } catch (error) {
+    console.error('Error getting token:', error);
+  }
 }
 
-.custom-select select {
-  display: none; /* Hide original SELECT element */
-}
-
-.select-selected {
-  background-color: DodgerBlue;
-}
-
-.select-selected:after {
-  position: absolute;
-  content: "";
-  top: 14px;
-  right: 10px;
-  border: 6px solid transparent;
-  border-color: #fff transparent transparent transparent;
-}
-
-.select-selected.select-arrow-active:after {
-  border-color: transparent transparent #fff transparent;
-  top: 7px;
-}
-
-.select-items div,.select-selected {
-  color: #ffffff;
-  padding: 8px 16px;
-  border: 1px solid transparent;
-  border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
-  cursor: pointer;
-}
-
-.select-items {
-  position: absolute;
-  background-color: DodgerBlue;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 99;
-}
-
-.select-hide {
-  display: none;
-}
-
-.select-items div:hover, .same-as-selected {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-</style>
+getToken().then(token => console.log('Token:', token));
 
