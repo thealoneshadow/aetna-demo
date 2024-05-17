@@ -7,7 +7,7 @@ CREATE TABLE DashboardInfoTable (
   URL STRING(MAX),
   Usecase STRING(MAX),
   Path STRING(MAX),
-  Disabled BOOLEAN,
+  Disabled BOOL,
   UserId STRING(255) NOT NULL,
   UpdateUserId STRING(255),
   CreateDateTime TIMESTAMP NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE DashboardHistory (
     URL STRING(MAX),
     Usecase STRING(MAX),
     Path STRING(MAX),
-    Disabled BOOLEAN,
+    Disabled BOOL,
     UserId STRING(MAX) NOT NULL,
     CreateDateTime TIMESTAMP NOT NULL,
     DeletedDateTime TIMESTAMP NOT NULL,
@@ -179,59 +179,17 @@ DROP TABLE KPI;
 DROP TABLE DashboardInfoTable;
 
 
-from flask import Flask, redirect, url_for, session
-from authlib.integrations.flask_client import OAuth
-from authlib.integrations.requests_client import OAuth2Session
-import os
+-- Insert into DashboardInfoTable
+INSERT INTO DashboardInfoTable (DashboardId, Name, Description, LastRefreshDate, RefreshFrequency, URL, Usecase, Path, Disabled, UserId, UpdateUserId, CreateDateTime, UpdateDateTime)
+VALUES ('D1', 'Dashboard1', 'This is a description', '2022-01-01', 'Daily', 'http://example.com', 'Use case 1', '/path/to/dashboard', FALSE, 'User1', 'User2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-# Initialize Flask app
-app = Flask(__name__)
-app.secret_key = 'random_secret_key'  # Replace with a secure secret key
+-- Insert into KPI
+INSERT INTO KPI (KPIId, DashboardId, Name, Description)
+VALUES ('K1', 'D1', 'KPI1', 'This is a KPI description');
 
-# OAuth configuration
-oauth = OAuth(app)
-oauth.register(
-    name='google',
-    client_id=os.getenv('GOOGLE_CLIENT_ID'),
-    client_secret=os.getenv('GOOGLE_CLIENT_SECRET'),
-    authorize_url='https://accounts.google.com/o/oauth2/auth',
-    authorize_params=None,
-    access_token_url='https://accounts.google.com/o/oauth2/token',
-    access_token_params=None,
-    refresh_token_url=None,
-    redirect_uri=os.getenv('GOOGLE_REDIRECT_URI'),
-    client_kwargs={'scope': 'openid profile email'},
-)
+-- Insert into Dimension
+INSERT INTO Dimension (DimensionId, DashboardId, Name, Description)
+VALUES ('Dim1', 'D1', 'Dimension1', 'This is a dimension description');
 
-# Define the login route
-@app.route('/login')
-def login():
-    google = oauth.create_client('google')
-    redirect_uri = url_for('authorize', _external=True)
-    return google.authorize_redirect(redirect_uri)
+-- Similarly, you can create INSERT statements for other tables.
 
-# Define the callback route
-@app.route('/authorize')
-def authorize():
-    google = oauth.create_client('google')
-    token = google.authorize_access_token()
-    user_info = google.parse_id_token(token)
-    session['user'] = user_info
-    return redirect('/protected')
-
-# Define a protected route
-@app.route('/protected')
-def protected():
-    user = session.get('user')
-    if user:
-        return f'Hello, {user["name"]}!'
-    return redirect(url_for('login'))
-
-# Define a logout route
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect('/')
-
-if __name__ == '__main__':
-    app.run(debug=True)
