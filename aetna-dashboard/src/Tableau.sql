@@ -214,3 +214,25 @@ sharepoint.login(function(err) {
     });
   });
 });
+
+
+var sharepoint = require('sharepointconnector')({
+  username: 'someusername',
+  password: 'somepassword',
+  type: 'ntlm', // Authentication type - current valid values: ntlm, basic, online, onlinesaml
+  url: 'https://sharepointHostname.com'
+});
+
+sharepoint.login(function(err) {
+  if (err) {
+    return console.error(err);
+  }
+  // Once logged in, we can list the "lists" within SharePoint
+  sharepoint.lists.list(function(err, listRes) {
+    var aList = listRes[0];
+    // We can pick a particular list, and read it. This also gives us the list's Items [] and Fields []
+    sharepoint.lists.read(aList.Id, function(err, listRead) {
+      console.log(singleResult);
+    });
+  });
+});
