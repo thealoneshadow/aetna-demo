@@ -1,262 +1,372 @@
-CREATE TABLE DashboardInfoTable (
-  DashboardId STRING(255),
-  Name STRING(255),
-  Description STRING(MAX),
-  LastRefreshDate STRING(MAX),
-  RefreshFrequency STRING(MAX),
-  URL STRING(MAX),
-  Usecase STRING(MAX),
-  Path STRING(MAX),
-  Disabled BOOL,
-  UserId STRING(255) NOT NULL,
-  UpdateUserId STRING(255),
-  CreateDateTime TIMESTAMP NOT NULL,
-  UpdateDateTime TIMESTAMP
-) PRIMARY KEY (Name);
-
-CREATE TABLE KPI (
-  KPIId STRING(255),
-  DashboardId STRING(255),
-  Name STRING(255),
-  Description STRING(MAX)
-) PRIMARY KEY (KPIId);
-
-CREATE TABLE Dimension (
-  DimensionId STRING(255),
-  DashboardId STRING(255),
-  Name STRING(255),
-  Description STRING(MAX)
-) PRIMARY KEY (DimensionId);
-
-
-CREATE TABLE ContentTable (
-    ContentId STRING(255),
-    TextId STRING(255),
-    TextContent STRING(MAX),
-    ContentImage STRING(MAX),
-    ContentDate STRING(MAX),
-    ContentOwnerName STRING(MAX),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (ContentId);
-
-CREATE TABLE SubContentTable (
-    SubContentId STRING(255),
-    ContentId STRING(255),
-    TextId STRING(255),
-    TextContent STRING(MAX),
-    ContentImage STRING(MAX),
-    ContentDate STRING(MAX),
-    ContentOwnerName STRING(MAX),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (SubContentId);
-
-CREATE TABLE ImageContent (
-    ImageId STRING(255),
-    ImageFieldId STRING(255),
-    Image BLOB,
-    ContentId STRING(255),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (ImageId);
-
-CREATE TABLE DashboardHistory (
-    DashboardId STRING(255),
-    Name STRING(255),
-    Description STRING(MAX),
-    LastRefreshDate STRING(MAX),
-    RefreshFrequency STRING(MAX),
-    URL STRING(MAX),
-    Usecase STRING(MAX),
-    Path STRING(MAX),
-    Disabled BOOL,
-    UserId STRING(MAX) NOT NULL,
-    CreateDateTime TIMESTAMP NOT NULL,
-    DeletedDateTime TIMESTAMP NOT NULL,
-) PRIMARY KEY (Id);
-
-
-CREATE TABLE ContentHistoryTable (
-    ContentId STRING(255),
-    TextId STRING(255),
-    TextContent STRING(MAX),
-    ContentImage STRING(MAX),
-    ContentDate STRING(MAX),
-    ContentOwnerName STRING(MAX),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
+CREATE TABLE dashboardInfoTable (
+  id STRING(255),
+  name STRING(255),
+  description STRING(MAX),
+  lastRefreshDate STRING(MAX),
+  refreshFrequency STRING(MAX),
+  url STRING(MAX),
+  usecase STRING(MAX),
+  path STRING(MAX),
+  disabled BOOL,
+  created_user STRING(255) NOT NULL,
+  updated_user STRING(255),
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP
 ) PRIMARY KEY (id);
 
-CREATE TABLE SubContentHistoryTable (
-    SubContentId STRING(255),
-    ContentId STRING(255),
-    TextId STRING(255),
-    TextContent STRING(MAX),
-    ContentImage STRING(MAX),
-    ContentDate STRING(MAX),
-    ContentOwnerName STRING(MAX),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
+CREATE TABLE kpi (
+  id STRING(255),
+  dashboardId STRING(255),
+  name STRING(255),
+  description STRING(MAX),
+  created_user STRING(255) NOT NULL,
+  updated_user STRING(255),
+  created_at TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP
+) PRIMARY KEY (id);
+
+CREATE TABLE dimension (
+  id STRING(255),
+  dashboardId STRING(255),
+  name STRING(255),
+  description STRING(MAX)
+) PRIMARY KEY (id);
+
+
+CREATE TABLE contentTable (
+    id STRING(255),
+    textId STRING(255),
+    textContent STRING(MAX),
+    contentImage STRING(MAX),
+    contentDate STRING(MAX),
+    contentOwnername STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE subContentTable (
+    id STRING(255),
+    contentId STRING(255),
+    textId STRING(255),
+    textContent STRING(MAX),
+    contentImage STRING(MAX),
+    contentDate STRING(MAX),
+    contentOwnername STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE imageContent (
+    id STRING(255),
+    imageFieldId STRING(255),
+    image BLOB,
+    contentId STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE dashboardHistory (
+    id STRING(255),
+    name STRING(255),
+    description STRING(MAX),
+    lastRefreshDate STRING(MAX),
+    refreshFrequency STRING(MAX),
+    url STRING(MAX),
+    usecase STRING(MAX),
+    path STRING(MAX),
+    disabled BOOL,
+    created_user STRING(MAX) NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    deletedDateTime TIMESTAMP NOT NULL,
+) PRIMARY KEY (id);
+
+
+CREATE TABLE contentHistoryTable (
+    id STRING(255),
+    textId STRING(255),
+    textContent STRING(MAX),
+    contentImage STRING(MAX),
+    contentDate STRING(MAX),
+    contentOwnername STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE subContentHistoryTable (
+    id STRING(255),
+    contentId STRING(255),
+    textId STRING(255),
+    textContent STRING(MAX),
+    contentImage STRING(MAX),
+    contentDate STRING(MAX),
+    contentOwnername STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
 ) PRIMARY KEY (SubContentId);
 
 
-CREATE TABLE Folders (
-    FolderId STRING(255),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (FolderId);
+CREATE TABLE folders (
+    id STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
 
-CREATE TABLE FavouriteDashboards (
-    FavouriteDashboardId STRING(255),
-    Name STRING(255),
-    URL STRING(MAX),
-    FolderId STRING(255),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (FavouriteDashboardId);
+CREATE TABLE favouriteDashboards (
+    id STRING(255),
+    name STRING(255),
+    url STRING(MAX),
+    folderId STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
 
-CREATE TABLE FavouriteDashboardsHistory (
-    FavouriteDashboardId STRING(255),
-    Name STRING(255),
-    URL STRING(MAX),
-    FolderId STRING(255),
-    UserId STRING(255) NOT NULL,
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (FavouriteDashboardId);
+CREATE TABLE favouriteDashboardsHistory (
+    id STRING(255),
+    name STRING(255),
+    url STRING(MAX),
+    folderId STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
 
-CREATE TABLE UserDetails (
-    UserId STRING(255),
-    Name STRING(255),
+CREATE TABLE userDetails (
+    created_user STRING(255),
+    name STRING(255),
     Role STRING(MAX),
     VerticalsAllowed STRING(255),
-    UpdateUserId STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-    UpdateDateTime TIMESTAMP,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
 ) PRIMARY KEY (FavouriteDashboardId);
 
-CREATE TABLE Vertical (
-    VerticalId STRING(255),
-    Name STRING(255),
-    CreateDateTime TIMESTAMP NOT NULL,
-    UpdateDateTime TIMESTAMP,
-    UpdateDateTime TIMESTAMP,
-) PRIMARY KEY (FavouriteDashboardId); 
+CREATE TABLE vertical (
+    id STRING(255),
+    name STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id); 
+
+CREATE TABLE seeMorePage (
+    id STRING(255),
+    heading STRING(255),
+    vertical STRING(255),
+    description STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE seeMorePageSubContent (
+    id STRING(255),
+    heading STRING(255),
+    seeMorePageId STRING(255),
+    url STRING(max),
+    description STRING(MAX),
+    owner STRING(255),
+    date STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE seeMorePageHistory (
+    id STRING(255),
+    heading STRING(255),
+    vertical STRING(255),
+    description STRING(MAX),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
+CREATE TABLE seeMorePageSubContentHistory (
+    id STRING(255),
+    heading STRING(255),
+    seeMorePageId STRING(255),
+    url STRING(max),
+    description STRING(MAX),
+    owner STRING(255),
+    date STRING(255),
+    created_user STRING(255) NOT NULL,
+    updated_user STRING(255),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+) PRIMARY KEY (id);
+
 
 -- For verticals Table Garima want to change name of vertical in future
 
 
-DROP TABLE Vertical;
-DROP TABLE UserDetails;
-DROP TABLE FavouriteDashboardsHistory;
-DROP TABLE FavouriteDashboards;
-DROP TABLE Folders;
-DROP TABLE SubContentHistoryTable;
-DROP TABLE ContentHistoryTable;
-DROP TABLE DashboardHistory;
-DROP TABLE ImageContent;
-DROP TABLE SubContentTable;
-DROP TABLE ContentTable;
-DROP TABLE Dimension;
-DROP TABLE KPI;
-DROP TABLE DashboardInfoTable;
+DROP TABLE vertical;
+DROP TABLE userDetails;
+DROP TABLE favouriteDashboardsHistory;
+DROP TABLE favouriteDashboards;
+DROP TABLE folders;
+DROP TABLE subContentHistoryTable;
+DROP TABLE contentHistoryTable;
+DROP TABLE dashboardHistory;
+DROP TABLE imageContent;
+DROP TABLE subContentTable;
+DROP TABLE contentTable;
+DROP TABLE dimension;
+DROP TABLE kpi;
+DROP TABLE dashboardInfoTable;
+DROP TABLE seeMorePage;
+DROP TABLE seeMorePageHistory;
+DROP TABLE seeMorePageSubContent;
+DROP TABLE seeMorePageSubContentHistory;
+
+-- Insert into dashboardInfoTable
+INSERT INTO dashboardInfoTable (
+    id, name, description, lastRefreshDate, refreshFrequency, url, usecase, path, disabled, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'Sales Dashboard', 'Dashboard for sales metrics', '2024-05-20', 'Daily', 'http://example.com/sales', 'Sales Analysis', '/dashboards/sales', false, 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into kpi
+INSERT INTO kpi (
+    id, dashboardId, name, description, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', '1', 'Total Sales', 'Total sales over time', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into dimension
+INSERT INTO dimension (
+    id, dashboardId, name, description
+) VALUES (
+    '1', '1', 'Region', 'Geographical regions'
+);
+
+-- Insert into contentTable
+INSERT INTO contentTable (
+    id, textId, textContent, contentImage, contentDate, contentOwnername, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'txt001', 'Sample text content', 'image.png', '2024-05-20', 'John Doe', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into subContentTable
+INSERT INTO subContentTable (
+    id, contentId, textId, textContent, contentImage, contentDate, contentOwnername, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', '1', 'txt002', 'Sub content text', 'subimage.png', '2024-05-20', 'Jane Doe', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into imageContent
+INSERT INTO imageContent (
+    id, imageFieldId, image, contentId, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'img001', 'sample_image_blob_data', '1', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into dashboardHistory
+INSERT INTO dashboardHistory (
+    id, name, description, lastRefreshDate, refreshFrequency, url, usecase, path, disabled, created_user, created_at, deletedDateTime
+) VALUES (
+    '1', 'Sales Dashboard', 'Historical record of sales dashboard', '2024-05-19', 'Daily', 'http://example.com/sales', 'Sales Analysis', '/dashboards/sales', false, 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into contentHistoryTable
+INSERT INTO contentHistoryTable (
+    id, textId, textContent, contentImage, contentDate, contentOwnername, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'txt001', 'Historical text content', 'hist_image.png', '2024-05-19', 'John Doe', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into subContentHistoryTable
+INSERT INTO subContentHistoryTable (
+    id, contentId, textId, textContent, contentImage, contentDate, contentOwnername, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', '1', 'txt002', 'Historical sub content', 'hist_subimage.png', '2024-05-19', 'Jane Doe', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into folders
+INSERT INTO folders (
+    id, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into favouriteDashboards
+INSERT INTO favouriteDashboards (
+    id, name, url, folderId, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'Favourite Sales Dashboard', 'http://example.com/sales', '1', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into favouriteDashboardsHistory
+INSERT INTO favouriteDashboardsHistory (
+    id, name, url, folderId, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'Favourite Sales Dashboard', 'http://example.com/sales', '1', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into userDetails
+INSERT INTO userDetails (
+    created_user, name, Role, VerticalsAllowed, updated_user, created_at, updated_at
+) VALUES (
+    'admin', 'Admin User', 'Administrator', 'All', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into vertical
+INSERT INTO vertical (
+    id, name, created_at, updated_at
+) VALUES (
+    '1', 'Sales', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into seeMorePage
+INSERT INTO seeMorePage (
+    id, heading, vertical, description, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'More on Sales', 'Sales', 'Detailed sales information', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into seeMorePageSubContent
+INSERT INTO seeMorePageSubContent (
+    id, heading, seeMorePageId, url, description, owner, date, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'Sales Detail', '1', 'http://example.com/details', 'In-depth sales detail', 'John Doe', '2024-05-20', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into seeMorePageHistory
+INSERT INTO seeMorePageHistory (
+    id, heading, vertical, description, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'More on Sales', 'Sales', 'Historical sales information', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+-- Insert into seeMorePageSubContentHistory
+INSERT INTO seeMorePageSubContentHistory (
+    id, heading, seeMorePageId, url, description, owner, date, created_user, updated_user, created_at, updated_at
+) VALUES (
+    '1', 'Sales Detail', '1', 'http://example.com/details', 'Historical in-depth sales detail', 'John Doe', '2024-05-19', 'admin', 'admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
 
 
--- Insert into DashboardInfoTable
-INSERT INTO DashboardInfoTable (DashboardId, Name, Description, LastRefreshDate, RefreshFrequency, URL, Usecase, Path, Disabled, UserId, UpdateUserId, CreateDateTime, UpdateDateTime)
-VALUES ('D1', 'Dashboard1', 'This is a description', '2022-01-01', 'Daily', 'http://example.com', 'Use case 1', '/path/to/dashboard', FALSE, 'User1', 'User2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- Insert into KPI
-INSERT INTO KPI (KPIId, DashboardId, Name, Description)
-VALUES ('K1', 'D1', 'KPI1', 'This is a KPI description');
 
--- Insert into Dimension
-INSERT INTO Dimension (DimensionId, DashboardId, Name, Description)
-VALUES ('Dim1', 'D1', 'Dimension1', 'This is a dimension description');
 
 -- Similarly, you can create INSERT statements for other tables.
 
 
 var sharepoint = require('sharepointconnector')({
-  username: 'someusername',
-  password: 'somepassword',
-  type: 'ntlm', // Authentication type - current valid values: ntlm, basic, online, onlinesaml
-  url: 'https://sharepointHostname.com'
-});
-
-sharepoint.login(function(err) {
-  if (err) {
-    return console.error(err);
-  }
-  // Once logged in, we can list the "lists" within SharePoint
-  sharepoint.lists.list(function(err, listRes) {
-    var aList = listRes[0];
-    // We can pick a particular list, and read it. This also gives us the list's Items [] and Fields []
-    sharepoint.lists.read(aList.Id, function(err, listRead) {
-      console.log(singleResult);
-    });
-  });
-});
-
-g
-import React, { useEffect, useState } from 'react';
-import sharepointconnector from 'sharepointconnector';
-
-const SharePointComponent = () => {
-  const [lists, setLists] = useState([]);
-
-  useEffect(() => {
-    const sharepoint = sharepointconnector({
-      username: 'someusername',
-      password: 'somepassword',
-      type: 'ntlm', // Authentication type - current valid values: ntlm, basic, online, onlinesaml
-      url: 'https://sharepointHostname.com'
-    });
-
-    sharepoint.login((err) => {
-      if (err) {
-        console.error(err);
-        return;
-      }
-
-      // Once logged in, we can list the "lists" within SharePoint
-      sharepoint.lists.list((err, listRes) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-
-        setLists(listRes);
-      });
-    });
-  }, []);
-
-  return (
-    <div>
-      <h1>SharePoint Lists</h1>
-      {lists.map((list) => (
-        <div key={list.Id}>{list.Title}</div>
-      ))}
-    </div>
-  );
-};
-
-export default SharePointComponent;
 
