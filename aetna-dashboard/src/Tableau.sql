@@ -366,80 +366,59 @@ INSERT INTO seeMorePageSubContentHistory (
 
 
 import React, { useState } from 'react';
-import './Table.css'; // Assuming you create a separate CSS file for styles
+import './CardList.css'; // Assuming you create and import this CSS file
 
-const SideBySideTable = () => {
-  const [names, setNames] = useState(['Name 1', 'Name 2', 'Name 3']);
-  const [descriptions, setDescriptions] = useState(['Description 1', 'Description 2', 'Description 3']);
+const CardList = () => {
+  const [names, setNames] = useState(['Name 1', 'Name 2', 'Name 3', 'Name 4']);
+  const [descriptions, setDescriptions] = useState(['Description 1', 'Description 2', 'Description 3', 'Description 4']);
 
   return (
-    <div className="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Name</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {names.map((name, index) => (
-            <tr key={index}>
-              <td>{name}</td>
-              <td>{descriptions[index]}</td>
-              <td>{names[index + names.length / 2]}</td>
-              <td>{descriptions[index + descriptions.length / 2]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="card-list-container">
+      {names.map((name, index) => (
+        <div key={index} className="card">
+          <div className="name">{name}</div>
+          <div className="description">{descriptions[index]}</div>
+          {names[index + names.length / 2] && (
+            <>
+              <div className="name">{names[index + names.length / 2]}</div>
+              <div className="description">{descriptions[index + descriptions.length / 2]}</div>
+            </>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
 
-export default SideBySideTable;
+export default CardList;
 
 
-.table-container {
+
+.card-list-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  margin: 20px;
+  gap: 20px;
+  padding: 20px;
 }
 
-table {
-  width: 80%;
-  border-spacing: 0;
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid #ddd;
   border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid #ddd;
+  padding: 20px;
+  width: 45%;
+  box-sizing: border-box;
 }
 
-th, td {
-  padding: 8px;
-  text-align: left;
-  border: 1px solid #ddd;
+.name, .description {
+  margin-bottom: 10px;
 }
 
-th {
-  background-color: #f2f2f2;
-}
-
-tbody tr:first-child td:first-child {
-  border-top-left-radius: 20px;
-}
-
-tbody tr:first-child td:last-child {
-  border-top-right-radius: 20px;
-}
-
-tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 20px;
-}
-
-tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 20px;
+.card:nth-child(2n) {
+  margin-right: 0;
 }
 
 
