@@ -410,15 +410,16 @@ export default SideBySideTable;
 
 table {
   width: 80%;
-  border-collapse: collapse;
+  border-spacing: 0;
   border-radius: 20px;
-  overflow: hidden; /* Ensures the border radius is applied properly */
+  overflow: hidden;
+  border: 1px solid #ddd;
 }
 
 th, td {
-  border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
+  border: 1px solid #ddd;
 }
 
 th {
@@ -440,4 +441,5 @@ tbody tr:last-child td:first-child {
 tbody tr:last-child td:last-child {
   border-bottom-right-radius: 20px;
 }
+
 
