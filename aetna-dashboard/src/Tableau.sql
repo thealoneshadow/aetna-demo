@@ -366,7 +366,7 @@ INSERT INTO seeMorePageSubContentHistory (
 
 
 import React, { useState } from 'react';
-import './CardList.css'; // Assuming you create and import this CSS file
+import './CardList.css'; // Create and import this CSS file
 
 const CardList = () => {
   const [names, setNames] = useState(['Name 1', 'Name 2', 'Name 3', 'Name 4']);
@@ -374,18 +374,14 @@ const CardList = () => {
 
   return (
     <div className="card-list-container">
-      {names.map((name, index) => (
-        <div key={index} className="card">
-          <div className="name">{name}</div>
-          <div className="description">{descriptions[index]}</div>
-          {names[index + names.length / 2] && (
-            <>
-              <div className="name">{names[index + names.length / 2]}</div>
-              <div className="description">{descriptions[index + descriptions.length / 2]}</div>
-            </>
-          )}
-        </div>
-      ))}
+      <div className="card">
+        {names.map((name, index) => (
+          <div key={index} className="name-description-pair">
+            <div className="name">{name}</div>
+            <div className="description">{descriptions[index]}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -401,6 +397,7 @@ export default CardList;
 
 .card {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   border: 1px solid #ddd;
   border-radius: 20px;
@@ -408,28 +405,25 @@ export default CardList;
   max-width: 80%;
 }
 
-.name, .description {
-  margin-right: 20px;
-  margin-bottom: 10px;
-  white-space: nowrap;
+.name-description-pair {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
 }
 
-.card > .name, .card > .description {
-  flex: 1 1 auto;
+.name {
+  width: 30px;
+  flex-shrink: 0;
+  margin-right: 10px;
 }
 
-.card > .name:last-of-type, .card > .description:last-of-type {
-  margin-right: 0;
+.description {
+  width: 100px;
+  flex-shrink: 0;
+  margin-right: 10px;
 }
 
-
-table tr:last-child td:first-child {
-    border: 2px solid orange;
-    border-bottom-left-radius: 10px;
+.name-description-pair:last-child {
+  border-bottom: none;
 }
-    
-table tr:last-child td:last-child {
-    border: 2px solid green;
-    border-bottom-right-radius: 10px;
-}
-
