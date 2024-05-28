@@ -411,6 +411,8 @@ export default SideBySideTable;
 table {
   width: 80%;
   border-collapse: collapse;
+  border-radius: 20px;
+  overflow: hidden; /* Ensures the border radius is applied properly */
 }
 
 th, td {
@@ -421,5 +423,21 @@ th, td {
 
 th {
   background-color: #f2f2f2;
+}
+
+tbody tr:first-child td:first-child {
+  border-top-left-radius: 20px;
+}
+
+tbody tr:first-child td:last-child {
+  border-top-right-radius: 20px;
+}
+
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 20px;
+}
+
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 20px;
 }
 
