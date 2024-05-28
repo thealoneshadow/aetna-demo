@@ -365,8 +365,61 @@ INSERT INTO seeMorePageSubContentHistory (
 
 
 
--- Similarly, you can create INSERT statements for other tables.
+import React, { useState } from 'react';
+import './Table.css'; // Assuming you create a separate CSS file for styles
+
+const SideBySideTable = () => {
+  const [names, setNames] = useState(['Name 1', 'Name 2', 'Name 3']);
+  const [descriptions, setDescriptions] = useState(['Description 1', 'Description 2', 'Description 3']);
+
+  return (
+    <div className="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Name</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {names.map((name, index) => (
+            <tr key={index}>
+              <td>{name}</td>
+              <td>{descriptions[index]}</td>
+              <td>{names[index + names.length / 2]}</td>
+              <td>{descriptions[index + descriptions.length / 2]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default SideBySideTable;
 
 
-var sharepoint = require('sharepointconnector')({
+.table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+}
+
+table {
+  width: 80%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+}
 
