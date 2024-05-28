@@ -393,31 +393,32 @@ const CardList = () => {
 export default CardList;
 
 
-
 .card-list-container {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
   padding: 20px;
 }
 
 .card {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-wrap: wrap;
   border: 1px solid #ddd;
   border-radius: 20px;
   padding: 20px;
-  width: 45%;
-  box-sizing: border-box;
+  max-width: 80%;
 }
 
 .name, .description {
+  margin-right: 20px;
   margin-bottom: 10px;
+  white-space: nowrap;
 }
 
-.card:nth-child(2n) {
+.card > .name, .card > .description {
+  flex: 1 1 auto;
+}
+
+.card > .name:last-of-type, .card > .description:last-of-type {
   margin-right: 0;
 }
 
