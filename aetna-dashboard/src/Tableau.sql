@@ -364,66 +364,35 @@ INSERT INTO seeMorePageSubContentHistory (
 
 
 
+const axios = require('axios');
+const qs = require('qs');
 
-import React, { useState } from 'react';
-import './CardList.css'; // Create and import this CSS file
+const tokenUrl = "<Your Token URL>";
+const clientSecret = "<Your Client Secret>";
+const grantType = "authorization_code";
+const code = "<The Authorization Code You Received>";
 
-const CardList = () => {
-  const [names, setNames] = useState(['Name 1', 'Name 2', 'Name 3', 'Name 4']);
-  const [descriptions, setDescriptions] = useState(['Description 1', 'Description 2', 'Description 3', 'Description 4']);
+let data = qs.stringify({
+  'grant_type': grantType,
+  'client_id': clientId,
+  'client_secret': clientSecret,
+  'redirect_uri': callbackUrl,
+  'code': code
+});
 
-  return (
-    <div className="card-list-container">
-      <div className="card">
-        {names.map((name, index) => (
-          <div key={index} className="name-description-pair">
-            <div className="name">{name}</div>
-            <div className="description">{descriptions[index]}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+let config = {
+  method: 'post',
+  url: tokenUrl,
+  headers: { 
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  data : data
 };
 
-export default CardList;
-
-
-.card-list-container {
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
-
-.card {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  padding: 20px;
-  max-width: 80%;
-}
-
-.name-description-pair {
-  display: flex;
-  width: 100%;
-  border-bottom: 1px solid #ddd;
-  padding: 10px 0;
-}
-
-.name {
-  width: 30px;
-  flex-shrink: 0;
-  margin-right: 10px;
-}
-
-.description {
-  width: 100px;
-  flex-shrink: 0;
-  margin-right: 10px;
-}
-
-.name-description-pair:last-child {
-  border-bottom: none;
-}
+axios(config)
+.then(function (response) {
+  console.log(JSON.stringify(response.data));
+})
+.catch(function (error) {
+  console.log(error);
+});
