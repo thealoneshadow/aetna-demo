@@ -396,3 +396,34 @@ axios(config)
 .catch(function (error) {
   console.log(error);
 });
+
+
+import pyodbc
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    # Create a connection
+    conn_str = (
+        r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
+        r'DBQ=path_to_your_database.accdb;'  # replace with your path
+    )
+    cnxn = pyodbc.connect(conn_str)
+    cursor = cnxn.cursor()
+
+    # Execute a query
+    cursor.execute("SELECT * FROM YourTable")  # replace with your table name
+
+    # Fetch the results
+    rows = cursor.fetchall()
+
+    # Do something with the results
+    for row in rows:
+        print(row)
+
+    return "Check your console for the results"
+
+if __name__ == '__main__':
+    app.run(debug=True)
