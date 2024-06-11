@@ -415,63 +415,22 @@ axios(config)
   opacity: 1;
 }
 
+from flask import Flask, send_file
+import pandas as pd
+import os
+from openpyxl import load_workbook
 
-function ImageWithTooltip() {
-  const [isHovering, setIsHovering] = useState(false);
+app = Flask(__name__)
 
-  const handleMouseOver = () => {
-    setIsHovering(true);
-  };
+@app.route('/update_excel', methods=['POST'])
+def update_excel():
+    # Load the workbook
+    book = load_workbook('example.xlsx')
 
-  const handleMouseOut = () => {
-    setIsHovering(false);
-  };
+    # Select the writer and the sheet
+    writer = pd.ExcelWriter('example.xlsx', engine='openpyxl') 
+    writer.book = book
 
-  return (
-    <div>
-      <img 
-        src="your_image.jpg" 
-        alt="Image" 
-        onMouseOver={handleMouseOver} 
-        onMouseOut={handleMouseOut}
-      />
-      <div className={`tooltip ${isHovering ? 'show' : ''}`}>Your tooltip text</div>
-    </div>
-  );
-}
-
-export default ImageWithTooltip;
-
-
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
-.circle {
-  height: 50px;
-  width: 50px;
-  background-color: #555;
-  border-radius: 50%;
-}
-
-.line {
-  flex-grow: 1;
-  height: 1px;
-  background: #555;
-  margin: 0 20px;
-  border-top: 1px dashed #555;
-}
-
-
-</style>
-</head>
-<body>
-
-<div className="container">
-      <div className="circle"></div>
-      <div className="line"></div>
-      <div className="circle"></div>
-    </div>
+    # Your data to be added
+    data = {'Column1': ['Value1'], 'Column2': ['Value2']}
+    df = pd.DataFrame(data)
