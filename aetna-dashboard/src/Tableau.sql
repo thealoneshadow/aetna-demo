@@ -397,33 +397,47 @@ axios(config)
   console.log(error);
 });
 
+.tooltip {
+  position: absolute;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  padding: 5px;
+  border-radius: 6px;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
 
-import pyodbc
-from flask import Flask
+.tooltip.show {
+  opacity: 1;
+}
 
-app = Flask(__name__)
 
-@app.route('/')
-def home():
-    # Create a connection
-    conn_str = (
-        r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};'
-        r'DBQ=path_to_your_database.accdb;'  # replace with your path
-    )
-    cnxn = pyodbc.connect(conn_str)
-    cursor = cnxn.cursor()
+function ImageWithTooltip() {
+  const [isHovering, setIsHovering] = useState(false);
 
-    # Execute a query
-    cursor.execute("SELECT * FROM YourTable")  # replace with your table name
+  const handleMouseOver = () => {
+    setIsHovering(true);
+  };
 
-    # Fetch the results
-    rows = cursor.fetchall()
+  const handleMouseOut = () => {
+    setIsHovering(false);
+  };
 
-    # Do something with the results
-    for row in rows:
-        print(row)
+  return (
+    <div>
+      <img 
+        src="your_image.jpg" 
+        alt="Image" 
+        onMouseOver={handleMouseOver} 
+        onMouseOut={handleMouseOut}
+      />
+      <div className={`tooltip ${isHovering ? 'show' : ''}`}>Your tooltip text</div>
+    </div>
+  );
+}
 
-    return "Check your console for the results"
-
-if __name__ == '__main__':
-    app.run(debug=True)
+export default ImageWithTooltip;
