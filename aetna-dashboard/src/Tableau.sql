@@ -464,12 +464,14 @@ export default ImageWithTooltip;
   margin: 0 20px;
   border-top: 1px dashed #555;
 }
+
+
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="circle"></div>
-  <div class="line"></div>
-  <div class="circle"></div>
-</div>
+<div className="container">
+      <div className="circle"></div>
+      <div className="line"></div>
+      <div className="circle"></div>
+    </div>
