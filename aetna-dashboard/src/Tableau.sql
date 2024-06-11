@@ -441,3 +441,35 @@ function ImageWithTooltip() {
 }
 
 export default ImageWithTooltip;
+
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.circle {
+  height: 50px;
+  width: 50px;
+  background-color: #555;
+  border-radius: 50%;
+}
+
+.line {
+  flex-grow: 1;
+  height: 1px;
+  background: #555;
+  margin: 0 20px;
+  border-top: 1px dashed #555;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="circle"></div>
+  <div class="line"></div>
+  <div class="circle"></div>
+</div>
