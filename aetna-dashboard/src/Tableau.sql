@@ -420,41 +420,59 @@ import pandas as pd
 import os
 from openpyxl import load_workbook
 
-app = Flask(__name__)
-
-@app.route('/update_excel', methods=['POST'])
-def update_excel():
-    # Load the workbook
-    book = load_workbook('example.xlsx')
-
-    # Select the writer and the sheet
-    writer = pd.ExcelWriter('example.xlsx', engine='openpyxl') 
-    writer.book = book
-
-    # Your data to be added
-    data = {'Column1': ['Value1'], 'Column2': ['Value2']}
-    df = pd.DataFrame(data)
 
 
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: Flask",
-            "type": "python",
-            "request": "launch",
-            "module": "flask",
-            "env": {
-                "FLASK_APP": "app.py",
-                "FLASK_ENV": "development",
-                "FLASK_DEBUG": "0"
-            },
-            "args": [
-                "run",
-                "--no-debugger",
-                "--no-reload"
-            ],
-            "jinja": true
-        }
-    ]
-}
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+
+const Layout = () => {
+  const [data, setData] = useState(null);
+  const history = useHistory();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('YOUR_API_ENDPOINT');
+        setData(response.data);
+        sessionStorage.setItem('data', JSON.stringify(response.data));
+
+        // Set session expiry time to 2 hours
+        const expiryTime = new Date().getTime() + 2 * 60 * 60 * 1000;
+        sessionStorage.setItem('expiryTime', expiryTime);
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    // Check if session data exists and is not expired
+    const sessionData = sessionStorage.getItem('data');
+    const expiryTime = sessionStorage.getItem('expiryTime');
+    if (sessionData && expiryTime > new Date().getTime()) {
+      setData(JSON.parse(sessionData));
+    } else {
+      fetchData();
+    }
+
+    // Check session expiry every minute
+    const intervalId = setInterval(() => {
+      const expiryTime = sessionStorage.getItem('expiryTime');
+      if (!expiryTime || expiryTime < new Date().getTime()) {
+        // Session expired, clear data and redirect to login
+        setData(null);
+        sessionStorage.clear();
+        history.push('/login');
+      }
+    }, 60 * 1000);
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [history]);
+
+  return (
+    <div>
+      {/* Your layout here, using the data as needed */}
+    </div>
+  );
+};
+
+export default Layout;
