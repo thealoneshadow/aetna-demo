@@ -415,64 +415,64 @@ axios(config)
   opacity: 1;
 }
 
-from flask import Flask, send_file
-import pandas as pd
-import os
-from openpyxl import load_workbook
+def upload_image():
+    # Get the image file from the form data
+    image_file = request.files['image']
+
+    # Read the image file as bytes
+    image_bytes = image_file.read()
+
+    # Convert the image bytes to base64
+    image_base64 = base64.b64encode(image_bytes)
+
+    # Instantiate a Spanner client
+    spanner_client = spanner.Client()
+
+    # Get a Spanner instance by ID
+    instance = spanner_client.instance('my-instance')
+
+    # Get a Spanner database by ID
+    database = instance.database('my-database')
+
+    # SQL statement to insert the image
+    sql = "INSERT INTO my-table (id, image) VALUES (@id, @image)"
+
+    # Parameters for the SQL statement
+    params = {"id": "your-id", "image": image_base64}
 
 
 
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useHistory } from 'react-router-dom';
 
-const Layout = () => {
-  const [data, setData] = useState(null);
-  const history = useHistory();
+    # Run the transaction
+    database.run_in_transaction(lambda transaction: transaction.execute_update(sql, params=params))
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post('YOUR_API_ENDPOINT');
-        setData(response.data);
-        sessionStorage.setItem('data', JSON.stringify(response.data));
+    return 'Image uploaded successfully', 200
 
-        // Set session expiry time to 2 hours
-        const expiryTime = new Date().getTime() + 2 * 60 * 60 * 1000;
-        sessionStorage.setItem('expiryTime', expiryTime);
-      } catch (error) {
-        console.error('Error fetching data: ', error);
-      }
-    };
 
-    // Check if session data exists and is not expired
-    const sessionData = sessionStorage.getItem('data');
-    const expiryTime = sessionStorage.getItem('expiryTime');
-    if (sessionData && expiryTime > new Date().getTime()) {
-      setData(JSON.parse(sessionData));
-    } else {
-      fetchData();
-    }
+    spanner_client = spanner.Client()
 
-    // Check session expiry every minute
-    const intervalId = setInterval(() => {
-      const expiryTime = sessionStorage.getItem('expiryTime');
-      if (!expiryTime || expiryTime < new Date().getTime()) {
-        // Session expired, clear data and redirect to login
-        setData(null);
-        sessionStorage.clear();
-        history.push('/login');
-      }
-    }, 60 * 1000);
+    # Get a Spanner instance by ID
+    instance = spanner_client.instance('my-instance')
 
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [history]);
+    # Get a Spanner database by ID
+    database = instance.database('my-database')
 
-  return (
-    <div>
-      {/* Your layout here, using the data as needed */}
-    </div>
-  );
-};
+    # SQL statement to select the image
+    sql = "SELECT image FROM my-table WHERE id = @id"
 
-export default Layout;
+    # Parameters for the SQL statement
+    params = {"id": "your-id"}
+
+    # Run the transaction and get the image
+    image_base64 = database.run_in_transaction(lambda transaction: transaction.execute_sql(sql, params=params).one()[0])
+
+    # Convert the base64 BLOB back to bytes
+    image_bytes = base64.b64decode(image_base64)
+
+    # Return the image bytes as a response
+    return image_bytes, 200, {'Content-Type': 'image/jpeg'}
+
+
+
+
+
