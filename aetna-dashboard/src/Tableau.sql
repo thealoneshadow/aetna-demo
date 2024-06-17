@@ -472,6 +472,35 @@ def upload_image():
     # Return the image bytes as a response
     return image_bytes, 200, {'Content-Type': 'image/jpeg'}
 
+    function transformData(fields, data) {
+    // Initialize an empty array to hold the transformed data
+    const result = [];
+    
+    // Iterate over each row in the data array
+    data.forEach(row => {
+        // Initialize an empty object to hold the row data
+        const obj = {};
+        
+        // Iterate over each field and assign the corresponding data value to the object
+        fields.forEach((field, index) => {
+            // Remove backslashes from the data if necessary and assign to the object
+            obj[field] = row[index].replace(/\\/g, '');
+        });
+        
+        // Push the object to the result array
+        result.push(obj);
+    });
+    
+    return result;
+}
+
+// Example usage:
+const fields = ["field1", "field2"];
+const data = [["data\\", "data2\\"], ["data1\\", "data2\\"]];
+
+const transformedData = transformData(fields, data);
+console.log(transformedData);
+
 
 
 
