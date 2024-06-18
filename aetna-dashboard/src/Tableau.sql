@@ -495,28 +495,35 @@ def upload_image():
 }
 
 // Example usage:
-const fields = ["field1", "field2"];
-const data = [["data\\", "data2\\"], ["data1\\", "data2\\"]];
-
-const transformedData = transformData(fields, data);
-console.log(transformedData);
-
-
-
-
+const data = [
+  { id: "1", name: "Item 1", vertical: "A", path: "/path1" },
+  { id: "2", name: "Item 2", vertical: "B", path: "/path2" },
+  { id: "3", name: "Item 3", vertical: "A", path: "/path3" },
+  { id: "4", name: "Item 4", vertical: "C", path: "/path4" },
+  { id: "5", name: "Item 5", vertical: "B", path: "/path5" },
+];
 
 const groupedData = data.reduce((acc, current) => {
   // Find the index of the object with the same vertical in the result array
   const index = acc.findIndex(item => item.vertical === current.vertical);
 
+  const newCategoryData = {
+    path: current.path,
+    dashboardInfo: {
+      id: current.id,
+      name: current.name,
+      vertical: current.vertical,
+    },
+  };
+
   if (index > -1) {
-    // If found, push the current object to the categoryData array of the found object
-    acc[index].categoryData.push(current);
+    // If found, push the new category data object to the categoryData array of the found object
+    acc[index].categoryData.push(newCategoryData);
   } else {
     // If not found, create a new object with vertical and categoryData properties
     acc.push({
       vertical: current.vertical,
-      categoryData: [current],
+      categoryData: [newCategoryData],
     });
   }
 
