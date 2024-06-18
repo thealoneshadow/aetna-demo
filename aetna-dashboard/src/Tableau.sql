@@ -505,3 +505,22 @@ console.log(transformedData);
 
 
 
+const groupedData = data.reduce((acc, current) => {
+  // Find the index of the object with the same vertical in the result array
+  const index = acc.findIndex(item => item.vertical === current.vertical);
+
+  if (index > -1) {
+    // If found, push the current object to the categoryData array of the found object
+    acc[index].categoryData.push(current);
+  } else {
+    // If not found, create a new object with vertical and categoryData properties
+    acc.push({
+      vertical: current.vertical,
+      categoryData: [current],
+    });
+  }
+
+  return acc;
+}, []);
+
+console.log(groupedData);
