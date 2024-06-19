@@ -494,14 +494,16 @@ def upload_image():
     return result;
 }
 
-import { Table, Input, Button, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-
-const App = () => {
-  const [searchText, setSearchText] = useState('');
+ const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
 
+  // State and refs for the second table
+  const [dashSearchText, setDashSearchText] = useState('');
+  const [searchedDashColumn, setSearchedDashColumn] = useState('');
+  const dashSearchInput = useRef(null);
+
+  // Search functions for the first table
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -563,6 +565,69 @@ const App = () => {
       ),
   });
 
+  // Search functions for the second table
+  const handleDashSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setDashSearchText(selectedKeys[0]);
+    setSearchedDashColumn(dataIndex);
+  };
+
+  const handleDashReset = clearFilters => {
+    clearFilters();
+    setDashSearchText('');
+  };
+
+  const getDashColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={dashSearchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleDashSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleDashSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => handleDashReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        : '',
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => dashSearchInput.current?.select(), 100);
+      }
+    },
+    render: text =>
+      searchedDashColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[dashSearchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  // Column definitions for the first table
   const columns = [
     {
       title: 'Name',
@@ -576,42 +641,44 @@ const App = () => {
       key: 'age',
       ...getColumnSearchProps('age'),
     },
-    {
-      title: 'Address',
-      dataIndex: 'address',
-      key: 'address',
-      ...getColumnSearchProps('address'),
-    },
   ];
 
+  // Data for the first table
   const data = [
     {
       key: '1',
       name: 'John Brown',
       age: 32,
-      address: 'New York No. 1 Lake Park',
     },
     {
       key: '2',
       name: 'Joe Black',
       age: 42,
-      address: 'London No. 1 Lake Park',
     },
     {
       key: '3',
       name: 'Jim Green',
       age: 32,
-      address: 'Sidney No. 1 Lake Park',
     },
     {
       key: '4',
       name: 'Jim Red',
       age: 32,
-      address: 'London No. 2 Lake Park',
     },
   ];
 
-  return <Table columns={columns} dataSource={data} />;
-};
-
-export default App;
+  // Column definitions for the second table
+  const dashColumns = [
+    {
+      title: 'Dash Column',
+      dataIndex: 'dashColumn',
+      key: 'dashColumn',
+      ...getDashColumnSearchProps('dashColumn'),
+    },
+    {
+      title: 'Another Column',
+      dataIndex: 'anotherColumn',
+      key: 'anotherColumn',
+      ...getDashColumnSearchProps('anotherColumn'),
+    },
+  ];
