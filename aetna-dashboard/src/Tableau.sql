@@ -494,40 +494,124 @@ def upload_image():
     return result;
 }
 
-// Example usage:
-const data = [
-  { id: "1", name: "Item 1", vertical: "A", path: "/path1" },
-  { id: "2", name: "Item 2", vertical: "B", path: "/path2" },
-  { id: "3", name: "Item 3", vertical: "A", path: "/path3" },
-  { id: "4", name: "Item 4", vertical: "C", path: "/path4" },
-  { id: "5", name: "Item 5", vertical: "B", path: "/path5" },
-];
+import { Table, Input, Button, Space } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
-const groupedData = data.reduce((acc, current) => {
-  // Find the index of the object with the same vertical in the result array
-  const index = acc.findIndex(item => item.vertical === current.vertical);
+const App = () => {
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
 
-  const newCategoryData = {
-    path: current.path,
-    dashboardInfo: {
-      id: current.id,
-      name: current.name,
-      vertical: current.vertical,
-    },
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
   };
 
-  if (index > -1) {
-    // If found, push the new category data object to the categoryData array of the found object
-    acc[index].categoryData.push(newCategoryData);
-  } else {
-    // If not found, create a new object with vertical and categoryData properties
-    acc.push({
-      vertical: current.vertical,
-      categoryData: [newCategoryData],
-    });
-  }
+  const handleReset = clearFilters => {
+    clearFilters();
+    setSearchText('');
+  };
 
-  return acc;
-}, []);
+  const getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        : '',
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: text =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
 
-console.log(groupedData);
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+      ...getColumnSearchProps('name'),
+    },
+    {
+      title: 'Age',
+      dataIndex: 'age',
+      key: 'age',
+      ...getColumnSearchProps('age'),
+    },
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+      ...getColumnSearchProps('address'),
+    },
+  ];
+
+  const data = [
+    {
+      key: '1',
+      name: 'John Brown',
+      age: 32,
+      address: 'New York No. 1 Lake Park',
+    },
+    {
+      key: '2',
+      name: 'Joe Black',
+      age: 42,
+      address: 'London No. 1 Lake Park',
+    },
+    {
+      key: '3',
+      name: 'Jim Green',
+      age: 32,
+      address: 'Sidney No. 1 Lake Park',
+    },
+    {
+      key: '4',
+      name: 'Jim Red',
+      age: 32,
+      address: 'London No. 2 Lake Park',
+    },
+  ];
+
+  return <Table columns={columns} dataSource={data} />;
+};
+
+export default App;
