@@ -682,3 +682,34 @@ def upload_image():
       ...getDashColumnSearchProps('anotherColumn'),
     },
   ];
+ const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalData, setModalData] = useState([]);
+
+const showModal = record => {
+    setModalData(dashData);
+    setIsModalVisible(true);
+  };
+
+  // Handle modal close
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  return (
+    <div>
+      <Table columns={columns} dataSource={data} title={() => 'Table 1'} />
+      <Modal
+        title="Details"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={800}
+        zIndex={1050} // Ensure modal z-index is high enough
+      >
+        <Table columns={dashColumns} dataSource={modalData} />
+      </Modal>
+    </div>
