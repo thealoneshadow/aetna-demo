@@ -643,73 +643,47 @@ def upload_image():
     },
   ];
 
-  // Data for the first table
-  const data = [
-    {
-      key: '1',
-      name: 'John Brown',
-      age: 32,
-    },
-    {
-      key: '2',
-      name: 'Joe Black',
-      age: 42,
-    },
-    {
-      key: '3',
-      name: 'Jim Green',
-      age: 32,
-    },
-    {
-      key: '4',
-      name: 'Jim Red',
-      age: 32,
-    },
-  ];
 
-  // Column definitions for the second table
-  const dashColumns = [
-    {
-      title: 'Dash Column',
-      dataIndex: 'dashColumn',
-      key: 'dashColumn',
-      ...getDashColumnSearchProps('dashColumn'),
-    },
-    {
-      title: 'Another Column',
-      dataIndex: 'anotherColumn',
-      key: 'anotherColumn',
-      ...getDashColumnSearchProps('anotherColumn'),
-    },
-  ];
- const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalData, setModalData] = useState([]);
+ const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(null);
 
-const showModal = record => {
-    setModalData(dashData);
-    setIsModalVisible(true);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file);
+
+    // Create a preview URL for the selected image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   };
 
-  // Handle modal close
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      alert('Please select a file first!');
+      return;
+    }
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+    const formData = new FormData();
+    formData.append('image', selectedFile);
+
+    try {
+      const response = await axios.post('YOUR_API_ENDPOINT', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('File uploaded successfully', response.data);
+    } catch (error) {
+      console.error('Error uploading file', error);
+    }
   };
 
   return (
     <div>
-      <Table columns={columns} dataSource={data} title={() => 'Table 1'} />
-      <Modal
-        title="Details"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        width={800}
-        zIndex={1050} // Ensure modal z-index is high enough
-      >
-        <Table columns={dashColumns} dataSource={modalData} />
-      </Modal>
-    </div>
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept="image/*" onChange={handleFileChange} />
