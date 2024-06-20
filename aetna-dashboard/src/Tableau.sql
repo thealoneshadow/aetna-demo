@@ -687,3 +687,29 @@ def upload_image():
     <div>
       <form onSubmit={handleSubmit}>
         <input type="file" accept="image/*" onChange={handleFileChange} />
+
+
+        const groupedData = [];
+
+for (let i = 0; i < data.length; i++) {
+  const { headingId, dashboardId } = data[i];
+  let existingGroup = null;
+
+  for (let j = 0; j < groupedData.length; j++) {
+    if (groupedData[j].headingId === headingId) {
+      existingGroup = groupedData[j];
+      break;
+    }
+  }
+
+  if (existingGroup) {
+    existingGroup.dashboardIds.push(dashboardId);
+  } else {
+    groupedData.push({
+      headingId,
+      dashboardIds: [dashboardId],
+    });
+  }
+}
+
+console.log(groupedData);
