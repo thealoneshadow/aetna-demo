@@ -713,3 +713,5 @@ for (let i = 0; i < data.length; i++) {
 }
 
 console.log(groupedData);
+
+const urlPattern = /^(https?:\/\/)?((([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,})|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[^\s]*)?$/;
