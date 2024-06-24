@@ -691,55 +691,44 @@ function customSort(a, b) {
 data.sort(customSort);
 
 
-
-
-function customSort(a, b) {
-    const valueA = a.path.length > 0 ? a.path[0] : a.name;
-    const valueB = b.path.length > 0 ? b.path[0] : b.name;
-
-    if (valueA < valueB) {
-        return -1;
-    }
-    if (valueA > valueB) {
-        return 1;
-    }
-    // If first path elements (or names) are the same, fall back to name comparison
-    if (a.name < b.name) {
-        return -1;
-    }
-    if (a.name > b.name) {
-        return 1;
-    }
-    return 0;
-}
-
-
- const iframeRef = useRef(null);
+const [iframeHeight, setIframeHeight] = useState('100vh');
 
     useEffect(() => {
         // Function to adjust the iframe height based on content
-        const resizeIframe = () => {
-            if (iframeRef.current) {
-                iframeRef.current.style.height = iframeRef.current.contentWindow.document.body.scrollHeight + 'px';
+        const resizeIframe = (iframe) => {
+            try {
+                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+                const newHeight = iframeDocument.body.scrollHeight + 'px';
+                setIframeHeight(newHeight);
+            } catch (e) {
+                console.error('Failed to access iframe content', e);
             }
         };
 
         // Add event listener for resizing the iframe when the content loads
-        const iframe = iframeRef.current;
-        iframe.addEventListener('load', resizeIframe);
+        const iframe = document.getElementById('tableau-iframe');
+        iframe.addEventListener('load', () => resizeIframe(iframe));
+
+        // Initial resize
+        if (iframe) {
+            resizeIframe(iframe);
+        }
 
         // Cleanup event listener on component unmount
         return () => {
-            iframe.removeEventListener('load', resizeIframe);
+            if (iframe) {
+                iframe.removeEventListener('load', () => resizeIframe(iframe));
+            }
         };
     }, []);
 
     return (
-        <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
+        <div className="iframe-container">
             <iframe
-                ref={iframeRef}
+                id="tableau-iframe"
                 src="YOUR_TABLEAU_DASHBOARD_URL"
-                style={{ width: '100%', border: 'none' }}
+                className="iframe"
+                style={{ height: iframeHeight }}
                 title="Tableau Dashboard"
             />
         </div>
