@@ -691,3 +691,26 @@ function customSort(a, b) {
 data.sort(customSort);
 
 
+
+
+function customSort(a, b) {
+    const valueA = a.path.length > 0 ? a.path[0] : a.name;
+    const valueB = b.path.length > 0 ? b.path[0] : b.name;
+
+    if (valueA < valueB) {
+        return -1;
+    }
+    if (valueA > valueB) {
+        return 1;
+    }
+    // If first path elements (or names) are the same, fall back to name comparison
+    if (a.name < b.name) {
+        return -1;
+    }
+    if (a.name > b.name) {
+        return 1;
+    }
+    return 0;
+}
+
+
