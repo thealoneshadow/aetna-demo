@@ -644,74 +644,50 @@ def upload_image():
   ];
 
 
- const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+function customSort(a, b) {
+    const maxLength = Math.max(a.path.length, b.path.length);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setSelectedFile(file);
-
-    // Create a preview URL for the selected image
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    if (file) {
-      reader.readAsDataURL(file);
+    for (let i = 0; i < maxLength; i++) {
+        const pathA = a.path[i] || '';
+        const pathB = b.path[i] || '';
+        
+        // If both paths are empty, compare names
+        if (pathA === '' && pathB === '') {
+            continue;
+        }
+        
+        // Compare path elements, considering empty paths
+        if (pathA === '') {
+            if (a.name < pathB) {
+                return -1;
+            } else if (a.name > pathB) {
+                return 1;
+            }
+        } else if (pathB === '') {
+            if (pathA < b.name) {
+                return -1;
+            } else if (pathA > b.name) {
+                return 1;
+            }
+        } else {
+            if (pathA < pathB) {
+                return -1;
+            } else if (pathA > pathB) {
+                return 1;
+            }
+        }
     }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedFile) {
-      alert('Please select a file first!');
-      return;
+    
+    // If paths are identical, compare names
+    if (a.name < b.name) {
+        return -1;
     }
-
-    const formData = new FormData();
-    formData.append('image', selectedFile);
-
-    try {
-      const response = await axios.post('YOUR_API_ENDPOINT', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      console.log('File uploaded successfully', response.data);
-    } catch (error) {
-      console.error('Error uploading file', error);
+    if (a.name > b.name) {
+        return 1;
     }
-  };
-
-  return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-
-
-        const groupedData = [];
-
-for (let i = 0; i < data.length; i++) {
-  const { headingId, dashboardId } = data[i];
-  let existingGroup = null;
-
-  for (let j = 0; j < groupedData.length; j++) {
-    if (groupedData[j].headingId === headingId) {
-      existingGroup = groupedData[j];
-      break;
-    }
-  }
-
-  if (existingGroup) {
-    existingGroup.dashboardIds.push(dashboardId);
-  } else {
-    groupedData.push({
-      headingId,
-      dashboardIds: [dashboardId],
-    });
-  }
+    return 0;
 }
 
-console.log(groupedData);
+data.sort(customSort);
 
-const urlPattern = /^(https?:\/\/)?((([a-zA-Z0-9\-_]+\.)+[a-zA-Z]{2,})|((\d{1,3}\.){3}\d{1,3}))(:\d+)?(\/[^\s]*)?$/;
+
