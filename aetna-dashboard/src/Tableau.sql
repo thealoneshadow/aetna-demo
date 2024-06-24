@@ -688,7 +688,8 @@ function customSort(a, b) {
     return 0;
 }
 
-  const vizRef = useRef(null);
+const vizRef = useRef(null);
+  const [viz, setViz] = useState(null);
   const [vizHeight, setVizHeight] = useState('auto');
 
   useEffect(() => {
@@ -696,37 +697,48 @@ function customSort(a, b) {
       await loadScript('https://public.tableau.com/javascripts/api/tableau-2.min.js');
       const { tableau } = window;
       if (tableau) {
-        const viz = new tableau.Viz(vizRef.current, url, {
+        if (viz) {
+          // Dispose of the existing viz before creating a new one
+          viz.dispose();
+        }
+        
+        const newViz = new tableau.Viz(vizRef.current, url, {
           onFirstInteractive: () => {
             // Adjust the height of the viz container
-            const vizElement = vizRef.current.querySelector('.tableauViz');
+            const vizElement = vizRef.current.querySelector('iframe');
             if (vizElement) {
-              setVizHeight(vizElement.clientHeight + 'px');
+              setVizHeight(vizElement.contentWindow.document.body.scrollHeight + 'px');
             }
           },
         });
 
-        // Resize event listener to adjust height dynamically
-        const handleResize = () => {
-          const vizElement = vizRef.current.querySelector('.tableauViz');
-          if (vizElement) {
-            setVizHeight(vizElement.clientHeight + 'px');
-          }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-          window.removeEventListener('resize', handleResize);
-          if (viz) {
-            viz.dispose();
-          }
-        };
+        setViz(newViz);
       }
     };
 
     initViz();
+
+    return () => {
+      // Cleanup viz on component unmount
+      if (viz) {
+        viz.dispose();
+      }
+    };
   }, [url]);
 
-  return <div ref={vizRef} className="tableau-container" style={{ height: vizHeight }} />;
-};
+  useEffect(() => {
+    const handleResize = () => {
+      if (viz) {
+        const vizElement = vizRef.current.querySelector('iframe');
+        if (vizElement) {
+          setVizHeight(vizElement.contentWindow.document.body.scrollHeight + 'px');
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [viz]);
