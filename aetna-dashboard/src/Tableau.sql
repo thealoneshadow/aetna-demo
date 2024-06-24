@@ -702,3 +702,49 @@ const getUniqueObjects = (arr) => {
 };
 
 const uniqueObjects = getUniqueObjects(arrayOfObjects);
+
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+};
+
+const TableauDashboard = ({ url }) => {
+  useEffect(() => {
+    const initViz = async () => {
+      await loadScript('https://public.tableau.com/javascripts/api/tableau-2.min.js');
+      const { tableau } = window;
+      if (tableau) {
+        const containerDiv = document.getElementById('tableauContainer');
+        const viz = new tableau.Viz(containerDiv, url, {
+          onFirstInteractive: () => {
+            // Adjust the iframe height dynamically
+            const iframe = containerDiv.querySelector('iframe');
+            if (iframe) {
+              iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+            }
+          },
+        });
+
+        // Listen for window resize to adjust iframe height
+        const handleResize = () => {
+          if (iframe) {
+            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+          }
+        };
+        
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          if (viz) {
+            viz.dispose();
+          }
+        };
+      }
+    };
+
+    initViz();
