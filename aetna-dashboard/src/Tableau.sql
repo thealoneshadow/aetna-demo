@@ -714,3 +714,33 @@ function customSort(a, b) {
 }
 
 
+ const iframeRef = useRef(null);
+
+    useEffect(() => {
+        // Function to adjust the iframe height based on content
+        const resizeIframe = () => {
+            if (iframeRef.current) {
+                iframeRef.current.style.height = iframeRef.current.contentWindow.document.body.scrollHeight + 'px';
+            }
+        };
+
+        // Add event listener for resizing the iframe when the content loads
+        const iframe = iframeRef.current;
+        iframe.addEventListener('load', resizeIframe);
+
+        // Cleanup event listener on component unmount
+        return () => {
+            iframe.removeEventListener('load', resizeIframe);
+        };
+    }, []);
+
+    return (
+        <div style={{ width: '100%', height: '100vh', overflow: 'hidden' }}>
+            <iframe
+                ref={iframeRef}
+                src="YOUR_TABLEAU_DASHBOARD_URL"
+                style={{ width: '100%', border: 'none' }}
+                title="Tableau Dashboard"
+            />
+        </div>
+
