@@ -742,3 +742,5 @@ const vizRef = useRef(null);
       window.removeEventListener('resize', handleResize);
     };
   }, [viz]);
+
+  vizElement.style.height = `${vizElement.contentWindow.document.body.scrollHeight}px`;
