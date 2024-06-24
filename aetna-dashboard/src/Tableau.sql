@@ -734,45 +734,36 @@ const [iframeHeight, setIframeHeight] = useState('100vh');
         </div>
 
 
-const [iframeHeight, setIframeHeight] = useState('100vh');
-
-    const resizeIframe = (iframe) => {
-        try {
-            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-            const newHeight = iframeDocument.body.scrollHeight + 'px';
-            setIframeHeight(newHeight);
-        } catch (e) {
-            console.error('Failed to access iframe content', e);
-        }
-    };
+const vizRef = useRef(null);
+    const [vizHeight, setVizHeight] = useState('100vh');
 
     useEffect(() => {
-        const iframe = document.getElementById('tableau-iframe');
-        if (iframe) {
-            resizeIframe(iframe);
-        }
+        const adjustVizHeight = () => {
+            if (vizRef.current) {
+                const vizElement = vizRef.current.querySelector('tableau-viz');
+                if (vizElement) {
+                    const newHeight = vizElement.scrollHeight + 'px';
+                    setVizHeight(newHeight);
+                }
+            }
+        };
+
+        // Initial adjustment
+        adjustVizHeight();
+
+        // Optionally, you can set an interval or an observer to adjust the height dynamically if the content changes
+        const intervalId = setInterval(adjustVizHeight, 1000);
+
+        return () => clearInterval(intervalId);
     }, []);
 
-     <div className="iframe-container">
-            <iframe
-                id="tableau-iframe"
+    return (
+        <div
+            ref={vizRef}
+            style={{ width: '100%', height: vizHeight, minHeight: '600px', maxHeight: '100vh', overflow: 'hidden' }}
+        >
+            <tableau-viz
                 src="YOUR_TABLEAU_DASHBOARD_URL"
-                className="iframe"
-                style={{ height: iframeHeight }}
-                title="Tableau Dashboard"
-                onLoad={(e) => resizeIframe(e.target)}
-            />
+                style={{ width: '100%', height: '100%' }}
+            ></tableau-viz>
         </div>
-
-        .iframe-container {
-    width: 100%;
-    height: 100vh;
-    overflow: hidden;
-}
-
-.iframe {
-    width: 100%;
-    min-height: 600px; /* Adjust as needed */
-    max-height: 100vh;
-    border: none;
-}
