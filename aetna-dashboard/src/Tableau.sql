@@ -688,82 +688,17 @@ function customSort(a, b) {
     return 0;
 }
 
-data.sort(customSort);
+const getUniqueObjects = (arr) => {
+  const uniqueSet = new Set();
+  return arr.filter((item) => {
+    const identifier = `${item.name}-${item.description}`;
+    if (uniqueSet.has(identifier)) {
+      return false;
+    } else {
+      uniqueSet.add(identifier);
+      return true;
+    }
+  });
+};
 
-
-const [iframeHeight, setIframeHeight] = useState('100vh');
-
-    useEffect(() => {
-        // Function to adjust the iframe height based on content
-        const resizeIframe = (iframe) => {
-            try {
-                const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-                const newHeight = iframeDocument.body.scrollHeight + 'px';
-                setIframeHeight(newHeight);
-            } catch (e) {
-                console.error('Failed to access iframe content', e);
-            }
-        };
-
-        // Add event listener for resizing the iframe when the content loads
-        const iframe = document.getElementById('tableau-iframe');
-        iframe.addEventListener('load', () => resizeIframe(iframe));
-
-        // Initial resize
-        if (iframe) {
-            resizeIframe(iframe);
-        }
-
-        // Cleanup event listener on component unmount
-        return () => {
-            if (iframe) {
-                iframe.removeEventListener('load', () => resizeIframe(iframe));
-            }
-        };
-    }, []);
-
-    return (
-        <div className="iframe-container">
-            <iframe
-                id="tableau-iframe"
-                src="YOUR_TABLEAU_DASHBOARD_URL"
-                className="iframe"
-                style={{ height: iframeHeight }}
-                title="Tableau Dashboard"
-            />
-        </div>
-
-
-const vizRef = useRef(null);
-    const [vizHeight, setVizHeight] = useState('100vh');
-
-    useEffect(() => {
-        const adjustVizHeight = () => {
-            if (vizRef.current) {
-                const vizElement = vizRef.current.querySelector('tableau-viz');
-                if (vizElement) {
-                    const newHeight = vizElement.scrollHeight + 'px';
-                    setVizHeight(newHeight);
-                }
-            }
-        };
-
-        // Initial adjustment
-        adjustVizHeight();
-
-        // Optionally, you can set an interval or an observer to adjust the height dynamically if the content changes
-        const intervalId = setInterval(adjustVizHeight, 1000);
-
-        return () => clearInterval(intervalId);
-    }, []);
-
-    return (
-        <div
-            ref={vizRef}
-            style={{ width: '100%', height: vizHeight, minHeight: '600px', maxHeight: '100vh', overflow: 'hidden' }}
-        >
-            <tableau-viz
-                src="YOUR_TABLEAU_DASHBOARD_URL"
-                style={{ width: '100%', height: '100%' }}
-            ></tableau-viz>
-        </div>
+const uniqueObjects = getUniqueObjects(arrayOfObjects);
