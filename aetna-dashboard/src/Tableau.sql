@@ -733,3 +733,46 @@ const [iframeHeight, setIframeHeight] = useState('100vh');
             />
         </div>
 
+
+const [iframeHeight, setIframeHeight] = useState('100vh');
+
+    const resizeIframe = (iframe) => {
+        try {
+            const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+            const newHeight = iframeDocument.body.scrollHeight + 'px';
+            setIframeHeight(newHeight);
+        } catch (e) {
+            console.error('Failed to access iframe content', e);
+        }
+    };
+
+    useEffect(() => {
+        const iframe = document.getElementById('tableau-iframe');
+        if (iframe) {
+            resizeIframe(iframe);
+        }
+    }, []);
+
+     <div className="iframe-container">
+            <iframe
+                id="tableau-iframe"
+                src="YOUR_TABLEAU_DASHBOARD_URL"
+                className="iframe"
+                style={{ height: iframeHeight }}
+                title="Tableau Dashboard"
+                onLoad={(e) => resizeIframe(e.target)}
+            />
+        </div>
+
+        .iframe-container {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.iframe {
+    width: 100%;
+    min-height: 600px; /* Adjust as needed */
+    max-height: 100vh;
+    border: none;
+}
