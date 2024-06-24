@@ -688,54 +688,32 @@ function customSort(a, b) {
     return 0;
 }
 
-const getUniqueObjects = (arr) => {
-  const uniqueSet = new Set();
-  return arr.filter((item) => {
-    const identifier = `${item.name}-${item.description}`;
-    if (uniqueSet.has(identifier)) {
-      return false;
-    } else {
-      uniqueSet.add(identifier);
-      return true;
-    }
-  });
-};
+  const vizRef = useRef(null);
+  const [vizHeight, setVizHeight] = useState('auto');
 
-const uniqueObjects = getUniqueObjects(arrayOfObjects);
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-};
-
-const TableauDashboard = ({ url }) => {
   useEffect(() => {
     const initViz = async () => {
       await loadScript('https://public.tableau.com/javascripts/api/tableau-2.min.js');
       const { tableau } = window;
       if (tableau) {
-        const containerDiv = document.getElementById('tableauContainer');
-        const viz = new tableau.Viz(containerDiv, url, {
+        const viz = new tableau.Viz(vizRef.current, url, {
           onFirstInteractive: () => {
-            // Adjust the iframe height dynamically
-            const iframe = containerDiv.querySelector('iframe');
-            if (iframe) {
-              iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+            // Adjust the height of the viz container
+            const vizElement = vizRef.current.querySelector('.tableauViz');
+            if (vizElement) {
+              setVizHeight(vizElement.clientHeight + 'px');
             }
           },
         });
 
-        // Listen for window resize to adjust iframe height
+        // Resize event listener to adjust height dynamically
         const handleResize = () => {
-          if (iframe) {
-            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+          const vizElement = vizRef.current.querySelector('.tableauViz');
+          if (vizElement) {
+            setVizHeight(vizElement.clientHeight + 'px');
           }
         };
-        
+
         window.addEventListener('resize', handleResize);
 
         return () => {
@@ -748,3 +726,7 @@ const TableauDashboard = ({ url }) => {
     };
 
     initViz();
+  }, [url]);
+
+  return <div ref={vizRef} className="tableau-container" style={{ height: vizHeight }} />;
+};
