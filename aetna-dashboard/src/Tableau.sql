@@ -162,6 +162,12 @@ const buildMenuStructure = (path, name, id) => {
   );
 };
 
+.dropdown-menu .rs-dropdown-item:last-child,
+.dropdown-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 
 CREATE TABLE contentTable (
     id STRING(255),
