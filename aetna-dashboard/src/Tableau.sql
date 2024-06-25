@@ -81,7 +81,8 @@ CREATE TABLE dimension (
 
 CREATE TABLE contentTable (
     id STRING(255),
-    textId STRING(255),
+    textId STRING(255),gfdhgdff
+    
     textContent STRING(MAX),
     contentImage STRING(MAX),
     contentDate STRING(MAX),
