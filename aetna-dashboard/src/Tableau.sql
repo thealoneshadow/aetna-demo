@@ -796,3 +796,75 @@ const MyDropdown = () => {
     </Container>
   );
 };
+
+
+
+const getDropdownItems = () => {
+  return [
+    { id: '1', name: 'Dashboard 1', path: ['Menu 1', 'Submenu 1'] },
+    { id: '2', name: 'Dashboard 2', path: ['Menu 1', 'Submenu 2'] },
+    { id: '3', name: 'Dashboard 3', path: ['Menu 2'] },
+    { id: '4', name: 'Dashboard 4', path: [] },
+  ];
+};
+
+const renderDropdownItems = (items) => {
+  const buildMenuStructure = (path, name, id) => {
+    if (path.length === 0) {
+      return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
+    }
+
+    const [first, ...rest] = path;
+    return (
+      <Dropdown.Menu key={first} title={first}>
+        {buildMenuStructure(rest, name, id)}
+      </Dropdown.Menu>
+    );
+  };
+
+  const menuMap = new Map();
+
+  items.forEach(item => {
+    const { path, name, id } = item;
+    const topPath = path.length > 0 ? path[0] : name;
+
+    if (!menuMap.has(topPath)) {
+      menuMap.set(topPath, []);
+    }
+
+    menuMap.get(topPath).push(item);
+  });
+
+  const renderMenu = (path, items) => {
+    return items.map(item => buildMenuStructure(item.path, item.name, item.id));
+  };
+
+  return (
+    <Dropdown title="My Dropdown">
+      {Array.from(menuMap.entries()).map(([key, items]) => (
+        items[0].path.length === 0
+          ? <Dropdown.Item key={items[0].id} eventKey={items[0].id}>{items[0].name}</Dropdown.Item>
+          : <Dropdown.Menu key={key} title={key}>
+              {renderMenu(key, items)}
+            </Dropdown.Menu>
+      ))}
+    </Dropdown>
+  );
+};
+
+const MyDropdown = () => {
+  const [dropdownItems, setDropdownItems] = useState([]);
+
+  useEffect(() => {
+    const items = getDropdownItems();  // Fetch items dynamically
+    setDropdownItems(items);
+  }, []);
+
+  return (
+    <Container style={{ padding: 20 }}>
+      {renderDropdownItems(dropdownItems)}
+    </Container>
+  );
+};
+
+export default MyDropdown;
