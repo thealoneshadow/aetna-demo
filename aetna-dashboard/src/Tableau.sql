@@ -868,3 +868,46 @@ const MyDropdown = () => {
 };
 
 export default MyDropdown;
+
+
+
+
+
+
+
+const buildMenuStructure = (items, currentPath = []) => {
+  const menuMap = new Map();
+
+  items.forEach(item => {
+    const [first, ...rest] = item.path.slice(currentPath.length);
+    if (first !== undefined) {
+      if (!menuMap.has(first)) {
+        menuMap.set(first, []);
+      }
+      menuMap.get(first).push(item);
+    }
+  });
+
+  const menuItems = [];
+
+  menuMap.forEach((subItems, title) => {
+    if (subItems[0].path.length === currentPath.length + 1) {
+      // If this is the last part of the path, create Dropdown.Item
+      subItems.forEach(item => {
+        menuItems.push(
+          <Dropdown.Item key={item.id} eventKey={item.id}>
+            {item.name}
+          </Dropdown.Item>
+        );
+      });
+    } else {
+      // Otherwise, create Dropdown.Menu and recursively add its children
+      menuItems.push(
+        <Dropdown.Menu key={title} title={title}>
+          {buildMenuStructure(subItems, [...currentPath, title])}
+        </Dropdown.Menu>
+      );
+    }
+  });
+
+  return menuItems;
