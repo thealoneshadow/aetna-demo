@@ -1,12 +1,11 @@
-const renderDropdownItems = (items) => {
-  const buildMenuStructure = (path, name, id) => {
+const buildMenuStructure = (path, name, id) => {
     if (path.length === 0) {
       return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
     }
 
     const [first, ...rest] = path;
     return (
-      <Dropdown.Menu key={first} title={first}>
+      <Dropdown.Menu key={id} title={first}>
         {buildMenuStructure(rest, name, id)}
       </Dropdown.Menu>
     );
@@ -40,18 +39,18 @@ const renderDropdownItems = (items) => {
     });
 
     return Array.from(subMenuMap.entries()).map(([key, subItems]) => {
-      if (subItems[0].path.length === path.length + 1) {
-        // If this is the last part of the path, create Dropdown.Item
+      const isLastLevel = subItems.every(item => item.path.length === path.length + 1);
+
+      if (isLastLevel) {
         return subItems.map(item => (
           <Dropdown.Item key={item.id} eventKey={item.id}>
             {item.name}
           </Dropdown.Item>
         ));
       } else {
-        // Otherwise, create Dropdown.Menu and recursively add its children
         return (
           <Dropdown.Menu key={key} title={key}>
-            {renderMenu([...path, key], subItems)}
+            {renderMenu([...path, key], subItems.filter(subItem => subItem.path.length > path.length))}
           </Dropdown.Menu>
         );
       }
@@ -71,18 +70,11 @@ const renderDropdownItems = (items) => {
   );
 };
 
-CREATE TABLE dimension (
-  id STRING(255),
-  dashboardId STRING(255),
-  name STRING(255),
-  description STRING(MAX)
-) PRIMARY KEY (id);
-
 
 CREATE TABLE contentTable (
     id STRING(255),
     textId STRING(255),gfdhgdff
-    
+
     textContent STRING(MAX),
     contentImage STRING(MAX),
     contentDate STRING(MAX),
