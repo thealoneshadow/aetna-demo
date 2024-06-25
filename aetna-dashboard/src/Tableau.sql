@@ -1,29 +1,75 @@
-CREATE TABLE dashboardInfoTable (
-  id STRING(255),
-  name STRING(255),
-  description STRING(MAX),
-  lastRefreshDate STRING(MAX),
-  refreshFrequency STRING(MAX),
-  url STRING(MAX),
-  usecase STRING(MAX),
-  path STRING(MAX),
-  disabled BOOL,
-  created_user STRING(255) NOT NULL,
-  updated_user STRING(255),
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP
-) PRIMARY KEY (id);
+const renderDropdownItems = (items) => {
+  const buildMenuStructure = (path, name, id) => {
+    if (path.length === 0) {
+      return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
+    }
 
-CREATE TABLE kpi (
-  id STRING(255),
-  dashboardId STRING(255),
-  name STRING(255),
-  description STRING(MAX),
-  created_user STRING(255) NOT NULL,
-  updated_user STRING(255),
-  created_at TIMESTAMP NOT NULL,
-  updated_at TIMESTAMP
-) PRIMARY KEY (id);
+    const [first, ...rest] = path;
+    return (
+      <Dropdown.Menu key={first} title={first}>
+        {buildMenuStructure(rest, name, id)}
+      </Dropdown.Menu>
+    );
+  };
+
+  const menuMap = new Map();
+
+  items.forEach(item => {
+    const { path, name, id } = item;
+    const topPath = path.length > 0 ? path[0] : name;
+
+    if (!menuMap.has(topPath)) {
+      menuMap.set(topPath, []);
+    }
+
+    menuMap.get(topPath).push(item);
+  });
+
+  const renderMenu = (path, items) => {
+    const subMenuMap = new Map();
+
+    items.forEach(item => {
+      const subPath = item.path.slice(path.length);
+      const nextPath = subPath[0] || item.name;
+
+      if (!subMenuMap.has(nextPath)) {
+        subMenuMap.set(nextPath, []);
+      }
+
+      subMenuMap.get(nextPath).push(item);
+    });
+
+    return Array.from(subMenuMap.entries()).map(([key, subItems]) => {
+      if (subItems[0].path.length === path.length + 1) {
+        // If this is the last part of the path, create Dropdown.Item
+        return subItems.map(item => (
+          <Dropdown.Item key={item.id} eventKey={item.id}>
+            {item.name}
+          </Dropdown.Item>
+        ));
+      } else {
+        // Otherwise, create Dropdown.Menu and recursively add its children
+        return (
+          <Dropdown.Menu key={key} title={key}>
+            {renderMenu([...path, key], subItems)}
+          </Dropdown.Menu>
+        );
+      }
+    });
+  };
+
+  return (
+    <Dropdown title="My Dropdown">
+      {Array.from(menuMap.entries()).map(([key, items]) => (
+        items[0].path.length === 0
+          ? <Dropdown.Item key={items[0].id} eventKey={items[0].id}>{items[0].name}</Dropdown.Item>
+          : <Dropdown.Menu key={key} title={key}>
+              {renderMenu([key], items)}
+            </Dropdown.Menu>
+      ))}
+    </Dropdown>
+  );
+};
 
 CREATE TABLE dimension (
   id STRING(255),
