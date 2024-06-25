@@ -744,3 +744,55 @@ const vizRef = useRef(null);
   }, [viz]);
 
   vizElement.style.height = `${vizElement.contentWindow.document.body.scrollHeight}px`;
+
+
+import { Dropdown, Container } from 'rsuite';
+import 'rsuite/dist/rsuite.min.css';
+
+const getDropdownItems = () => {
+  return [
+    { type: 'item', eventKey: '1', title: 'Item 1' },
+    { type: 'item', eventKey: '2', title: 'Item 2' },
+    {
+      type: 'menu', title: 'Menu', items: [
+        { type: 'item', eventKey: '3-1', title: 'Subitem 1' },
+        { type: 'item', eventKey: '3-2', title: 'Subitem 2' }
+      ]
+    },
+    { type: 'item', eventKey: '3', title: 'Item 3' }
+  ];
+};
+
+const MyDropdown = () => {
+  const [dropdownItems, setDropdownItems] = useState([]);
+
+  useEffect(() => {
+    const items = getDropdownItems();  // Fetch items dynamically
+    setDropdownItems(items);
+  }, []);
+
+  const renderDropdownItem = (item) => {
+    if (item.type === 'item') {
+      return <Dropdown.Item key={item.eventKey} eventKey={item.eventKey}>{item.title}</Dropdown.Item>;
+    } else if (item.type === 'menu') {
+      return (
+        <Dropdown.Menu key={item.title} title={item.title}>
+          {item.items.map(subItem => (
+            <Dropdown.Item key={subItem.eventKey} eventKey={subItem.eventKey}>
+              {subItem.title}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <Container style={{ padding: 20 }}>
+      <Dropdown title="My Dropdown">
+        {dropdownItems.map(item => renderDropdownItem(item))}
+      </Dropdown>
+    </Container>
+  );
+};
