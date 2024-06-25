@@ -1,3 +1,95 @@
+  const buildMenuStructure = (path, name, id) => {
+  if (path.length === 0) {
+    return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
+  }
+
+  const [first, ...rest] = path;
+  if (rest.length === 0) {
+    return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
+  }
+
+  return (
+    <Dropdown.Menu key={first} title={first}>
+      {buildMenuStructure(rest, name, id)}
+    </Dropdown.Menu>
+  );
+};
+  
+  
+  const menuMap = new Map();
+
+  items.forEach(item => {
+    const { path, name, id } = item;
+    const topPath = path.length > 0 ? path[0] : name;
+
+    if (!menuMap.has(topPath)) {
+      menuMap.set(topPath, []);
+    }
+
+    menuMap.get(topPath).push(item);
+  });
+
+  const renderMenu = (path, items) => {
+    const subMenuMap = new Map();
+
+    items.forEach(item => {
+      const subPath = item.path.slice(path.length);
+      const nextPath = subPath[0] || item.name;
+
+      if (!subMenuMap.has(nextPath)) {
+        subMenuMap.set(nextPath, []);
+      }
+
+      subMenuMap.get(nextPath).push(item);
+    });
+
+    return Array.from(subMenuMap.entries()).map(([key, subItems]) => {
+      const isLastLevel = subItems.every(item => item.path.length === path.length + 1);
+
+      if (isLastLevel) {
+        return subItems.map(item => (
+          <Dropdown.Item key={item.id} eventKey={item.id}>
+            {item.name}
+          </Dropdown.Item>
+        ));
+      } else {
+        return (
+          <Dropdown.Menu key={key} title={key}>
+            {renderMenu([...path, key], subItems)}
+          </Dropdown.Menu>
+        );
+      }
+    });
+  };
+
+  return (
+    <Dropdown title="My Dropdown">
+      {Array.from(menuMap.entries()).map(([key, items]) => (
+        items[0].path.length === 0
+          ? <Dropdown.Item key={items[0].id} eventKey={items[0].id}>{items[0].name}</Dropdown.Item>
+          : <Dropdown.Menu key={key} title={key}>
+              {renderMenu([key], items)}
+            </Dropdown.Menu>
+      ))}
+    </Dropdown>
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const buildMenuStructure = (path, name, id) => {
     if (path.length === 0) {
       return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
