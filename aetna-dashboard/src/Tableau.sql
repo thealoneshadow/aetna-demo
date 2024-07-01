@@ -1,18 +1,23 @@
-  const buildMenuStructure = (path, name, id) => {
-  if (path.length === 0) {
-    return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
-  }
+ 
+function groupByFolderIdAndPath(arr) {
+    const grouped = {};
+    const noFolderIdOrPath = [];
 
-  const [first, ...rest] = path;
-  if (rest.length === 0) {
-    return <Dropdown.Item key={id} eventKey={id}>{name}</Dropdown.Item>;
-  }
+    arr.forEach(item => {
+        const { dashboardId, name, folderId, folderPath } = item;
 
-  return (
-    <Dropdown.Menu key={first} title={first}>
-      {buildMenuStructure(rest, name, id)}
-    </Dropdown.Menu>
-  );
+        if (!folderId || folderId === "" || !folderPath || folderPath === "") {
+            noFolderIdOrPath.push(item);
+        } else {
+            const key = `${folderId}-${folderPath}`;
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+            grouped[key].push(item);
+        }
+    });
+
+    return { grouped, noFolderIdOrPath };
 };
   
   
