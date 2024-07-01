@@ -1,24 +1,42 @@
  
 function groupByFolderIdAndPath(arr) {
-    const grouped = {};
-    const noFolderIdOrPath = [];
+    const groupedWithUrl = {};
+    const groupedWithoutUrl = {};
+    const noFolderIdOrPathWithUrl = [];
+    const noFolderIdOrPathWithoutUrl = [];
 
     arr.forEach(item => {
-        const { dashboardId, name, folderId, folderPath } = item;
+        const { folderId, folderPath, URL } = item;
 
         if (!folderId || folderId === "" || !folderPath || folderPath === "") {
-            noFolderIdOrPath.push(item);
+            if (!URL || URL === "") {
+                noFolderIdOrPathWithoutUrl.push(item);
+            } else {
+                noFolderIdOrPathWithUrl.push(item);
+            }
         } else {
             const key = `${folderId}-${folderPath}`;
-            if (!grouped[key]) {
-                grouped[key] = [];
+            if (!URL || URL === "") {
+                if (!groupedWithoutUrl[key]) {
+                    groupedWithoutUrl[key] = { folderId, folderPath, dashboards: [] };
+                }
+                groupedWithoutUrl[key].dashboards.push(item);
+            } else {
+                if (!groupedWithUrl[key]) {
+                    groupedWithUrl[key] = { folderId, folderPath, dashboards: [] };
+                }
+                groupedWithUrl[key].dashboards.push(item);
             }
-            grouped[key].push(item);
         }
     });
 
-    return { grouped, noFolderIdOrPath };
-};
+    return {
+        groupedWithUrl: Object.values(groupedWithUrl),
+        groupedWithoutUrl: Object.values(groupedWithoutUrl),
+        noFolderIdOrPathWithUrl,
+        noFolderIdOrPathWithoutUrl
+    };
+}
   
   
   const menuMap = new Map();
