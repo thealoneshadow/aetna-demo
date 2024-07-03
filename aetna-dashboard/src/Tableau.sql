@@ -1,4 +1,35 @@
- 
+  const handleMouseEnter = (rowId) => {
+        const updatedRows = rows.map((row) =>
+            row.id === rowId ? { ...row, isHovered: true } : row
+        );
+        setRows(updatedRows);
+    };
+
+    const handleMouseLeave = (rowId) => {
+        const updatedRows = rows.map((row) =>
+            row.id === rowId ? { ...row, isHovered: false } : row
+        );
+        setRows(updatedRows);
+    };
+
+    return (
+        <div>
+            {rows.map((row) => (
+                <div
+                    key={row.id}
+                    className={`row ${row.isHovered ? 'hovered' : ''}`}
+                    onMouseEnter={() => handleMouseEnter(row.id)}
+                    onMouseLeave={() => handleMouseLeave(row.id)}
+                >
+
+
+
+
+
+
+
+
+
 function groupByFolderIdAndPath(arr) {
     const groupedWithUrl = {};
     const groupedWithoutUrl = {};
