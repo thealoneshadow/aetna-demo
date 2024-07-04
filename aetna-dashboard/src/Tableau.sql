@@ -1,28 +1,32 @@
-  const handleMouseEnter = (rowId) => {
-        const updatedRows = rows.map((row) =>
-            row.id === rowId ? { ...row, isHovered: true } : row
-        );
-        setRows(updatedRows);
-    };
+.custom-list {
+    list-style: none;
+    padding: 0;
+}
 
-    const handleMouseLeave = (rowId) => {
-        const updatedRows = rows.map((row) =>
-            row.id === rowId ? { ...row, isHovered: false } : row
-        );
-        setRows(updatedRows);
-    };
+.custom-list li {
+    margin-bottom: 20px;
+}
 
-    return (
-        <div>
-            {rows.map((row) => (
-                <div
-                    key={row.id}
-                    className={`row ${row.isHovered ? 'hovered' : ''}`}
-                    onMouseEnter={() => handleMouseEnter(row.id)}
-                    onMouseLeave={() => handleMouseLeave(row.id)}
-                >
+.custom-list h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.custom-list p {
+    font-size: 14px;
+    color: #666;
+}
 
 
+
+ <ul className="custom-list">
+            {items.map((item) => (
+                <li key={item.id}>
+                    <h3>{item.heading}</h3>
+                    <p>{item.description}</p>
+                </li>
+            ))}
+        </ul>
 
 
 
