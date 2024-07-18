@@ -1,31 +1,36 @@
-.custom-list {
-    list-style: none;
-    padding: 0;
-}
-
-.custom-list li {
-    margin-bottom: 20px;
-}
-
-.custom-list h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-}
-
-.custom-list p {
-    font-size: 14px;
-    color: #666;
-}
 
 
+import React from 'react';
+import { Segmented } from 'antd';
 
- <ul className="custom-list">
-            {items.map((item) => (
-                <li key={item.id}>
-                    <h3>{item.heading}</h3>
-                    <p>{item.description}</p>
-                </li>
-            ))}
+const Demo: React.FC = () => (
+  <Segmented<string>
+    options={['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']}
+    onChange={(value) => {
+      console.log(value); // string
+    }}
+  />
+);
+
+export default Demo;
+
+
+import { Card } from 'antd';
+
+const { Meta } = Card;
+
+const App: React.FC = () => (
+  <Card
+    hoverable
+    style={{ width: 240 }}
+    cover={<img alt="example" src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />}
+  >
+    <Meta title="Europe Street beat" description="www.instagram.com" />
+  </Card>
+);
+
+
+
         </ul>
 
 
