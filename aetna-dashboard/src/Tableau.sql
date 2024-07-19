@@ -5,14 +5,18 @@ function formatDateToTimestamp(inputDate) {
   // Create a Date object (Note: Months are 0-indexed, so we subtract 1 from the month)
   const dateObject = new Date(2000 + year, month - 1, day); // Adjust the year as needed
 
-  // Get the timestamp (in milliseconds since Unix epoch)
+  // Get the timestamp in milliseconds since Unix epoch
   const timestamp = dateObject.getTime();
 
   // Convert to seconds (if needed)
-  const timestampInSeconds = Math.floor(timestamp / 1000);
+  const timestampInSeconds = timestamp / 1000;
 
-  return timestampInSeconds;
+  // Format as ISO string with milliseconds and 'Z' for UTC
+  const isoTimestamp = new Date(timestamp).toISOString();
+
+  return isoTimestamp;
 }
+
 
 import { Card } from 'antd';
 
