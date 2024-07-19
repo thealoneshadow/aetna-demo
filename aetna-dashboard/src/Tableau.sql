@@ -1,19 +1,18 @@
+function formatDateToTimestamp(inputDate) {
+  // Assuming inputDate is in the format "dd/mm/yy"
+  const [day, month, year] = inputDate.split('/').map(Number);
 
+  // Create a Date object (Note: Months are 0-indexed, so we subtract 1 from the month)
+  const dateObject = new Date(2000 + year, month - 1, day); // Adjust the year as needed
 
-import React from 'react';
-import { Segmented } from 'antd';
+  // Get the timestamp (in milliseconds since Unix epoch)
+  const timestamp = dateObject.getTime();
 
-const Demo: React.FC = () => (
-  <Segmented<string>
-    options={['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly']}
-    onChange={(value) => {
-      console.log(value); // string
-    }}
-  />
-);
+  // Convert to seconds (if needed)
+  const timestampInSeconds = Math.floor(timestamp / 1000);
 
-export default Demo;
-
+  return timestampInSeconds;
+}
 
 import { Card } from 'antd';
 
