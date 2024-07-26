@@ -6,7 +6,7 @@ def quote_table_names(query):
     import re
 
     # Regex to match table names with hyphens or special characters
-    pattern = re.compile(r'(\b\w+[-\w]*\b)')
+    pattern = re.compile(r'\b[\w-]+\.[\w-]+\b')
 
     # Function to quote table names
     def quote_match(match):
