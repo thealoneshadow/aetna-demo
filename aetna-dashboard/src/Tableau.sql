@@ -1,3 +1,23 @@
+def quote_table_names(query):
+    """
+    Function to quote table names with special characters in backticks.
+    Assumes table names with hyphens need to be quoted.
+    """
+    import re
+
+    # Regex to match table names with hyphens or special characters
+    pattern = re.compile(r'(\b\w+[-\w]*\b)')
+
+    # Function to quote table names
+    def quote_match(match):
+        table_name = match.group(0)
+        if '-' in table_name:
+            return f'`{table_name}`'
+        return table_name
+
+    return pattern.sub(quote_match, query) 
+ 
+ 
  query_id = request.args.get('id', type=int)
 
     if not query_id:
