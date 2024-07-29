@@ -1,19 +1,26 @@
-const nameCountMap = new Map();
-
-// Loop through the data array
-for (const item of data) {
-  const { name, count, vertical } = item;
-  if (nameCountMap.has(name)) {
-    // If the name already exists in the Map, update the count
-    nameCountMap.get(name).count += count;
-  } else {
-    // If the name does not exist in the Map, add a new entry
-    nameCountMap.set(name, { name, count, vertical });
-  }
-}
-
-// Convert the Map back to an array of objects
-const uniqueData = Array.from(nameCountMap.values());
+import React from 'react';
+import { Button, Tooltip } from 'antd';
+const style = {
+  width: '300vw',
+  height: '300vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+const App = () => {
+  React.useEffect(() => {
+    document.documentElement.scrollTop = document.documentElement.clientHeight;
+    document.documentElement.scrollLeft = document.documentElement.clientWidth;
+  }, []);
+  return (
+    <div style={style}>
+      <Tooltip title="Thanks for using antd. Have a nice day !" open>
+        <Button type="primary">Scroll The Window</Button>
+      </Tooltip>
+    </div>
+  );
+};
+export default App;
 
 
 INSERT INTO userList (userId, userName, email)
