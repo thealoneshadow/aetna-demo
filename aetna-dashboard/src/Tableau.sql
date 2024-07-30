@@ -1,28 +1,32 @@
-<div>
-  <canvas id="myChart"></canvas>
-</div>
+import { Bar } from "react-chartjs-2";
+export const BarChart = ({ chartData }) => {
+  return (
+    <div className="chart-container">
+      <h2 style={{ textAlign: "center" }}>Bar Chart</h2>
+      <Bar
+        data={chartData}
+        options={{
+          plugins: {
+            title: {
+              display: true,
+              text: "Users Gained between 2016-2020"
+            },
+            legend: {
+              display: false
+            }
+          }
+        }}
+      />
+    </div>
+  );
+};
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+import Chart from "chart.js/auto";
+import { CategoryScale } from "chart.js";
+import { useState } from "react";
+import { Data } from "./Data";
+import PieChart from "../components/PieChart";
+import BarChart from "../components/BarChart";
+import "./styles.css";
 
-<script>
-  const ctx = document.getElementById('myChart');
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-</script>
+Chart.register(CategoryScale);
