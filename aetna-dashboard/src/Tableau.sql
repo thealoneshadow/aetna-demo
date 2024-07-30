@@ -1,32 +1,28 @@
-import React from 'react';
-import { Button, Tooltip } from 'antd';
-const style = {
-  width: '300vw',
-  height: '300vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-};
-const App = () => {
-  React.useEffect(() => {
-    document.documentElement.scrollTop = document.documentElement.clientHeight;
-    document.documentElement.scrollLeft = document.documentElement.clientWidth;
-  }, []);
-  return (
-    <div style={style}>
-      <Tooltip title="Thanks for using antd. Have a nice day !" open>
-        <Button type="primary">Scroll The Window</Button>
-      </Tooltip>
-    </div>
-  );
-};
-export default App;
+<div>
+  <canvas id="myChart"></canvas>
+</div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-INSERT INTO userList (userId, userName, email)
-SELECT 'new_user_id', 'New User', 'new.user@example.com'
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM userList
-    WHERE email = 'new.user@example.com'
-);
+<script>
+  const ctx = document.getElementById('myChart');
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+</script>
