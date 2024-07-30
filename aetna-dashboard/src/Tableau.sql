@@ -50,10 +50,14 @@ Chart.register(CategoryScale);
     ]
 
      scales: {
-                xAxes: [{
-                    stacked: true
-                }],
-                yAxes: [{
-                    stacked: true
-                }]
-            }d
+    x: {
+      scaleLabel: {
+        display: false, // Hide x-axis label
+      },
+    },
+    y: {
+      scaleLabel: {
+        display: false, // Hide y-axis label
+      },
+    },
+  },
