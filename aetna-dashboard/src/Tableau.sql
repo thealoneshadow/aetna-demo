@@ -48,3 +48,12 @@ Chart.register(CategoryScale);
         borderWidth: 2
       }
     ]
+
+     scales: {
+                xAxes: [{
+                    stacked: true
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }d
