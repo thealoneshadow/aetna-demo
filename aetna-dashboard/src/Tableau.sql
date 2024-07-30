@@ -45,19 +45,15 @@ Chart.register(CategoryScale);
           "#2a71d0"
         ],
         borderColor: "black",
-        borderWidth: 2
-      }
-    ]
+      
 
-     scales: {
-    x: {
-      scaleLabel: {
-        display: false, // Hide x-axis label
-      },
-    },
-    y: {
-      scaleLabel: {
-        display: false, // Hide y-axis label
-      },
-    },
-  },
+ 
+  /* Hide x-axis labels */
+  .chartjs-render-monitor .chartjs-chart-x-axis {
+    display: none;
+  }
+
+  /* Hide y-axis labels */
+  .chartjs-render-monitor .chartjs-chart-y-axis {
+    display: none;
+  }
