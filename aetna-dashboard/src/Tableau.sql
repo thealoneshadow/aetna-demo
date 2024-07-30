@@ -57,3 +57,12 @@ Chart.register(CategoryScale);
   .chartjs-render-monitor .chartjs-chart-y-axis {
     display: none;
   }
+
+
+ scales: {
+     yAxes: [{
+         ticks: {
+            display: false
+          }
+      }]
+  }
