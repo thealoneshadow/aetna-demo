@@ -1,68 +1,51 @@
-import { Bar } from "react-chartjs-2";
-export const BarChart = ({ chartData }) => {
+Certainly! Let’s create a React component that allows users to upload an Excel file and then extracts columns 3 and 4 (assuming the columns are indexed from 0) to create a JSON array of objects with the specified keys (email and team).
+
+Here’s how you can achieve this:
+
+Install Dependencies: First, install the necessary dependencies for handling file uploads and parsing Excel files:
+npm install xlsx-file-reader
+# or
+yarn add xlsx-file-reader
+
+Create the File Upload Component: Create a new component (let’s call it ExcelUploader) that allows users to upload an Excel file. When the file is uploaded, we’ll read its contents and extract the required columns.
+// ExcelUploader.js
+
+import React, { useState } from 'react';
+import XLSX from 'xlsx-file-reader';
+
+const ExcelUploader = () => {
+  const [data, setData] = useState([]);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      const workbook = await XLSX.readFile(file);
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      // Assuming columns 3 and 4 (indexed from 0) contain email and team data
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const extractedData = rows.map((row) => ({
+        email: row[2], // Column 3
+        team: row[3], // Column 4
+      }));
+
+      setData(extractedData);
+    } catch (error) {
+      console.error('Error reading Excel file:', error);
+    }
+  };
+
   return (
-    <div className="chart-container">
-      <h2 style={{ textAlign: "center" }}>Bar Chart</h2>
-      <Bar
-        data={chartData}
-        options={{
-          plugins: {
-            title: {
-              display: true,
-              text: "Users Gained between 2016-2020"
-            },
-            legend: {
-              display: false
-            }
-          }
-        }}
-      />
+    <div>
+      <input type="file" accept=".xls,.xlsx" onChange={handleFileUpload} />
+      {data.length > 0 && (
+        <pre>{JSON.stringify(data, null, 2)}</pre>
+      )}
     </div>
   );
 };
 
-import Chart from "chart.js/auto";
-import { CategoryScale } from "chart.js";
-import { useState } from "react";
-import { Data } from "./Data";
-import PieChart from "../components/PieChart";
-import BarChart from "../components/BarChart";
-import "./styles.css";
-
-Chart.register(CategoryScale);
-
-
- labels: Data.map((data) => data.year), 
-    datasets: [
-      {
-        label: "Users Gained ",
-        data: Data.map((data) => data.userGain),
-        backgroundColor: [
-          "rgba(75,192,192,1)",
-          &quot;#ecf0f1",
-          "#50AF95",
-          "#f3ba2f",
-          "#2a71d0"
-        ],
-        borderColor: "black",
-      
-
- 
-  /* Hide x-axis labels */
-  .chartjs-render-monitor .chartjs-chart-x-axis {
-    display: none;
-  }
-
-  /* Hide y-axis labels */
-  .chartjs-render-monitor .chartjs-chart-y-axis {
-    display: none;
-  }
-
-
- scales: {
-     yAxes: [{
-         ticks: {
-            display: false
-          }
-      }]
-  }
+export default ExcelUploader;
