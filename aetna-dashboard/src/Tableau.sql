@@ -1,26 +1,39 @@
-useEffect(() => {
+ const shinyAppBaseUrl = 'https://your-rshiny-dashboard-url'; // Replace with your R Shiny base URL
+  const [childWindow, setChildWindow] = useState(null);
+
+  useEffect(() => {
     const monitorChildWindow = setInterval(() => {
-      // Check all open windows (excluding the main window)
-      for (const win of window) {
-        if (win !== window && !win.closed) {
-          try {
-            // If the child window is detected and has navigated to a URL
-            const childUrl = win.location.href;
+      if (childWindow && !childWindow.closed) {
+        try {
+          const childUrl = childWindow.location.href;
 
-            // Ensure it's the R Shiny URL (optional check)
-            if (childUrl.includes(shinyAppUrl)) {
-              // Redirect the main window to the child window's URL
-              window.location.href = childUrl;
-
-              // Close the child window
-              win.close();
-            }
-          } catch (e) {
-            console.log('Cross-origin error or window not yet navigated:', e);
+          // If the child window URL matches or includes the Shiny dashboard's base URL
+          if (childUrl.includes(shinyAppBaseUrl)) {
+            window.location.href = childUrl; // Redirect the main window
+            childWindow.close(); // Close the child window
+            setChildWindow(null); // Clear the child window reference
           }
+        } catch (e) {
+          console.log('Waiting for the child window to navigate or cross-origin issue:', e);
         }
       }
     }, 1000); // Check every second
 
-    return () => clearInterval(monitorChildWindow); // Cleanup interval on component unmount
+    return () => clearInterval(monitorChildWindow); // Clean up the interval on component unmount
+  }, [childWindow]);
+
+  // Detect and store the child window when it is opened
+  useEffect(() => {
+    const originalWindowOpen = window.open;
+
+    // Override the default window.open to detect when the child window opens
+    window.open = function (url, name, specs) {
+      const newWindow = originalWindowOpen(url, name, specs);
+      setChildWindow(newWindow); // Save the reference to the new window
+      return newWindow;
+    };
+
+    return () => {
+      window.open = originalWindowOpen; // Restore original window.open on cleanup
+    };
   }, []);
