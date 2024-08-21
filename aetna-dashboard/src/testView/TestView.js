@@ -7,6 +7,13 @@ const TestView = () => {
   let arr2 = ["thar", "far", "car"];
   let newArr = arr1.concat(arr2);
 
+  data.find 
+  data.findOne
+
+  data.aggregate({
+    {$match: {name:""}},
+    {$project }
+  })
   newArr = newArr.sort();
   newArr = newArr.reverse();
   console.log(newArr);
