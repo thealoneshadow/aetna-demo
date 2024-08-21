@@ -38,3 +38,28 @@
     };
   }, []);
 ert
+
+
+
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+};
+
+const CheckCookieComponent = () => {
+  const [cookieExists, setCookieExists] = useState(false);
+
+  useEffect(() => {
+    const cookieName = 'rsconnect-legacy';
+    const cookieValue = getCookie(cookieName);
+
+    if (cookieValue) {
+      setCookieExists(true);
+      console.log(`${cookieName} exists with value: ${cookieValue}`);
+    } else {
+      setCookieExists(false);
+      console.log(`${cookieName} does not exist`);
+    }
+  }, []);
