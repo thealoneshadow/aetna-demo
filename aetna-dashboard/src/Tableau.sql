@@ -1,80 +1,96 @@
- const shinyAppBaseUrl = 'https://your-rshiny-dashboard-url'; // Replace with your R Shiny base URL
-  const [childWindow, setChildWindow] = useState(null);
-
-  useEffect(() => {
-    const monitorChildWindow = setInterval(() => {
-      if (childWindow && !childWindow.closed) {
-        try {
-          const childUrl = childWindow.location.href;
-
-          // If the child window URL matches or includes the Shiny dashboard's base URL
-          if (childUrl.includes(shinyAppBaseUrl)) {
-            window.location.href = childUrl; // Redirect the main window
-            childWindow.close(); // Close the child window
-            setChildWindow(null); // Clear the child window reference
-          }
-        } catch (e) {
-          console.log('Waiting for the child window to navigate or cross-origin issue:', e);
-        }
-      }
-    }, 1000); // Check every second
-
-    return () => clearInterval(monitorChildWindow); // Clean up the interval on component unmount
-  }, [childWindow]);
-
-  // Detect and store the child window when it is opened
-  useEffect(() => {
-    const originalWindowOpen = window.open;
-
-    // Override the default window.open to detect when the child window opens
-    window.open = function (url, name, specs) {
-      const newWindow = originalWindowOpen(url, name, specs);
-      setChildWindow(newWindow); // Save the reference to the new window
-      return newWindow;
-    };
-
-    return () => {
-      window.open = originalWindowOpen; // Restore original window.open on cleanup
-    };
-  }, []);
-ert
-
-
-
-const getCookie = (name) => {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
+import React from 'react';
+import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
+import { Breadcrumb, Layout, Menu, theme } from 'antd';
+const { Header, Content, Sider } = Layout;
+const items1 = ['1', '2', '3'].map((key) => ({
+  key,
+  label: `nav ${key}`,
+}));
+const items2 = [UserOutlined, LaptopOutlined, NotificationOutlined].map((icon, index) => {
+  const key = String(index + 1);
+  return {
+    key: `sub${key}`,
+    icon: React.createElement(icon),
+    label: `subnav ${key}`,
+    children: new Array(4).fill(null).map((_, j) => {
+      const subKey = index * 4 + j + 1;
+      return {
+        key: subKey,
+        label: `option${subKey}`,
+      };
+    }),
+  };
+});
+const App = () => {
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
+  return (
+    <Layout>
+      <Header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+        }}
+      >
+        <div className="demo-logo" />
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          defaultSelectedKeys={['2']}
+          items={items1}
+          style={{
+            flex: 1,
+            minWidth: 0,
+          }}
+        />
+      </Header>
+      <Layout>
+        <Sider
+          width={200}
+          style={{
+            background: colorBgContainer,
+          }}
+        >
+          <Menu
+            mode="inline"
+            defaultSelectedKeys={['1']}
+            defaultOpenKeys={['sub1']}
+            style={{
+              height: '100%',
+              borderRight: 0,
+            }}
+            items={items2}
+          />
+        </Sider>
+        <Layout
+          style={{
+            padding: '0 24px 24px',
+          }}
+        >
+          <Breadcrumb
+            style={{
+              margin: '16px 0',
+            }}
+          >
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>List</Breadcrumb.Item>
+            <Breadcrumb.Item>App</Breadcrumb.Item>
+          </Breadcrumb>
+          <Content
+            style={{
+              padding: 24,
+              margin: 0,
+              minHeight: 280,
+              background: colorBgContainer,
+              borderRadius: borderRadiusLG,
+            }}
+          >
+            Content
+          </Content>
+        </Layout>
+      </Layout>
+    </Layout>
+  );
 };
-
-const CheckCookieComponent = () => {
-  const [cookieExists, setCookieExists] = useState(false);
-
-  useEffect(() => {
-    const cookieName = 'rsconnect-legacy';
-    const cookieValue = getCookie(cookieName);
-
-    if (cookieValue) {
-      setCookieExists(true);
-      console.log(`${cookieName} exists with value: ${cookieValue}`);
-    } else {
-      setCookieExists(false);
-      console.log(`${cookieName} does not exist`);
-    }
-  }, []);
-
-const checkCookie = () => {
-      try {
-        const cookies = newWindow.document.cookie;
-        if (cookies.includes('desired_cookie_name')) {
-          clearInterval(cookieInterval);
-          newWindow.close();
-          window.location.reload(); // Reload the main window
-        }
-      } catch (error) {
-        console.error('Error accessing the new window\'s cookies:', error);
-      }
-    };
-
-    const cookieInterval = setInterval(checkCookie, 1000);
+export default App;
