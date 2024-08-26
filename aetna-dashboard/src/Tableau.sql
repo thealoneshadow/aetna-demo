@@ -87,48 +87,96 @@ const App = () => {
 export default App;
 
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './styles.css';
 
- const iframeRef = useRef(null);
 
-  useEffect(() => {
-    // Function to handle click events within the iframe
-    const handleIframeClick = (event) => {
-      if (event.target.tagName === 'A' && event.target.href.includes('login')) {
-        event.preventDefault();
-        // Open the login in the same window or redirect the parent window
-        window.location.href = event.target.href;
-      }
-    };
+import { Sidenav, Nav } from 'rsuite';
+import DashboardIcon from '@rsuite/icons/legacy/Dashboard';
+import GroupIcon from '@rsuite/icons/legacy/Group';
+import MagicIcon from '@rsuite/icons/legacy/Magic';
+import GearCircleIcon from '@rsuite/icons/legacy/GearCircle';
 
-    // Function to check if iframe content is accessible and add event listeners
-    const checkIframeContent = () => {
-      try {
-        // Access the iframe's document
-        const iframeDoc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow.document;
-        
-        if (iframeDoc) {
-          // Add click event listener to the iframe document
-          iframeDoc.addEventListener('click', handleIframeClick);
-        }
-      } catch (error) {
-        console.error('Cannot access iframe content due to cross-origin restrictions:', error);
-      }
-    };
+const styles = {
+  width: 240,
+  display: 'inline-table',
+  marginRight: 10
+};
 
-    // Ensure the iframe is loaded before accessing its content
-    const iframe = iframeRef.current;
-    iframe?.addEventListener('load', checkIframeContent);
+const CustomSidenav = ({ appearance, openKeys, expanded, onOpenChange, onExpand, ...navProps }) => {
+  return (
+    <div style={styles}>
+      <Sidenav
+        appearance={appearance}
+        expanded={expanded}
+        openKeys={openKeys}
+        onOpenChange={onOpenChange}
+      >
+        <Sidenav.Body>
+          <Nav {...navProps}>
+            <Nav.Item eventKey="1" active icon={<DashboardIcon />}>
+              Dashboard
+            </Nav.Item>
+            <Nav.Item eventKey="2" icon={<GroupIcon />}>
+              User Group
+            </Nav.Item>
+            <Nav.Menu eventKey="3" title="Advanced" icon={<MagicIcon />}>
+              <Nav.Item eventKey="3-1">Geo</Nav.Item>
+              <Nav.Item eventKey="3-2">Devices</Nav.Item>
+              <Nav.Item eventKey="3-3">Loyalty</Nav.Item>
+              <Nav.Item eventKey="3-4">Visit Depth</Nav.Item>
+            </Nav.Menu>
+            <Nav.Menu eventKey="4" title="Settings" icon={<GearCircleIcon />}>
+              <Nav.Item eventKey="4-1">Applications</Nav.Item>
+              <Nav.Item eventKey="4-2">Channels</Nav.Item>
+              <Nav.Item eventKey="4-3">Versions</Nav.Item>
+              <Nav.Menu eventKey="4-5" title="Custom Action">
+                <Nav.Item eventKey="4-5-1">Action Name</Nav.Item>
+                <Nav.Item eventKey="4-5-2">Action Params</Nav.Item>
+              </Nav.Menu>
+            </Nav.Menu>
+          </Nav>
+        </Sidenav.Body>
+        <Sidenav.Toggle onToggle={onExpand} />
+      </Sidenav>
+    </div>
+  );
+};
 
-    // Cleanup function to remove event listeners when component unmounts
-    return () => {
-      iframe?.removeEventListener('load', checkIframeContent);
-      try {
-        const iframeDoc = iframe?.contentDocument || iframe?.contentWindow.document;
-        if (iframeDoc) {
-          iframeDoc.removeEventListener('click', handleIframeClick);
-        }
-      } catch (error) {
-        console.error('Cleanup error: Could not access iframe content:', error);
-      }
-    };
-  }, []);
+const App = () => {
+  const [activeKey, setActiveKey] = React.useState('1');
+  const [openKeys, setOpenKeys] = React.useState(['3', '4']);
+  const [expanded, setExpand] = React.useState(true);
+
+  return (
+    <>
+      <CustomSidenav
+        activeKey={activeKey}
+        openKeys={openKeys}
+        onSelect={setActiveKey}
+        onOpenChange={setOpenKeys}
+        expanded={expanded}
+        onExpand={setExpand}
+      />
+      <CustomSidenav
+        activeKey={activeKey}
+        openKeys={openKeys}
+        onOpenChange={setOpenKeys}
+        onSelect={setActiveKey}
+        expanded={expanded}
+        onExpand={setExpand}
+        appearance="inverse"
+      />
+      <CustomSidenav
+        activeKey={activeKey}
+        openKeys={openKeys}
+        onOpenChange={setOpenKeys}
+        onSelect={setActiveKey}
+        expanded={expanded}
+        onExpand={setExpand}
+        appearance="subtle"
+      />
+    </>
+  );
+};
