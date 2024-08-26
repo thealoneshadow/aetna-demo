@@ -88,11 +88,7 @@ export default App;
 
 
 
-
-import React, { useEffect, useRef } from 'react';
-
-const RStudioDashboard = () => {
-  const iframeRef = useRef(null);
+ const iframeRef = useRef(null);
 
   useEffect(() => {
     // Function to handle click events within the iframe
@@ -104,11 +100,14 @@ const RStudioDashboard = () => {
       }
     };
 
-    // Check if iframe content is loaded and accessible
+    // Function to check if iframe content is accessible and add event listeners
     const checkIframeContent = () => {
       try {
+        // Access the iframe's document
         const iframeDoc = iframeRef.current?.contentDocument || iframeRef.current?.contentWindow.document;
+        
         if (iframeDoc) {
+          // Add click event listener to the iframe document
           iframeDoc.addEventListener('click', handleIframeClick);
         }
       } catch (error) {
@@ -116,27 +115,20 @@ const RStudioDashboard = () => {
       }
     };
 
-    // Add an event listener to monitor iframe loading
+    // Ensure the iframe is loaded before accessing its content
     const iframe = iframeRef.current;
-    iframe.addEventListener('load', checkIframeContent);
+    iframe?.addEventListener('load', checkIframeContent);
 
-    // Cleanup function to remove event listeners
+    // Cleanup function to remove event listeners when component unmounts
     return () => {
-      iframe.removeEventListener('load', checkIframeContent);
-      if (iframe.contentDocument) {
-        iframe.contentDocument.removeEventListener('click', handleIframeClick);
+      iframe?.removeEventListener('load', checkIframeContent);
+      try {
+        const iframeDoc = iframe?.contentDocument || iframe?.contentWindow.document;
+        if (iframeDoc) {
+          iframeDoc.removeEventListener('click', handleIframeClick);
+        }
+      } catch (error) {
+        console.error('Cleanup error: Could not access iframe content:', error);
       }
     };
   }, []);
-
-  return (
-    <iframe
-      ref={iframeRef}
-      src="https://your-rstudio-dashboard-url.com"
-      title="RStudio Dashboard"
-      style={{ width: '100%', height: '500px', border: 'none' }}
-    />
-  );
-};
-
-export default RStudioDashboard;
