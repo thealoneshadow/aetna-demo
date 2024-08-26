@@ -87,10 +87,12 @@ const App = () => {
 export default App;
 
 
+
+
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './styles.css';
-
 
 import { Sidenav, Nav } from 'rsuite';
 import DashboardIcon from '@rsuite/icons/legacy/Dashboard';
@@ -100,13 +102,18 @@ import GearCircleIcon from '@rsuite/icons/legacy/GearCircle';
 
 const styles = {
   width: 240,
+  position: 'absolute', // Position absolutely on the screen
+  top: 0,
+  left: 0,
+  zIndex: 1000, // Make sure it is on top of other content
   display: 'inline-table',
-  marginRight: 10
+  marginRight: 10,
+  transition: 'transform 0.3s ease-in-out', // Smooth transition for showing/hiding
 };
 
 const CustomSidenav = ({ appearance, openKeys, expanded, onOpenChange, onExpand, ...navProps }) => {
   return (
-    <div style={styles}>
+    <div style={{ ...styles, transform: expanded ? 'translateX(0)' : 'translateX(-100%)' }}>
       <Sidenav
         appearance={appearance}
         expanded={expanded}
@@ -147,10 +154,19 @@ const CustomSidenav = ({ appearance, openKeys, expanded, onOpenChange, onExpand,
 const App = () => {
   const [activeKey, setActiveKey] = React.useState('1');
   const [openKeys, setOpenKeys] = React.useState(['3', '4']);
-  const [expanded, setExpand] = React.useState(true);
+  const [expanded, setExpand] = React.useState(false); // Sidebar initially hidden
 
   return (
     <>
+      {/* Sidebar Toggle Button */}
+      <button
+        style={{ position: 'fixed', top: 10, left: 10, zIndex: 1100 }}
+        onClick={() => setExpand(!expanded)}
+      >
+        Toggle Sidebar
+      </button>
+
+      {/* Sidebar Components */}
       <CustomSidenav
         activeKey={activeKey}
         openKeys={openKeys}
@@ -180,3 +196,5 @@ const App = () => {
     </>
   );
 };
+
+ReactDOM.render(<App />, document.getElementById('root'));
