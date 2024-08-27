@@ -197,4 +197,14 @@ const App = () => {
   );
 };
 
+
+.rs-nav-item: Used for navigation items.
+.rs-nav-item-active: Applied to a navigation item when it is active.
+.rs-nav-sub-nav-item: Used for submenu items under a dropdown.
+.rs-nav-sub-nav-item-active: Applied to a submenu item when it is active.
+.rs-sidenav: Applied to the side navigation container.
+.rs-sidenav-body: Applied to the body of the side navigation.
+.rs-sidenav-toggle: Applied to the toggle button in the side navigation.
+.rs-nav-menu: Used for dropdown menus within the navigation.
+.rs-icon: Applied to icons used within rsuite components.
 ReactDOM.render(<App />, document.getElementById('root'));
