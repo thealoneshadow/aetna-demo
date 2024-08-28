@@ -198,13 +198,74 @@ const App = () => {
 };
 
 
-.rs-nav-item: Used for navigation items.
-.rs-nav-item-active: Applied to a navigation item when it is active.
-.rs-nav-sub-nav-item: Used for submenu items under a dropdown.
-.rs-nav-sub-nav-item-active: Applied to a submenu item when it is active.
-.rs-sidenav: Applied to the side navigation container.
-.rs-sidenav-body: Applied to the body of the side navigation.
-.rs-sidenav-toggle: Applied to the toggle button in the side navigation.
-.rs-nav-menu: Used for dropdown menus within the navigation.
-.rs-icon: Applied to icons used within rsuite components.
-ReactDOM.render(<App />, document.getElementById('root'));
+import React, { useState } from 'react';
+import $SP from 'sprestlib';
+
+const SharePointDocumentManager = () => {
+  const [uploadFile, setUploadFile] = useState(null);
+  const [downloadLink, setDownloadLink] = useState('');
+
+  // Initialize spRestLib
+  $SP.init({ 
+    baseUrl: 'https://your-sharepoint-site-url' // Replace with your SharePoint site URL
+  });
+
+  // Handle file upload to SharePoint
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+
+    if (!uploadFile) return;
+
+    try {
+      const response = await $SP().upload({
+        url: '/sites/your-site/Shared Documents', // Replace with your SharePoint library path
+        name: uploadFile.name,
+        data: uploadFile,
+      });
+
+      console.log('Upload successful!', response);
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    }
+  };
+
+  // Handle file download from SharePoint
+  const handleFileDownload = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await $SP().read({
+        url: '/sites/your-site/Shared Documents/your-file-name', // Replace with your file path in SharePoint
+        type: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'downloaded-file-name'); // Replace with the name you want for the downloaded file
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+  return (
+    <div>
+      <h1>SharePoint Document Manager</h1>
+      {/* File Upload */}
+      <form onSubmit={handleFileUpload}>
+        <input
+          type="file"
+          onChange={(e) => setUploadFile(e.target.files[0])}
+        />
+        <button type="submit">Upload File</button>
+      </form>
+
+      {/* File Download */}
+      <button onClick={handleFileDownload}>Download File</button>
+    </div>
+  );
+};
+
+export default SharePointDocumentManager;
