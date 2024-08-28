@@ -203,40 +203,32 @@ import $SP from 'sprestlib';
 
 const SharePointDocumentManager = () => {
   const [uploadFile, setUploadFile] = useState(null);
-  const [downloadLink, setDownloadLink] = useState('');
 
-  // Initialize spRestLib
-  $SP.init({ 
-    baseUrl: 'https://your-sharepoint-site-url' // Replace with your SharePoint site URL
-  });
-
-  // Handle file upload to SharePoint
+  // Function to handle file upload to SharePoint
   const handleFileUpload = async (e) => {
     e.preventDefault();
-
     if (!uploadFile) return;
 
     try {
       const response = await $SP().upload({
-        url: '/sites/your-site/Shared Documents', // Replace with your SharePoint library path
+        url: "/sites/your-site/Shared Documents",  // Replace with your SharePoint library path
         name: uploadFile.name,
         data: uploadFile,
       });
-
-      console.log('Upload successful!', response);
+      console.log("Upload successful!", response);
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error);
     }
   };
 
-  // Handle file download from SharePoint
-  const handleFileDownload = async (e) => {
-    e.preventDefault();
-
+  // Function to handle file download from SharePoint
+  const handleFileDownload = async () => {
     try {
-      const response = await $SP().read({
-        url: '/sites/your-site/Shared Documents/your-file-name', // Replace with your file path in SharePoint
-        type: 'blob',
+      const response = await $SP().getFile({
+        url: "/sites/your-site/Shared Documents/your-file-name",  // Replace with your file path in SharePoint
+        query: { $select: 'FileLeafRef,FileRef' },  // Query for specific fields
+        filename: 'your-file-name',  // The file you want to download
+        type: 'blob'  // Response type to download as a blob
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -245,8 +237,10 @@ const SharePointDocumentManager = () => {
       link.setAttribute('download', 'downloaded-file-name'); // Replace with the name you want for the downloaded file
       document.body.appendChild(link);
       link.click();
+      link.remove();  // Clean up the DOM
+
     } catch (error) {
-      console.error('Error downloading file:', error);
+      console.error("Error downloading file:", error);
     }
   };
 
@@ -269,3 +263,4 @@ const SharePointDocumentManager = () => {
 };
 
 export default SharePointDocumentManager;
+
