@@ -199,68 +199,55 @@ const App = () => {
 
 
 import React, { useState } from 'react';
-import $SP from 'sprestlib';
+import { sp } from "@pnp/sp/presets/all";
+import "@pnp/sp/files";
+import "@pnp/sp/webs";
 
-const SharePointDocumentManager = () => {
-  const [uploadFile, setUploadFile] = useState(null);
+// Replace this with your actual token acquisition logic
+const getToken = async () => "your-oauth-token";
 
-  // Function to handle file upload to SharePoint
-  const handleFileUpload = async (e) => {
-    e.preventDefault();
-    if (!uploadFile) return;
+const SharePointDocumentDownloader = ({ fileUrl }) => {
+  const [loading, setLoading] = useState(false);
 
-    try {
-      const response = await $SP().upload({
-        url: "/sites/your-site/Shared Documents",  // Replace with your SharePoint library path
-        name: uploadFile.name,
-        data: uploadFile,
-      });
-      console.log("Upload successful!", response);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-    }
+  const initializePnPjs = async () => {
+    const token = await getToken();
+    sp.setup({
+      sp: {
+        headers: {
+          "Accept": "application/json;odata=verbose",
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    });
   };
 
-  // Function to handle file download from SharePoint
-  const handleFileDownload = async () => {
+  const downloadFile = async () => {
+    setLoading(true);
+    await initializePnPjs();
     try {
-      const response = await $SP().getFile({
-        url: "/sites/your-site/Shared Documents/your-file-name",  // Replace with your file path in SharePoint
-        query: { $select: 'FileLeafRef,FileRef' },  // Query for specific fields
-        filename: 'your-file-name',  // The file you want to download
-        type: 'blob'  // Response type to download as a blob
-      });
-
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'downloaded-file-name'); // Replace with the name you want for the downloaded file
-      document.body.appendChild(link);
-      link.click();
-      link.remove();  // Clean up the DOM
-
+      const file = await sp.web.getFileByServerRelativeUrl(fileUrl).getBlob();
+      const url = window.URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileUrl.split('/').pop(); // Extract file name from URL
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
     } catch (error) {
       console.error("Error downloading file:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <h1>SharePoint Document Manager</h1>
-      {/* File Upload */}
-      <form onSubmit={handleFileUpload}>
-        <input
-          type="file"
-          onChange={(e) => setUploadFile(e.target.files[0])}
-        />
-        <button type="submit">Upload File</button>
-      </form>
-
-      {/* File Download */}
-      <button onClick={handleFileDownload}>Download File</button>
+      <button onClick={downloadFile} disabled={loading}>
+        {loading ? "Downloading..." : "Download File"}
+      </button>
     </div>
   );
 };
 
-export default SharePointDocumentManager;
+export default SharePointDocumentDownloader;
 
