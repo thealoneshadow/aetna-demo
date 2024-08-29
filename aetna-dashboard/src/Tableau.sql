@@ -199,11 +199,11 @@ const App = () => {
 
 
 import React, { useState } from 'react';
-import { sp } from "@pnp/sp/presets/all";
+import { spfi, SPFx } from "@pnp/sp";
 import "@pnp/sp/files";
 import "@pnp/sp/webs";
 
-// Replace this with your actual token acquisition logic
+// Function to get an OAuth token (replace with your actual logic)
 const getToken = async () => "your-oauth-token";
 
 const SharePointDocumentDownloader = ({ fileUrl }) => {
@@ -211,19 +211,21 @@ const SharePointDocumentDownloader = ({ fileUrl }) => {
 
   const initializePnPjs = async () => {
     const token = await getToken();
-    sp.setup({
-      sp: {
-        headers: {
-          "Accept": "application/json;odata=verbose",
-          "Authorization": `Bearer ${token}`
-        }
-      }
-    });
+
+    const sp = spfi().using(SPFx({
+      headers: {
+        "Accept": "application/json;odata=verbose",
+        "Authorization": `Bearer ${token}`,
+      },
+    }));
+
+    return sp;
   };
 
   const downloadFile = async () => {
     setLoading(true);
-    await initializePnPjs();
+    const sp = await initializePnPjs();
+
     try {
       const file = await sp.web.getFileByServerRelativeUrl(fileUrl).getBlob();
       const url = window.URL.createObjectURL(file);
@@ -250,4 +252,5 @@ const SharePointDocumentDownloader = ({ fileUrl }) => {
 };
 
 export default SharePointDocumentDownloader;
+
 
