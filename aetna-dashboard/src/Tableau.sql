@@ -37,6 +37,34 @@ def get_sharepoint_items():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
+         # Get the file path from the query parameter
+        file_path = request.args.get('file_path')
+        
+        if not file_path:
+            return jsonify({"error": "Please provide the file path as a query parameter"}), 400
+
+        # Get the client context
+        ctx = get_sharepoint_context()
+
+        # Get the file from SharePoint
+        file = ctx.web.get_file_by_server_relative_url(file_path).get().execute_query()
+
+        # Download the file content to memory
+        file_content = io.BytesIO()
+        file.download(file_content).execute_query()
+
+        # Move the pointer to the beginning of the file
+        file_content.seek(0)
+
+        # Send the file as a response
+        return send_file(
+            file_content,
+            as_attachment=True,
+            download_name=os.path.basename(file_path)
+        )
+
 if __name__ == '__main__':
     app.run(debug=True)
 
