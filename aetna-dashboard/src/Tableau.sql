@@ -1,34 +1,44 @@
-import React from 'react';
-import { DatePicker, Space } from 'antd';
-import moment from 'moment';
+from flask import Flask, jsonify
+from office365.sharepoint.client_context import ClientContext
+from office365.runtime.auth.client_credential import ClientCredential
+import os
 
-const onChange = (date, dateString) => {
-  console.log(date, dateString);
-};
+app = Flask(__name__)
 
-// Function to disable dates based on the current date
-const disabledDate = (current) => {
-  const today = moment();
-  const currentYear = today.year();
-  const cutoffDate = moment(`${currentYear}-10-01`); // October 1st of the current year
+# Get SharePoint credentials from environment variables
+client_id = os.getenv('SHAREPOINT_CLIENT_ID')
+client_secret = os.getenv('SHAREPOINT_CLIENT_SECRET')
+tenant = os.getenv('SHAREPOINT_TENANT')
+site_url = os.getenv('SHAREPOINT_SITE_URL')
 
-  // If today is after October 1st, disable current year
-  if (today.isAfter(cutoffDate)) {
-    return current && current.year() < currentYear; // Allow only years greater than or equal to the current year
-  }
+# Function to authenticate and get client context
+def get_sharepoint_context():
+    credentials = ClientCredential(client_id, client_secret)
+    ctx = ClientContext(site_url).with_credentials(credentials)
+    return ctx
 
-  // If today is before October 1st, allow current year and beyond
-  return current && current.year() < currentYear - 1; // Disable years less than the previous year
-};
+@app.route('/get-sharepoint-items', methods=['GET'])
+def get_sharepoint_items():
+    try:
+        # Get the client context
+        ctx = get_sharepoint_context()
 
-const App = () => (
-  <Space direction="vertical">
-    {/* Set disabledDate to dynamically control the year selection */}
-    <DatePicker onChange={onChange} picker="year" disabledDate={disabledDate} />
-  </Space>
-);
+        # Specify the list name you want to retrieve items from
+        list_title = "Your List Title"  # Replace with your list title
+        sp_list = ctx.web.lists.get_by_title(list_title)
 
-export default App;
+        # Load and execute the query
+        items = sp_list.items.get().execute_query()
+
+        # Extract the data and convert to JSON format
+        result = [{"ID": item.properties["Id"], "Title": item.properties["Title"]} for item in items]
+
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
 
