@@ -41,6 +41,11 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
+export SHAREPOINT_CLIENT_ID='your-client-id'
+export SHAREPOINT_CLIENT_SECRET='your-client-secret'
+export SHAREPOINT_TENANT='your-tenant-name'
+export SHAREPOINT_SITE_URL='https://your-tenant.sharepoint.com/sites/yoursite'
+
 
 import React, { useState } from 'react';
 import { spfi, SPFx } from "@pnp/sp";
