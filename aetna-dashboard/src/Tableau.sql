@@ -131,3 +131,70 @@ const SharePointDocumentDownloader = ({ fileUrl }) => {
 export default SharePointDocumentDownloader;
 
 
+import React, { useState } from 'react';
+import { Nav, Sidenav, Modal, Button } from 'rsuite';
+import DashboardIcon from '@rsuite/icons/legacy/Dashboard';
+import GroupIcon from '@rsuite/icons/legacy/Group';
+import './App.css';
+
+const App = () => {
+  const [showModal, setShowModal] = useState(false); // Modal visibility state
+
+  const handleModalOpen = () => {
+    setShowModal(true); // Show modal
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false); // Hide modal
+  };
+
+  return (
+    <>
+      {/* Navbar Wrapper */}
+      <div className="navbar-container">
+        <Nav activeKey="1">
+          <Nav.Item eventKey="1" onClick={handleModalOpen}>Home</Nav.Item>
+          <Nav.Item eventKey="2">About</Nav.Item>
+        </Nav>
+      </div>
+
+      {/* Sidebar Wrapper */}
+      <div className="sidebar-container">
+        <Sidenav defaultOpenKeys={['3', '4']} appearance="subtle">
+          <Sidenav.Body>
+            <Nav>
+              <Nav.Item eventKey="1" icon={<DashboardIcon />}>Dashboard</Nav.Item>
+              <Nav.Menu eventKey="2" title="User Group" icon={<GroupIcon />} className="custom-submenu">
+                <Nav.Item eventKey="2-1">User 1</Nav.Item>
+                <Nav.Item eventKey="2-2">User 2</Nav.Item>
+              </Nav.Menu>
+            </Nav>
+          </Sidenav.Body>
+        </Sidenav>
+      </div>
+
+      {/* Modal with iframe */}
+      <Modal open={showModal} onClose={handleModalClose} size="lg">
+        <Modal.Header>
+          <Modal.Title>Modal with Iframe</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <iframe
+            src="https://www.example.com"
+            title="iframe"
+            width="100%"
+            height="400px"
+            style={{ border: 'none' }}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleModalClose} appearance="primary">
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+export default App;
