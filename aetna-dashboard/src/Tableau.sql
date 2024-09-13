@@ -198,3 +198,23 @@ const App = () => {
 };
 
 export default App;
+
+
+
+
+const disabledDate = (current) => {
+  if (!current) return false; // Handle null or undefined
+
+  const today = moment(); // Get today's date
+  const currentYear = today.year(); // Get the current year
+  const cutoffDate = moment(`${currentYear}-10-01`); // October 1st of the current year
+  const fiveYearsAgo = currentYear - 5; // 5 years ago
+
+  // If today is before October 1st, disable the current year and any future years
+  if (today.isBefore(cutoffDate)) {
+    return current.year() > currentYear || current.year() === currentYear;
+  }
+
+  // After October 1st, only disable future years beyond the current year
+  return current.year() > currentYear || current.year() < fiveYearsAgo;
+};
