@@ -218,3 +218,24 @@ const disabledDate = (current) => {
   // After October 1st, only disable future years beyond the current year
   return current.year() > currentYear || current.year() < fiveYearsAgo;
 };
+
+
+const getLatestYear = () => {
+  const today = moment();
+  const currentYear = today.year();
+  const cutoffDate = moment(`${currentYear}-10-01`); // October 1st of the current year
+
+  // If it's before October 1st, return the previous year; otherwise, return the current year
+  return today.isBefore(cutoffDate) ? currentYear - 1 : currentYear;
+};
+
+// Function to disable years outside the past 5 years range
+const disabledDate = (current) => {
+  if (!current) return false; // Handle null or undefined
+
+  const latestYear = getLatestYear(); // Get the latest year based on the cutoff logic
+  const fiveYearsAgo = latestYear - 4; // Get the year 5 years ago (inclusive of the latest year)
+
+  // Disable all years that are before 5 years ago or beyond the latest year
+  return current.year() < fiveYearsAgo || current.year() > latestYear;
+};
