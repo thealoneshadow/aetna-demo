@@ -231,3 +231,42 @@ function addYearIfMissing(str) {
 
   return str;
 }
+
+
+db = mysql.connector.connect(
+    host="localhost",  # Your database host
+    user="username",   # Your database username
+    password="password",  # Your database password
+    database="your_database_name"  # Your database name
+)
+
+# Function to authenticate and get client context
+def get_sharepoint_context():
+    credentials = ClientCredential(client_id, client_secret)
+    ctx = ClientContext(site_url).with_credentials(credentials)
+    return ctx
+
+@app.route('/list-files', methods=['GET'])
+def list_files():
+    try:
+        ctx = get_sharepoint_context()
+        
+        # Specify the document library name (e.g., 'Documents' for the default library)
+        library_name = "Documents"
+
+        # Query the document library
+        files = ctx.web.lists.get_by_title(library_name).items.select("FileLeafRef", "FileRef").get().execute_query()
+
+        # Prepare a list of file metadata
+        file_list = []
+        for file in files:
+            file_list.append({
+                "filename": file.properties['FileLeafRef'],
+                "file_url": file.properties['FileRef']
+            })
+
+        return jsonify(file_list), 200
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
