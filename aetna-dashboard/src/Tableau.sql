@@ -202,71 +202,26 @@ export default App;
 
 
 
-const disabledDate = (current) => {
-  if (!current) return false; // Handle null or undefined
+  if (!sessionStorage.getItem('redirectPath')) {
+      sessionStorage.setItem('redirectPath', currentPath);
+    }
 
-  const today = moment(); // Get today's date
-  const currentYear = today.year(); // Get the current year
-  const cutoffDate = moment(`${currentYear}-10-01`); // October 1st of the current year
-  const fiveYearsAgo = currentYear - 5; // 5 years ago
+    // Trigger the SSO login logic after a delay (if using setTimeout for SSO logic)
+    const timeout = setTimeout(() => {
+      // Assuming your SSO URL logic is here
+      // Example: window.location.href = "https://sso.example.com";
 
-  // If today is before October 1st, disable the current year and any future years
-  if (today.isBefore(cutoffDate)) {
-    return current.year() > currentYear || current.year() === currentYear;
-  }
+      // Here, call your SSO API
+      // fetch('/sso/login')...
 
-  // After October 1st, only disable future years beyond the current year
-  return current.year() > currentYear || current.year() < fiveYearsAgo;
-};
+    }, 500); // Delay for demonstration, modify as needed
 
+    return () => clearTimeout(timeout); // Cleanup the timeout
+  }, [location]);
 
-function addYearIfMissing(str) {
-  // Regular expression to check if string contains a four-digit number (year)
-  const yearRegex = /\b\d{4}\b/;
-
-  // Check if the string contains a year
-  if (!yearRegex.test(str)) {
-    return `2024 ${str}`;
-  }
-
-  return str;
-}
-
-
-db = mysql.connector.connect(
-    host="localhost",  # Your database host
-    user="username",   # Your database username
-    password="password",  # Your database password
-    database="your_database_name"  # Your database name
-)
-
-# Function to authenticate and get client context
-def get_sharepoint_context():
-    credentials = ClientCredential(client_id, client_secret)
-    ctx = ClientContext(site_url).with_credentials(credentials)
-    return ctx
-
-@app.route('/list-files', methods=['GET'])
-def list_files():
-    try:
-        ctx = get_sharepoint_context()
-        
-        # Specify the document library name (e.g., 'Documents' for the default library)
-        library_name = "Documents"
-
-        # Query the document library
-        files = ctx.web.lists.get_by_title(library_name).items.select("FileLeafRef", "FileRef").get().execute_query()
-
-        # Prepare a list of file metadata
-        file_list = []
-        for file in files:
-            file_list.append({
-                "filename": file.properties['FileLeafRef'],
-                "file_url": file.properties['FileRef']
-            })
-
-        return jsonify(file_list), 200
-
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
-
+  useEffect(() => {
+    // After successful SSO login, redirect to the saved path or default to home page
+    const redirectPath = sessionStorage.getItem('redirectPath') || '/';
+    sessionStorage.removeItem('redirectPath'); // Clean up once used
+    navigate(redirectPath);
+  }, []);
