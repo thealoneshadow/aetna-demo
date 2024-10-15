@@ -106,3 +106,49 @@
 
   return <>{children}</>;
 };
+
+ const startTimeRef = useRef(Date.now()); // Use ref to track start time
+  const currentPageRef = useRef(location.pathname); // Use ref to track the current page
+
+  // Function to calculate time spent and save it
+  const saveTimeSpent = () => {
+    const endTime = Date.now();
+    const timeSpent = Math.floor((endTime - startTimeRef.current) / 1000); // time in seconds
+
+    // Send API call with the time spent on the page
+    axios.post('/api/save-time', {
+      page: currentPageRef.current,  // Ref ensures correct page is used
+      timeSpent: timeSpent,
+    })
+    .then(response => {
+      console.log('Time saved successfully:', response.data);
+    })
+    .catch(error => {
+      console.error('Error saving time:', error);
+    });
+  };
+
+  useEffect(() => {
+    // Handle when user navigates to a different route
+    const handleRouteChange = () => {
+      saveTimeSpent();  // Save the time spent on the current page before navigating away
+      startTimeRef.current = Date.now(); // Reset start time for the new page
+      currentPageRef.current = location.pathname; // Update the current page ref
+    };
+
+    // Handle tab close, page reload, or navigating away
+    const handleBeforeUnload = () => {
+      saveTimeSpent();  // Save time when user closes tab or reloads
+    };
+
+    // Listen for beforeunload events (for tab close, reload, etc.)
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    // Save time spent when route changes
+    handleRouteChange(); // Call on initial load and when location changes
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      saveTimeSpent(); // Ensure time is saved when unmounting the component
+    };
+  }, [location]);
