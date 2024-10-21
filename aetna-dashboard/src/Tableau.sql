@@ -205,3 +205,18 @@ WHERE id IN (
     ) AS subquery
     WHERE row_num <= FLOOR(total_count / 2)
 );
+
+DELETE FROM your_table
+WHERE id IN (
+    SELECT id FROM (
+        SELECT id
+        FROM your_table
+        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+        ORDER BY created_at
+        LIMIT (
+            SELECT CAST(FLOOR(COUNT(*) / 2) AS INT64)
+            FROM your_table
+            WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+        )
+    )
+);
