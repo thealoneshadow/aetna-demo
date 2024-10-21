@@ -168,3 +168,21 @@ WHERE id IN (
     FROM DuplicateRows
     WHERE row_num > 1
 );
+
+DELETE FROM your_table
+WHERE id IN (
+    SELECT id
+    FROM (
+        SELECT id, 
+               ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
+        FROM your_table
+        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+    )
+    WHERE row_num > 1
+);
+
+
+SELECT id, name, created_at,
+       ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
+FROM your_table
+WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z';
