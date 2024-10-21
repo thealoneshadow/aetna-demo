@@ -260,3 +260,16 @@ WHERE id IN (
     WHERE t1.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
     AND t2.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
 );
+
+WITH DuplicatePairs AS (
+    SELECT t2.id AS id_to_delete
+    FROM your_table t1
+    JOIN your_table t2
+      ON t1.userId = t2.userId
+      AND t1.created_at < t2.created_at
+      AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
+    WHERE t1.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
+    AND t2.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
+)
+DELETE FROM your_table
+WHERE id IN (SELECT id_to_delete FROM DuplicatePairs);
