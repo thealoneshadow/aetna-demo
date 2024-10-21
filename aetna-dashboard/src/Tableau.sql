@@ -195,10 +195,13 @@ GROUP BY name;
 
 
 DELETE FROM your_table
-WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-AND (name, created_at) NOT IN (
-    SELECT name, MIN(created_at)
-    FROM your_table
-    WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-    GROUP BY name
+WHERE id IN (
+    SELECT id FROM (
+        SELECT id, 
+               ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num,
+               COUNT(*) OVER (PARTITION BY name) AS total_count
+        FROM your_table
+        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+    ) AS subquery
+    WHERE row_num <= FLOOR(total_count / 2)
 );
