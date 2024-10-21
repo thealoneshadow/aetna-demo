@@ -186,3 +186,20 @@ SELECT id, name, created_at,
        ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
 FROM your_table
 WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z';
+
+
+
+SELECT MIN(created_at) AS earliest_created_at, name
+FROM your_table
+WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+GROUP BY name;
+
+
+DELETE FROM your_table
+WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+AND (name, created_at) NOT IN (
+    SELECT name, MIN(created_at)
+    FROM your_table
+    WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
+    GROUP BY name
+);
