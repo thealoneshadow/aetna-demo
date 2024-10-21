@@ -220,3 +220,21 @@ WHERE id IN (
         )
     )
 );
+
+
+SELECT t2.id
+FROM your_table t1
+JOIN your_table t2
+  ON t1.userId = t2.userId
+  AND t1.created_at < t2.created_at
+  AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5;
+
+DELETE FROM your_table
+WHERE id IN (
+    SELECT t2.id
+    FROM your_table t1
+    JOIN your_table t2
+      ON t1.userId = t2.userId
+      AND t1.created_at < t2.created_at
+      AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
+);
