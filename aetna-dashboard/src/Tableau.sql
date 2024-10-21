@@ -188,7 +188,6 @@ FROM your_table
 WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z';
 
 
-
 SELECT MIN(created_at) AS earliest_created_at, name
 FROM your_table
 WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
