@@ -152,3 +152,19 @@
       saveTimeSpent(); // Ensure time is saved when unmounting the component
     };
   }, [location]);
+
+
+  WITH DuplicateRows AS (
+    SELECT id, name, 
+           ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
+    FROM your_table
+    WHERE userId = 'your_userId'
+      AND created_at BETWEEN '2024-10-15 09:00:00' AND '2024-10-18 18:11:00'
+)
+-- Delete duplicates, keeping only 1 row per name
+DELETE FROM your_table
+WHERE id IN (
+    SELECT id
+    FROM DuplicateRows
+    WHERE row_num > 1
+);
