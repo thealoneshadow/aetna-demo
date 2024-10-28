@@ -61,226 +61,53 @@
   }, [location]);
 
 
-   useEffect(() => {
-    // Function to save time spent
-    const saveTimeSpent = () => {
-      const endTime = Date.now();
-      const timeSpent = Math.floor((endTime - startTime) / 1000); // time in seconds
+  import React, { useEffect, useState } from 'react';
 
-      // API call to save the time spent on the current page
-      axios.post('/api/save-time', {
-        page: currentPage,
-        timeSpent: timeSpent,
-      })
-      .then(response => {
-        console.log('Time saved successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error saving time:', error);
-      });
-    };
+const InactivityLogout = () => {
+  const [isActive, setIsActive] = useState(true);
+  let inactivityTimeout;
 
-    // Track route changes (navigating between dashboards)
-    const handleRouteChange = () => {
-      saveTimeSpent(); // Save the time spent on the current page before navigating away
-      setStartTime(Date.now()); // Reset start time for the new route
-      setCurrentPage(location.pathname); // Update the current page
-    };
+  const logoutUser = () => {
+    // Implement your logout logic here
+    console.log("User logged out due to inactivity");
+    // For example: redirect to login page, clear user state, etc.
+  };
 
-    // Listen for route changes using React Router's useLocation
-    handleRouteChange();
+  const resetTimer = () => {
+    setIsActive(true);
+    clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(() => {
+      setIsActive(false);
+      logoutUser();
+    }, 300000); // 5 minutes
+  };
 
-    // Handle tab close, page reload, or navigating away from the app
-    const handleBeforeUnload = (event) => {
-      saveTimeSpent(); // Save the time when user reloads, closes the tab, or navigates away
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Cleanup listeners when component unmounts or location changes
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      saveTimeSpent(); // Ensure time is saved when navigating to another route
-    };
-  }, [location, startTime, currentPage]);
-
-  return <>{children}</>;
-};
-
- const startTimeRef = useRef(Date.now()); // Use ref to track start time
-  const currentPageRef = useRef(location.pathname); // Use ref to track the current page
-
-  // Function to calculate time spent and save it
-  const saveTimeSpent = () => {
-    const endTime = Date.now();
-    const timeSpent = Math.floor((endTime - startTimeRef.current) / 1000); // time in seconds
-
-    // Send API call with the time spent on the page
-    axios.post('/api/save-time', {
-      page: currentPageRef.current,  // Ref ensures correct page is used
-      timeSpent: timeSpent,
-    })
-    .then(response => {
-      console.log('Time saved successfully:', response.data);
-    })
-    .catch(error => {
-      console.error('Error saving time:', error);
-    });
+  const handleActivity = () => {
+    resetTimer();
   };
 
   useEffect(() => {
-    // Handle when user navigates to a different route
-    const handleRouteChange = () => {
-      saveTimeSpent();  // Save the time spent on the current page before navigating away
-      startTimeRef.current = Date.now(); // Reset start time for the new page
-      currentPageRef.current = location.pathname; // Update the current page ref
-    };
+    // Set up event listeners for user activity
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keypress', handleActivity);
+    window.addEventListener('click', handleActivity);
 
-    // Handle tab close, page reload, or navigating away
-    const handleBeforeUnload = () => {
-      saveTimeSpent();  // Save time when user closes tab or reloads
-    };
-
-    // Listen for beforeunload events (for tab close, reload, etc.)
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    // Save time spent when route changes
-    handleRouteChange(); // Call on initial load and when location changes
+    resetTimer(); // Start the inactivity timer on mount
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      saveTimeSpent(); // Ensure time is saved when unmounting the component
+      // Cleanup event listeners and timeout on component unmount
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keypress', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      clearTimeout(inactivityTimeout);
     };
-  }, [location]);
+  }, []);
 
+  return (
+    <div>
+      <h1>{isActive ? "User is Active" : "User has been logged out due to inactivity"}</h1>
+    </div>
+  );
+};
 
-  WITH DuplicateRows AS (
-    SELECT id, name, 
-           ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
-    FROM your_table
-    WHERE userId = 'your_userId'
-      AND created_at BETWEEN '2024-10-15 09:00:00' AND '2024-10-18 18:11:00'
-)
--- Delete duplicates, keeping only 1 row per name
-DELETE FROM your_table
-WHERE id IN (
-    SELECT id
-    FROM DuplicateRows
-    WHERE row_num > 1
-);
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT id
-    FROM (
-        SELECT id, 
-               ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
-        FROM your_table
-        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-    )
-    WHERE row_num > 1
-);
-
-
-SELECT id, name, created_at,
-       ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num
-FROM your_table
-WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z';
-
-
-SELECT MIN(created_at) AS earliest_created_at, name
-FROM your_table
-WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-GROUP BY name;
-
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT id FROM (
-        SELECT id, 
-               ROW_NUMBER() OVER (PARTITION BY name ORDER BY created_at) AS row_num,
-               COUNT(*) OVER (PARTITION BY name) AS total_count
-        FROM your_table
-        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-    ) AS subquery
-    WHERE row_num <= FLOOR(total_count / 2)
-);
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT id FROM (
-        SELECT id
-        FROM your_table
-        WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-        ORDER BY created_at
-        LIMIT (
-            SELECT CAST(FLOOR(COUNT(*) / 2) AS INT64)
-            FROM your_table
-            WHERE created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-        )
-    )
-);
-
-
-SELECT t2.id
-FROM your_table t1
-JOIN your_table t2
-  ON t1.userId = t2.userId
-  AND t1.created_at < t2.created_at
-  AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5;
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT t2.id
-    FROM your_table t1
-    JOIN your_table t2
-      ON t1.userId = t2.userId
-      AND t1.created_at < t2.created_at
-      AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
-);
-
-
-SELECT t2.id
-FROM your_table t1
-JOIN your_table t2
-  ON t1.userId = t2.userId
-  AND t1.created_at < t2.created_at
-  AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
-WHERE t1.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-AND t2.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z';
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT t2.id
-    FROM your_table t1
-    JOIN your_table t2
-      ON t1.userId = t2.userId
-      AND t1.created_at < t2.created_at
-      AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
-    WHERE t1.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-    AND t2.created_at BETWEEN '2024-10-15T09:00:00Z' AND '2024-10-18T18:11:00Z'
-);
-
-DELETE FROM your_table
-WHERE id IN (
-    SELECT t2.id
-    FROM your_table t1
-    JOIN your_table t2
-      ON t1.userId = t2.userId
-      AND t1.created_at < t2.created_at
-      AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
-    WHERE t1.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
-    AND t2.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
-    GROUP BY t2.id
-);
-
-
-SELECT t2.id
-FROM your_table t1
-JOIN your_table t2
-  ON t1.userId = t2.userId
-  AND t1.created_at < t2.created_at
-  AND TIMESTAMP_DIFF(t2.created_at, t1.created_at, SECOND) < 5
-WHERE t1.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
-AND t2.created_at BETWEEN '2024-10-15 14:30:00' AND '2024-10-18 23:41:00'
-GROUP BY t2.id;
+export default InactivityLogout;
