@@ -1,113 +1,56 @@
- useEffect(() => {
-    // When the component is mounted, record the start time
-    const start = Date.now();
-    setStartTime(start);
+const [sessionStartTime, setSessionStartTime] = useState(null); // Track session start time
+  const [currentDashboard, setCurrentDashboard] = useState(null); // Track the current dashboard
 
-    // Function to be called when user leaves the dashboard
-    const handleLeave = () => {
-      const endTime = Date.now();
-      const timeSpent = Math.floor((endTime - startTime) / 1000); // in seconds
+  // Function to call the API
+  const saveSessionData = async () => {
+    if (sessionStartTime && currentDashboard) {
+      const sessionEndTime = Date.now(); // Capture session end time
+      const duration = sessionEndTime - sessionStartTime; // Calculate session duration
 
-      // API call to save the time spent
-      axios.post('/api/save-time', {
-        page: 'Dashboard', // Adjust this according to the page name
-        timeSpent: timeSpent
-      })
-      .then(response => {
-        console.log('Time saved successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error saving time:', error);
-      });
-    };
+      try {
+        await fetch('https://api.example.com/save-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dashboard: currentDashboard,
+            startTime: new Date(sessionStartTime).toISOString(),
+            endTime: new Date(sessionEndTime).toISOString(),
+            duration,
+          }),
+        });
+        console.log('Session data saved successfully.');
+      } catch (error) {
+        console.error('Failed to save session data:', error);
+      }
+    }
+  };
 
-    // When component unmounts or user navigates away
-    window.addEventListener('beforeunload', handleLeave);
-
-    return () => {
-      // Cleanup event listener
-      window.removeEventListener('beforeunload', handleLeave);
-      handleLeave(); // Ensure the time is saved if the component unmounts
-    };
-  }, [startTime]);
-
-
-    const location = useLocation();
-  const [startTime, setStartTime] = useState(Date.now());
-  const [currentPage, setCurrentPage] = useState(location.pathname);
-
+  // Handle page reload or tab close
   useEffect(() => {
-    // When the location changes (i.e., user navigates to another page)
-    return () => {
-      const endTime = Date.now();
-      const timeSpent = Math.floor((endTime - startTime) / 1000); // in seconds
-
-      // API call to save the time spent on the previous page
-      axios.post('/api/save-time', {
-        page: currentPage,
-        timeSpent: timeSpent,
-      })
-      .then(response => {
-        console.log('Time saved successfully:', response.data);
-      })
-      .catch(error => {
-        console.error('Error saving time:', error);
-      });
-
-      // Reset start time and page for the new route
-      setStartTime(Date.now());
-      setCurrentPage(location.pathname);
+    const handleUnload = () => {
+      saveSessionData(); // Save session on unload
     };
+
+    window.addEventListener('beforeunload', handleUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+    };
+  }, [sessionStartTime, currentDashboard]);
+
+  // Track route changes
+  useEffect(() => {
+    if (location.pathname.startsWith('/dashboard')) {
+      const dashboardId = location.pathname.split('/')[2]; // Example: Extract dashboard ID
+      setCurrentDashboard(dashboardId);
+
+      // Start session tracking
+      setSessionStartTime(Date.now());
+    } else {
+      // Save session when navigating away from the dashboard
+      saveSessionData();
+    }
   }, [location]);
 
-
-  import React, { useEffect, useState } from 'react';
-
-const InactivityLogout = () => {
-  const [isActive, setIsActive] = useState(true);
-  let inactivityTimeout;
-
-  const logoutUser = () => {
-    // Implement your logout logic here
-    console.log("User logged out due to inactivity");
-    // For example: redirect to login page, clear user state, etc.
-  };
-
-  const resetTimer = () => {
-    setIsActive(true);
-    clearTimeout(inactivityTimeout);
-    inactivityTimeout = setTimeout(() => {
-      setIsActive(false);
-      logoutUser();
-    }, 300000); // 5 minutes
-  };
-
-  const handleActivity = () => {
-    resetTimer();
-  };
-
-  useEffect(() => {
-    // Set up event listeners for user activity
-    window.addEventListener('mousemove', handleActivity);
-    window.addEventListener('keypress', handleActivity);
-    window.addEventListener('click', handleActivity);
-
-    resetTimer(); // Start the inactivity timer on mount
-
-    return () => {
-      // Cleanup event listeners and timeout on component unmount
-      window.removeEventListener('mousemove', handleActivity);
-      window.removeEventListener('keypress', handleActivity);
-      window.removeEventListener('click', handleActivity);
-      clearTimeout(inactivityTimeout);
-    };
-  }, []);
-
-  return (
-    <div>
-      <h1>{isActive ? "User is Active" : "User has been logged out due to inactivity"}</h1>
-    </div>
-  );
-};
-
-export default InactivityLogout;
