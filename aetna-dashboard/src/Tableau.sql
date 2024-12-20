@@ -1,27 +1,50 @@
-BEGIN TRANSACTION;
-
--- Check for duplicates
-SELECT COUNT(*) INTO duplicate_count
-FROM userviewtracking
-WHERE name = 'DASHBOARD_ID'
-  AND userId = 'USER_ID'
-  AND createdat >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 SECOND);
-
--- Conditional insert
-IF duplicate_count = 0 THEN
-  INSERT INTO userviewtracking (id, vertical, name, userId, duration, createdat, updatedat)
-  VALUES ('NEW_ID', 'VERTICAL_VALUE', 'DASHBOARD_ID', 'USER_ID', 'DURATION', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP());
-END IF;
-
-COMMIT;
+import { CaretRightOutlined } from '@ant-design/icons';
+import type { CollapseProps } from 'antd';
+import { Collapse, theme } from 'antd';
+import type { CSSProperties } from 'react';
 
 
-INSERT INTO userviewtracking (id, vertical, name, userId, duration, createdat, updatedat)
-SELECT 'NEW_ID', 'VERTICAL_VALUE', 'DASHBOARD_ID', 'USER_ID', 'DURATION', CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP()
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM userviewtracking
-    WHERE name = 'DASHBOARD_ID'
-      AND userId = 'USER_ID'
-      AND createdat >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 SECOND)
-);
+const text = `
+  A dog is a type of domesticated animal.
+  Known for its loyalty and faithfulness,
+  it can be found as a welcome guest in many households across the world.
+`;
+
+const getItems: (panelStyle: CSSProperties) => CollapseProps['items'] = (panelStyle) => [
+  {
+    key: '1',
+    label: 'This is panel header 1',
+    children: <p>{text}</p>,
+    style: panelStyle,
+  },
+  {
+    key: '2',
+    label: 'This is panel header 2',
+    children: <p>{text}</p>,
+    style: panelStyle,
+  },
+  {
+    key: '3',
+    label: 'This is panel header 3',
+    children: <p>{text}</p>,
+    style: panelStyle,
+  },
+];
+
+const { token } = theme.useToken();
+
+  const panelStyle: React.CSSProperties = {
+    marginBottom: 24,
+    background: token.colorFillAlter,
+    borderRadius: token.borderRadiusLG,
+    border: 'none',
+  };
+
+
+<Collapse
+      bordered={false}
+      defaultActiveKey={['1']}
+      expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+      style={{ background: token.colorBgContainer }}
+      items={getItems(panelStyle)}
+    />
