@@ -5,23 +5,24 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 // Mock data
 const columns = ["Column1", "Column2", "Column3", "Column4"];
 const aggregateFunctions = ["None", "SUM", "AVG", "MAX", "MIN"];
-const operators = ["=", "!=", ">", "<", ">=", "<="];
 
-const ColumnItem = ({ column, onDrop }) => {
+const ColumnItem = ({ column, onDrop, onClick, isSelected }) => {
   const [, drag] = useDrag(() => ({
     type: "COLUMN",
     item: { column },
   }));
+
   return (
     <div
       ref={drag}
+      onClick={() => onClick(column)}
       style={{
         padding: "8px",
         margin: "5px",
-        border: "1px solid #ccc",
+        border: isSelected ? "2px solid #007bff" : "1px solid #ccc",
         borderRadius: "4px",
         cursor: "grab",
-        background: "#f9f9f9",
+        background: isSelected ? "#e7f3ff" : "#f9f9f9",
       }}
     >
       {column}
@@ -34,6 +35,7 @@ const DropArea = ({ onDrop, children }) => {
     accept: "COLUMN",
     drop: (item) => onDrop(item.column),
   }));
+
   return (
     <div
       ref={drop}
@@ -53,16 +55,25 @@ const DropArea = ({ onDrop, children }) => {
 
 const QueryBuilder = () => {
   const [selectedColumns, setSelectedColumns] = useState([]);
-  const [filters, setFilters] = useState([]);
 
-  // Handle Drag and Drop
+  // Handle Drag-and-Drop
   const handleDrop = (column) => {
     if (!selectedColumns.find((col) => col.column === column)) {
       setSelectedColumns([...selectedColumns, { column, aggregate: "None", groupBy: false }]);
     }
   };
 
-  // Update Selected Columns
+  // Handle Click
+  const handleClick = (column) => {
+    if (!selectedColumns.find((col) => col.column === column)) {
+      setSelectedColumns([...selectedColumns, { column, aggregate: "None", groupBy: false }]);
+    } else {
+      // Remove column if already selected
+      setSelectedColumns(selectedColumns.filter((col) => col.column !== column));
+    }
+  };
+
+  // Update Column
   const updateColumn = (index, field, value) => {
     const updated = [...selectedColumns];
     updated[index][field] = value;
@@ -74,31 +85,27 @@ const QueryBuilder = () => {
     setSelectedColumns(selectedColumns.filter((_, i) => i !== index));
   };
 
-  // Add Filters
-  const addFilter = () => {
-    setFilters([...filters, { column: "", operator: "=", value: "", logic: "AND" }]);
-  };
-
-  const updateFilter = (index, field, value) => {
-    const updated = [...filters];
-    updated[index][field] = value;
-    setFilters(updated);
-  };
-
   return (
     <DndProvider backend={HTML5Backend}>
-      <div style={{ display: "flex", flexDirection: "column", padding: "20px" }}>
-        {/* Column Selection */}
-        <h2>Drag Columns to Select and Configure</h2>
+      <div style={{ padding: "20px" }}>
+        {/* Available Columns */}
+        <h2>Available Columns</h2>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "20px" }}>
           {columns.map((column) => (
-            <ColumnItem key={column} column={column} />
+            <ColumnItem
+              key={column}
+              column={column}
+              onDrop={handleDrop}
+              onClick={handleClick}
+              isSelected={selectedColumns.some((col) => col.column === column)}
+            />
           ))}
         </div>
 
         {/* Drop Area for Selected Columns */}
+        <h2>Selected Columns</h2>
         <DropArea onDrop={handleDrop}>
-          <h3>Selected Columns</h3>
+          {selectedColumns.length === 0 && <p>Drag or click to add columns here.</p>}
           {selectedColumns.map((col, index) => (
             <div
               key={index}
@@ -107,6 +114,10 @@ const QueryBuilder = () => {
                 alignItems: "center",
                 gap: "10px",
                 marginBottom: "10px",
+                padding: "8px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                background: "#fff",
               }}
             >
               <span>{col.column}</span>
@@ -132,53 +143,6 @@ const QueryBuilder = () => {
             </div>
           ))}
         </DropArea>
-
-        {/* Filtering Section */}
-        <h2>Configure Filtering Criteria</h2>
-        {filters.map((filter, index) => (
-          <div key={index} style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-            <select
-              value={filter.column}
-              onChange={(e) => updateFilter(index, "column", e.target.value)}
-            >
-              <option value="">Select Column</option>
-              {selectedColumns.map((col) => (
-                <option key={col.column} value={col.column}>
-                  {col.column}
-                </option>
-              ))}
-            </select>
-            <select
-              value={filter.operator}
-              onChange={(e) => updateFilter(index, "operator", e.target.value)}
-            >
-              {operators.map((op) => (
-                <option key={op} value={op}>
-                  {op}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              placeholder="Value"
-              value={filter.value}
-              onChange={(e) => updateFilter(index, "value", e.target.value)}
-            />
-            {index > 0 && (
-              <select
-                value={filter.logic}
-                onChange={(e) => updateFilter(index, "logic", e.target.value)}
-              >
-                <option value="AND">AND</option>
-                <option value="OR">OR</option>
-              </select>
-            )}
-            <button onClick={() => setFilters(filters.filter((_, i) => i !== index))}>
-              Remove
-            </button>
-          </div>
-        ))}
-        <button onClick={addFilter}>Add Filter</button>
       </div>
     </DndProvider>
   );
