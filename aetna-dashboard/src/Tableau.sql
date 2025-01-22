@@ -8,6 +8,7 @@ const QueryBuilder = () => {
   const [screen, setScreen] = useState(1); // Track which screen to display
   const [selectedColumns, setSelectedColumns] = useState([]);
   const [filters, setFilters] = useState([]);
+  const [query, setQuery] = useState(""); // Store the generated query
 
   // Handle column selection on Screen 1
   const handleColumnClick = (column) => {
@@ -41,6 +42,37 @@ const QueryBuilder = () => {
   // Remove a filter
   const removeFilter = (index) => {
     setFilters(filters.filter((_, i) => i !== index));
+  };
+
+  // Generate SQL query
+  const generateQuery = () => {
+    // Build SELECT clause
+    const selectClause = selectedColumns
+      .map((col) => {
+        if (col.aggregate !== "None") {
+          return `${col.aggregate}(${col.column}) AS ${col.aggregate}_${col.column}`;
+        }
+        return col.column;
+      })
+      .join(", ");
+
+    // Build GROUP BY clause
+    const groupByClause = selectedColumns
+      .filter((col) => col.groupBy)
+      .map((col) => col.column)
+      .join(", ");
+
+    // Build WHERE clause
+    const whereClause = filters
+      .filter((filter) => filter.column && filter.operator && filter.value)
+      .map((filter) => `${filter.column} ${filter.operator} '${filter.value}'`)
+      .join(" AND ");
+
+    // Combine clauses into a query
+    let query = `SELECT ${selectClause} FROM table_name`;
+    if (whereClause) query += ` WHERE ${whereClause}`;
+    if (groupByClause) query += ` GROUP BY ${groupByClause}`;
+    setQuery(query);
   };
 
   return (
@@ -169,12 +201,23 @@ const QueryBuilder = () => {
             <button onClick={() => setScreen(1)} style={{ marginRight: "10px", padding: "10px 20px" }}>
               Back
             </button>
-            <button style={{ padding: "10px 20px" }}>Generate Query</button>
+            <button onClick={generateQuery} style={{ padding: "10px 20px" }}>
+              Generate Query
+            </button>
           </div>
         </>
+      )}
+
+      {query && (
+        <div style={{ marginTop: "30px", padding: "15px", border: "1px solid #ccc", borderRadius: "4px" }}>
+          <h3>Generated Query:</h3>
+          <pre>{query}</pre>
+        </div>
       )}
     </div>
   );
 };
 
 export default QueryBuilder;
+
+
