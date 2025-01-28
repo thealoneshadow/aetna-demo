@@ -418,3 +418,125 @@ const QueryBuilder = () => {
 };
 
 export default QueryBuilder;
+
+
+
+
+import React, { useState } from "react";
+
+const columns = ["Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10"]; // Example list of columns
+const aggregateFunctions = ["None", "SUM", "AVG", "MAX", "MIN"];
+
+const QueryBuilder = () => {
+  const [screen, setScreen] = useState(1); // Track which screen to display
+  const [searchQuery, setSearchQuery] = useState(""); // Track search input for filtering columns
+  const [selectedColumns, setSelectedColumns] = useState([]);
+
+  const filteredColumns = columns.filter((col) => col.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const handleSelectColumn = (column) => {
+    if (!selectedColumns.some((col) => col.column === column)) {
+      setSelectedColumns([...selectedColumns, { column, aggregate: "None", groupBy: false }]);
+    }
+  };
+
+  const handleRemoveColumn = (column) => {
+    setSelectedColumns(selectedColumns.filter((col) => col.column !== column));
+  };
+
+  const updateColumn = (index, field, value) => {
+    const updated = [...selectedColumns];
+    updated[index][field] = value;
+    setSelectedColumns(updated);
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      {/* Screen 1: Select Columns and Configure */}
+      {screen === 1 && (
+        <>
+          <h2>Select Columns and Configure</h2>
+
+          <div style={{ display: "flex", gap: "20px" }}>
+            {/* Left: Available Columns */}
+            <div style={{ flex: 1 }}>
+              <h3>Available Columns</h3>
+              <input
+                type="text"
+                placeholder="Search columns..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ marginBottom: "10px", padding: "10px", width: "100%", boxSizing: "border-box" }}
+              />
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #ccc", padding: "8px" }}>Column Name</th>
+                    <th style={{ border: "1px solid #ccc", padding: "8px" }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredColumns.map((column) => (
+                    <tr key={column}>
+                      <td style={{ border: "1px solid #ccc", padding: "8px" }}>{column}</td>
+                      <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                        <button onClick={() => handleSelectColumn(column)}>Select</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Right: Selected Columns */}
+            <div style={{ flex: 1 }}>
+              <h3>Selected Columns</h3>
+              {selectedColumns.length === 0 && <p>No columns selected.</p>}
+              {selectedColumns.length > 0 && (
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr>
+                      <th style={{ border: "1px solid #ccc", padding: "8px" }}>Column Name</th>
+                      <th style={{ border: "1px solid #ccc", padding: "8px" }}>Aggregate</th>
+                      <th style={{ border: "1px solid #ccc", padding: "8px" }}>Group By</th>
+                      <th style={{ border: "1px solid #ccc", padding: "8px" }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedColumns.map((col, index) => (
+                      <tr key={index}>
+                        <td style={{ border: "1px solid #ccc", padding: "8px" }}>{col.column}</td>
+                        <td style={{ border: "1px solid #ccc", padding: "8px" }}>
+                          <select
+                            value={col.aggregate}
+                            onChange={(e) => updateColumn(index, "aggregate", e.target.value)}
+                          >
+                            {aggregateFunctions.map((func) => (
+                              <option key={func} value={func}>
+                                {func}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                          <input
+                            type="checkbox"
+                            checked={col.groupBy}
+                            onChange={(e) => updateColumn(index, "groupBy", e.target.checked)}
+                          />
+                        </td>
+                        <td style={{ border: "1px solid #ccc", padding: "8px", textAlign: "center" }}>
+                          <button onClick={() => handleRemoveColumn(col.column)}>Remove</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          <button onClick={() => setScreen(2)} style={{ marginTop: "20px", padding: "10px 20px" }}>
+            Next
+          </button>
+        </>
