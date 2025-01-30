@@ -1,3 +1,33 @@
+from flask import Flask, Response, stream_with_context, json
+from google.cloud import bigquery
+
+app = Flask(__name__)
+client = bigquery.Client()
+
+@app.route('/fetch-data')
+def fetch_data():
+    query = "SELECT * FROM your_table"  # Replace with your actual query
+    query_job = client.query(query)
+
+    def generate():
+        yield '{"message": "Data fetched", "data": ['  # Start JSON object
+        first = True
+        for row in query_job:
+            if not first:
+                yield ','  # Add comma between records
+            first = False
+            yield json.dumps(dict(row))  # Convert each row to JSON
+        yield ']}'  # End JSON object
+
+    return Response(stream_with_context(generate()), content_type="application/json")
+
+if __name__ == '__main__':
+    app.run()
+
+
+
+
+
 import React, { useState } from "react";
 
 const columns = ["Column1", "Column2", "Column3", "Column4", "Column5", "Column6", "Column7", "Column8", "Column9", "Column10"]; // Example list of columns
