@@ -1,28 +1,20 @@
-from flask import Flask, Response, stream_with_context, json
-from google.cloud import bigquery
+  // Convert Blob to JSON
+      const fileReader = new FileReader();
+      fileReader.onload = (event) => {
+        const jsonData = JSON.parse(event.target.result);
+        setData(jsonData.data); // Access the "data" field
+      };
+      fileReader.readAsText(response.data); // Read Blob as 
 
-app = Flask(__name__)
-client = bigquery.Client()
 
-@app.route('/fetch-data')
-def fetch_data():
-    query = "SELECT * FROM your_table"  # Replace with your actual query
-    query_job = client.query(query)
+             const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "data.json"); // Set file name
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link); // Cleanup
 
-    def generate():
-        yield '{"message": "Data fetched", "data": ['  # Start JSON object
-        first = True
-        for row in query_job:
-            if not first:
-                yield ','  # Add comma between records
-            first = False
-            yield json.dumps(dict(row))  # Convert each row to JSON
-        yield ']}'  # End JSON object
-
-    return Response(stream_with_context(generate()), content_type="application/json")
-
-if __name__ == '__main__':
-    app.run()
 
 
 
