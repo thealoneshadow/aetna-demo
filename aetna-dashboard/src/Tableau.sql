@@ -18,7 +18,6 @@
 
 
 
-
     file_path = "output.json"
 
     # Write data to a JSON file (streaming to avoid memory issues)
