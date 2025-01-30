@@ -27,6 +27,23 @@ if __name__ == '__main__':
 
 
 
+    file_path = "output.json"
+
+    # Write data to a JSON file (streaming to avoid memory issues)
+    with open(file_path, "w") as f:
+        f.write('{"message": "Data fetched", "data": [')  # Start JSON object
+        first = True
+        for row in query_job:
+            if not first:
+                f.write(',')
+            first = False
+            json.dump(dict(row), f)  # Write row as JSON
+        f.write("]}")  # End JSON object
+
+    # Send the JSON file as a response
+    return send_file(file_path, as_attachment=True, mimetype="application/json")
+
+
 
 import React, { useState } from "react";
 
