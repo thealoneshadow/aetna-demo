@@ -27,20 +27,38 @@ if query_job is None:  # ✅ Check if query_job is None
         )
 
 
-             // Create a blob URL from response data
-    const blob = new Blob([response.data], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
+             def format_value(value):
+        """Convert values to a safe CSV format"""
+        if value is None:
+            return ""  # ✅ Convert None to an empty string
+        if isinstance(value, str):
+            return f'"{value.replace(\'"\', \'""\')}"'  # ✅ Escape quotes for CSV
+        if isinstance(value, (int, float)):
+            return str(value)  # ✅ Convert numbers to string safely
+        if isinstance(value, (list, dict)):
+            return f'"{str(value)}"'  # ✅ Convert JSON-like structures to string
+        if hasattr(value, 'isoformat'):  # ✅ Handle datetime objects
+            return value.isoformat()
+        return str(value)  # Default case
 
-    // Create a temporary <a> element and trigger download
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "data.csv"); // ✅ File name
-    document.body.appendChild(link);
-    link.click();
+    def generate_csv():
+        """Generator function to stream CSV row by row."""
+        yield ",".join([field.name for field in query_job.schema]) + "\n"  # Header row
 
-    // Clean up
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+        for row in query_job:
+            formatted_row = [format_value(col) for col in row.values()]
+            yield ",".join(formatted_row) + "\n"  # Row data
+            time.sleep(0.001)  # Small delay to avoid overwhelming the server
+
+    return Response(
+        generate_csv(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=data.csv",
+            "Transfer-Encoding": "chunked"
+        }
+    )
+            
 
 
 
