@@ -1,18 +1,22 @@
-  // Convert Blob to JSON
-      const fileReader = new FileReader();
-      fileReader.onload = (event) => {
-        const jsonData = JSON.parse(event.target.result);
-        setData(jsonData.data); // Access the "data" field
-      };
-      fileReader.readAsText(response.data); // Read Blob as 
+def fetch_data():
+    query = "SELECT * FROM your_table"
+    query_job = client.query(query)
+    
+    # ✅ Convert data to CSV in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # ✅ Write headers
+    writer.writerow(query_job.schema)  
+    
+    # ✅ Write rows
+    for row in query_job:
+        writer.writerow(row.values())
+    
+    output.seek(0)  # Reset file pointer
+    
+    return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=data.csv"})
 
-
-             const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "data.json"); // Set file name
-    document.body.appendChild(link);
-    link.click();
     document.body.removeChild(link); // Cleanup
 
 
