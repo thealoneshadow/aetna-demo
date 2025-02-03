@@ -27,6 +27,21 @@ if query_job is None:  # ✅ Check if query_job is None
         )
 
 
+             // Create a blob URL from response data
+    const blob = new Blob([response.data], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary <a> element and trigger download
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "data.csv"); // ✅ File name
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
 
 
     file_path = "output.json"
