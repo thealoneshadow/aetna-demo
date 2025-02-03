@@ -1,23 +1,28 @@
-def fetch_data():
-    query = "SELECT * FROM your_table"
-    query_job = client.query(query)
-    
-    # ✅ Convert data to CSV in memory
+ # ✅ Convert query results to a list to check if it's empty
+    results = list(query_job)  
+
+    if not results:
+        return Response("No data found", status=204)  # 204 = No Content
+
+    # ✅ Create CSV in memory
     output = io.StringIO()
     writer = csv.writer(output)
-    
-    # ✅ Write headers
-    writer.writerow(query_job.schema)  
-    
-    # ✅ Write rows
-    for row in query_job:
-        writer.writerow(row.values())
-    
-    output.seek(0)  # Reset file pointer
-    
-    return Response(output, mimetype="text/csv", headers={"Content-Disposition": "attachment; filename=data.csv"})
 
-    document.body.removeChild(link); // Cleanup
+    # ✅ Write headers
+    writer.writerow([field.name for field in query_job.schema])
+
+    # ✅ Write rows if data exists
+    for row in results:
+        writer.writerow(row.values())
+
+    output.seek(0)  # Reset pointer
+
+    # ✅ Return CSV with correct headers
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=data.csv"}
+    )
 
 
 
