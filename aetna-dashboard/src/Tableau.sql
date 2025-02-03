@@ -1,28 +1,30 @@
- # ✅ Convert query results to a list to check if it's empty
-    results = list(query_job)  
+if query_job is None:  # ✅ Check if query_job is None
+            return jsonify({"error": "Query returned no data"}), 204  # 204 = No Content
 
-    if not results:
-        return Response("No data found", status=204)  # 204 = No Content
+        results = list(query_job)  # ✅ Convert to list to check if empty
 
-    # ✅ Create CSV in memory
-    output = io.StringIO()
-    writer = csv.writer(output)
+        if not results:
+            return jsonify({"error": "No data found"}), 204  # Handle empty result set
 
-    # ✅ Write headers
-    writer.writerow([field.name for field in query_job.schema])
+        # ✅ Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
 
-    # ✅ Write rows if data exists
-    for row in results:
-        writer.writerow(row.values())
+        # ✅ Write headers
+        writer.writerow([field.name for field in query_job.schema])
 
-    output.seek(0)  # Reset pointer
+        # ✅ Write rows
+        for row in results:
+            writer.writerow(row.values())
 
-    # ✅ Return CSV with correct headers
-    return Response(
-        output,
-        mimetype="text/csv",
-        headers={"Content-Disposition": "attachment; filename=data.csv"}
-    )
+        output.seek(0)  # Reset pointer
+
+        # ✅ Return CSV as response
+        return Response(
+            output,
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment; filename=data.csv"}
+        )
 
 
 
