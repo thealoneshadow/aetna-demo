@@ -6,27 +6,39 @@ from google.cloud import bigquery
 app = Flask(__name__)
 client = bigquery.Client()
 
+def extract_columns_from_query(query):
+    """Extract column names from the SELECT query."""
+    # Simple regex to extract columns from SELECT clause
+    select_clause = query.split("FROM")[0].replace("SELECT", "").strip()
+    columns = [col.strip() for col in select_clause.split(",")]
+    return columns
+
 @app.route('/fetch-data', methods=['GET'])
 def fetch_data():
-    query = "SELECT * FROM your_table LIMIT 5000000"  # Adjust as needed
+    query = "SELECT id, name, age FROM your_table LIMIT 5000000"  # Adjust your query
     query_job = client.query(query)
 
-    if query_job is None:
-        return jsonify({"error": "Query returned no data"}), 204
+    try:
+        results = query_job.result()  # Fetch results safely
+    except Exception as e:
+        return jsonify({"error": f"Query failed: {str(e)}"}), 500
+
+    # ✅ Extract column names from the query string
+    column_names = extract_columns_from_query(query)
 
     # ✅ Streaming Generator Function
     def stream_csv():
         output = io.StringIO()
         writer = csv.writer(output)
 
-        # ✅ Write Headers
-        writer.writerow([field.name for field in query_job.schema])
+        # ✅ Write headers (from query)
+        writer.writerow(column_names)
         yield output.getvalue()
         output.seek(0)
         output.truncate(0)
 
         # ✅ Stream rows dynamically (chunk-by-chunk)
-        for row in query_job:
+        for row in results:
             writer.writerow(row.values())
             yield output.getvalue()  # Send data immediately
             output.seek(0)
@@ -43,20 +55,3 @@ def fetch_data():
 
 if __name__ == '__main__':
     app.run()
-
-
-
-  const csvText = await response.data.text();
-
-        // ✅ Parse CSV into an Array of Arrays
-        const rows = csvText.split("\n").map(row => row.split(","));
-
-        // ✅ Convert to Excel Format
-        const worksheet = XLSX.utils.aoa_to_sheet(rows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-
-        // ✅ Trigger Excel Download
-        XLSX.writeFile(workbook, "data.xlsx");
-        
-        console.log("Excel downloaded successfully!");
