@@ -51,11 +51,9 @@ export default function AutoLogoutPopup() {
   return (
     <div>
       {showPopup && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-          <div style={{ backgroundColor: "white", padding: "16px", borderRadius: "8px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}>
-            <p>You have been inactive. Click "Active" to continue.</p>
-            <button onClick={handleActive} style={{ backgroundColor: "#3B82F6", color: "white", padding: "8px", borderRadius: "4px", marginTop: "8px", border: "none", cursor: "pointer" }}>Active</button>
-          </div>
+        <div style={{ position: "fixed", top: "10px", right: "10px", width: "300px", backgroundColor: "white", padding: "16px", borderRadius: "8px", boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}>
+          <p>You have been inactive. Click "Active" to continue.</p>
+          <button onClick={handleActive} style={{ backgroundColor: "#3B82F6", color: "white", padding: "8px", borderRadius: "4px", marginTop: "8px", border: "none", cursor: "pointer" }}>Active</button>
         </div>
       )}
     </div>
