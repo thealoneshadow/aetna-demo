@@ -5,6 +5,12 @@ def generate_large_csv():
     query_job = client.query(query)
 
     def stream():
+
+     # ✅ Get column names from schema
+        column_names = [field.name for field in query_job.schema]
+        yield ",".join(column_names) + "\n"  # ✅ Write headers first
+
+    
         for row in query_job:
             yield ",".join(map(str, row)) + "\n"
 
