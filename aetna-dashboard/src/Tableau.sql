@@ -47,6 +47,9 @@
 )}
 
 
+  const operators = ["=", "!=", ">", "<", ">=", "<="]; // Common operators
+const logicalOperators = ["AND", "OR"];
+
 filters
     .map((filter, index) =>
       `${index > 0 ? filter.logicalOp + " " : ""}${filter.column} ${filter.operator} '${filter.value}'`
