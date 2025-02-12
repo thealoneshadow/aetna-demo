@@ -45,3 +45,10 @@
     <button onClick={() => setScreen(1)} style={{ marginTop: "20px", marginLeft: "10px" }}>Back</button>
   </>
 )}
+
+
+filters
+    .map((filter, index) =>
+      `${index > 0 ? filter.logicalOp + " " : ""}${filter.column} ${filter.operator} '${filter.value}'`
+    )
+    .join(" ");
