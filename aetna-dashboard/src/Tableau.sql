@@ -1,3 +1,14 @@
+
+
+const handleAddFilter = () => {
+  setFilters([...filters, { column: "", operator: "=", value: "", logicalOp: filters.length ? "AND" : "" }]);
+};
+
+const handleRemoveFilter = (index) => {
+  setFilters(filters.filter((_, i) => i !== index));
+};
+
+
 {screen === 2 && (
   <>
     <h2>Configure Filters</h2>
