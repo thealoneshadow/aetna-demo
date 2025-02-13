@@ -9,6 +9,23 @@ const handleRemoveFilter = (index) => {
 };
 
 
+const formatDate = (value) => {
+  const date = new Date(value);
+  return !isNaN(date.getTime()) ? date.toISOString().split("T")[0] : value;
+};
+
+const generateQuery = () => {
+  return filters
+    .filter(filter => filter.column && filter.value) // Exclude incomplete filters
+    .map((filter, index, arr) => {
+      const logicalOp = index > 0 ? filter.logicalOp + " " : "";
+      const formattedValue = formatDate(filter.value); // Convert date if applicable
+      return `${logicalOp}${filter.column} ${filter.operator} '${formattedValue}'`;
+    })
+    .join(" ");
+};
+
+
 {screen === 2 && (
   <>
     <h2>Configure Filters</h2>
