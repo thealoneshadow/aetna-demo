@@ -61,8 +61,10 @@ const handleRemoveFilter = (index) => {
   const operators = ["=", "!=", ">", "<", ">=", "<="]; // Common operators
 const logicalOperators = ["AND", "OR"];
 
-filters
-    .map((filter, index) =>
-      `${index > 0 ? filter.logicalOp + " " : ""}${filter.column} ${filter.operator} '${filter.value}'`
-    )
+
+.filter(filter => filter.column && filter.value) // Exclude incomplete filters
+    .map((filter, index, arr) => {
+      const logicalOp = index > 0 ? filter.logicalOp + " " : "";
+      return `${logicalOp}${filter.column} ${filter.operator} '${filter.value}'`;
+    })
     .join(" ");
