@@ -1,18 +1,20 @@
 
-
-const handleAddFilter = () => {
-  setFilters([...filters, { column: "", operator: "=", value: "", logicalOp: filters.length ? "AND" : "" }]);
+const formatFinalQueryDates = (query) => {
+  return query.replace(/'(\d{1,2}[-/]\d{1,2}[-/]\d{4})'/g, (match, dateString) => {
+    const [day, month, year] = dateString.includes("/") ? dateString.split("/") : dateString.split("-");
+    
+    // Ensure it's a valid date before replacing
+    const formattedDate = new Date(`${year}-${month}-${day}`);
+    return isNaN(formattedDate.getTime()) ? match : `'${formattedDate.toISOString().split("T")[0]}'`;
+  });
 };
 
-const handleRemoveFilter = (index) => {
-  setFilters(filters.filter((_, i) => i !== index));
+const generateFinalQuery = () => {
+  let rawQuery = buildQuery(); // Assume this builds the query string
+  let formattedQuery = formatFinalQueryDates(rawQuery);
+  setFinalQuery(formattedQuery);
 };
 
-
-const formatDate = (value) => {
-  const date = new Date(value);
-  return !isNaN(date.getTime()) ? date.toISOString().split("T")[0] : value;
-};
 
 const generateQuery = () => {
   return filters
