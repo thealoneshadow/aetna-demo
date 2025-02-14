@@ -14,18 +14,19 @@ const CSVUploader = () => {
         const csvData = e.target.result;
         Papa.parse(csvData, {
           complete: (result) => {
-            if (result.data.length > 0) {
+            if (result.data.length > 1) {
               const headers = result.data[0];
               const types = inferColumnTypes(result.data);
 
               const structuredData = headers.map((header, index) => ({
-                name: header,
-                type: types[index] || "Unknown",
+                column_name: header,
+                data_type: types[index] || "Unknown",
+                description: ""
               }));
 
               fileDataArray.push({ fileName: file.name, data: structuredData });
-              setParsedData((prev) => [...prev, ...fileDataArray]);
-              saveAsJson([...fileDataArray]);
+              setParsedData((prev) => [...prev, { fileName: file.name, data: structuredData }]);
+              saveAsJson([...parsedData, { fileName: file.name, data: structuredData }]);
             }
           },
           header: false,
@@ -64,7 +65,7 @@ const CSVUploader = () => {
             <h3 className="font-bold">{file.fileName}</h3>
             <ul>
               {file.data.map((col, index) => (
-                <li key={index}>{col.name} - {col.type}</li>
+                <li key={index}>{col.column_name} - {col.data_type} - {col.description}</li>
               ))}
             </ul>
           </div>
