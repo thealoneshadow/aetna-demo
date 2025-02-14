@@ -1,89 +1,79 @@
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
 
-const formatFinalQueryDates = (query) => {
-  return query.replace(/'(\d{1,2}[-/]\d{1,2}[-/]\d{4})'/g, (match, dateString) => {
-    const [day, month, year] = dateString.includes("/") ? dateString.split("/") : dateString.split("-");
-    
-    // Ensure it's a valid date before replacing
-    const formattedDate = new Date(`${year}-${month}-${day}`);
-    return isNaN(formattedDate.getTime()) ? match : `'${formattedDate.toISOString().split("T")[0]}'`;
-  });
-};
+const ExcelUploader = () => {
+  const [parsedData, setParsedData] = useState([]);
 
-const generateFinalQuery = () => {
-  let rawQuery = buildQuery(); // Assume this builds the query string
-  let formattedQuery = formatFinalQueryDates(rawQuery);
-  setFinalQuery(formattedQuery);
-};
+  const handleFileUpload = (event) => {
+    const files = event.target.files;
+    const fileDataArray = [];
 
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        
+        workbook.SheetNames.forEach((sheetName) => {
+          const sheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-const generateQuery = () => {
-  return filters
-    .filter(filter => filter.column && filter.value) // Exclude incomplete filters
-    .map((filter, index, arr) => {
-      const logicalOp = index > 0 ? filter.logicalOp + " " : "";
-      const formattedValue = formatDate(filter.value); // Convert date if applicable
-      return `${logicalOp}${filter.column} ${filter.operator} '${formattedValue}'`;
-    })
-    .join(" ");
-};
+          if (jsonData.length > 0) {
+            const headers = jsonData[0];
+            const types = inferColumnTypes(jsonData);
 
+            const structuredData = headers.map((header, index) => ({
+              name: header,
+              type: types[index] || "Unknown",
+            }));
 
-{screen === 2 && (
-  <>
-    <h2>Configure Filters</h2>
-    <button onClick={handleAddFilter} style={{ marginBottom: "10px" }}>Add Filter</button>
+            fileDataArray.push({ fileName: file.name, sheetName, data: structuredData });
+          }
+        });
+        setParsedData((prev) => [...prev, ...fileDataArray]);
+        saveAsJson([...fileDataArray]);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  };
 
-    {filters.map((filter, index) => (
-      <div key={index} style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-        {/* Logical Operator Dropdown (except for the first filter) */}
-        {index > 0 && (
-          <select value={filter.logicalOp} onChange={(e) => updateFilter(index, "logicalOp", e.target.value)}>
-            {logicalOperators.map((op) => (
-              <option key={op} value={op}>{op}</option>
-            ))}
-          </select>
-        )}
+  const inferColumnTypes = (data) => {
+    if (data.length < 2) return [];
+    return data[1].map((value) => {
+      if (typeof value === "number") return "Number";
+      if (typeof value === "boolean") return "Boolean";
+      if (typeof value === "string" && !isNaN(Date.parse(value))) return "Date";
+      return "String";
+    });
+  };
 
-        {/* Column Selection */}
-        <select value={filter.column} onChange={(e) => updateFilter(index, "column", e.target.value)}>
-          <option value="">Select Column</option>
-          {columns.map((col) => (
-            <option key={col} value={col}>{col}</option>
-          ))}
-        </select>
+  const saveAsJson = (data) => {
+    const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(jsonBlob);
+    link.download = "parsedData.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-        {/* Operator Selection */}
-        <select value={filter.operator} onChange={(e) => updateFilter(index, "operator", e.target.value)}>
-          {operators.map((op) => (
-            <option key={op} value={op}>{op}</option>
-          ))}
-        </select>
-
-        {/* Input for Filter Value */}
-        <input type="text" value={filter.value} onChange={(e) => updateFilter(index, "value", e.target.value)} placeholder="Enter value" />
-
-        {/* Remove Filter Button */}
-        <button onClick={() => handleRemoveFilter(index)}>Remove</button>
+  return (
+    <div className="p-4">
+      <input type="file" multiple accept=".xlsx, .xls" onChange={handleFileUpload} />
+      <div className="mt-4">
+        {parsedData.map((file, fileIndex) => (
+          <div key={fileIndex} className="border p-2 mb-4">
+            <h3 className="font-bold">{file.fileName} - {file.sheetName}</h3>
+            <ul>
+              {file.data.map((col, index) => (
+                <li key={index}>{col.name} - {col.type}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
-    ))}
+    </div>
+  );
+};
 
-    {/* Query Preview */}
-    <h3>Generated Query:</h3>
-    <p style={{ background: "#f4f4f4", padding: "10px", borderRadius: "5px" }}>{generateQuery()}</p>
-
-    <button onClick={() => setScreen(3)} style={{ marginTop: "20px" }}>Next</button>
-    <button onClick={() => setScreen(1)} style={{ marginTop: "20px", marginLeft: "10px" }}>Back</button>
-  </>
-)}
-
-
-  const operators = ["=", "!=", ">", "<", ">=", "<="]; // Common operators
-const logicalOperators = ["AND", "OR"];
-
-
-.filter(filter => filter.column && filter.value) // Exclude incomplete filters
-    .map((filter, index, arr) => {
-      const logicalOp = index > 0 ? filter.logicalOp + " " : "";
-      return `${logicalOp}${filter.column} ${filter.operator} '${filter.value}'`;
-    })
-    .join(" ");
+export default ExcelUploader;
