@@ -16,11 +16,14 @@ const CSVUploader = () => {
           complete: (result) => {
             if (result.data.length > 1) {
               const headers = result.data[0];
-              const types = inferColumnTypes(result.data);
+              const dataRows = result.data.slice(1);
 
-              const structuredData = headers.map((header, index) => ({
-                column_name: header,
-                data_type: types[index] || "Unknown",
+              const structuredData = dataRows.map((row) => ({
+                name: row[headers.indexOf("column_name")],
+                type: row[headers.indexOf("data_type")],
+                is_nullable: row[headers.indexOf("is_nullable")],
+                is_partitioning: row[headers.indexOf("is_partioning")],
+                default: row[headers.indexOf("default")],
                 description: ""
               }));
 
@@ -30,19 +33,10 @@ const CSVUploader = () => {
             }
           },
           header: false,
+          skipEmptyLines: true
         });
       };
       reader.readAsText(file);
-    });
-  };
-
-  const inferColumnTypes = (data) => {
-    if (data.length < 2) return [];
-    return data[1].map((value) => {
-      if (!isNaN(value)) return "Number";
-      if (value.toLowerCase() === "true" || value.toLowerCase() === "false") return "Boolean";
-      if (!isNaN(Date.parse(value))) return "Date";
-      return "String";
     });
   };
 
@@ -65,7 +59,9 @@ const CSVUploader = () => {
             <h3 className="font-bold">{file.fileName}</h3>
             <ul>
               {file.data.map((col, index) => (
-                <li key={index}>{col.column_name} - {col.data_type} - {col.description}</li>
+                <li key={index}>
+                  {col.name} - {col.type} - {col.is_nullable} - {col.is_partitioning} - {col.default} - {col.description}
+                </li>
               ))}
             </ul>
           </div>
@@ -74,5 +70,4 @@ const CSVUploader = () => {
     </div>
   );
 };
-
 export default CSVUploader;
