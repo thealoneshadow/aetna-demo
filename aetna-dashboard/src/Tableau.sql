@@ -10,16 +10,23 @@ const data = [
 ];
 
 const CascadingDropdowns = () => {
-  const [selectedDashboard, setSelectedDashboard] = useState("");
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState("");
+  const dashboards = [...new Set(data.map((item) => item.dashboard))];
+  const timePeriods = ["AEP", "OEP", "SEP"];
+
+  const [selectedDashboard, setSelectedDashboard] = useState(dashboards[0] || "");
   const [filteredTables, setFilteredTables] = useState([]);
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState("");
+  const [showTimePeriod, setShowTimePeriod] = useState(false);
 
   useEffect(() => {
     if (selectedDashboard) {
       const tables = data.filter((item) => item.dashboard === selectedDashboard);
       setFilteredTables(tables);
+      setShowTimePeriod(tables.some(item => timePeriods.includes(item.timePeriod)));
+      setSelectedTimePeriod(showTimePeriod ? tables[0]?.timePeriod || "" : "");
     } else {
       setFilteredTables([]);
+      setShowTimePeriod(false);
     }
   }, [selectedDashboard]);
 
@@ -33,30 +40,28 @@ const CascadingDropdowns = () => {
     }
   }, [selectedTimePeriod]);
 
-  const dashboards = [...new Set(data.map((item) => item.dashboard))];
-  const timePeriods = ["AEP", "OEP", "SEP", ""];
-
   return (
     <div>
       <label>Dashboard:</label>
-      <select onChange={(e) => { setSelectedDashboard(e.target.value); setSelectedTimePeriod(""); }}>
-        <option value="">Select Dashboard</option>
+      <select value={selectedDashboard} onChange={(e) => setSelectedDashboard(e.target.value)}>
         {dashboards.map((dashboard) => (
           <option key={dashboard} value={dashboard}>{dashboard}</option>
         ))}
       </select>
 
-      <label>Time Period:</label>
-      <select onChange={(e) => setSelectedTimePeriod(e.target.value)} disabled={!selectedDashboard}>
-        <option value="">Select Time Period</option>
-        {timePeriods.map((period) => (
-          <option key={period} value={period}>{period || "(Empty)"}</option>
-        ))}
-      </select>
+      {showTimePeriod && (
+        <>
+          <label>Time Period:</label>
+          <select value={selectedTimePeriod} onChange={(e) => setSelectedTimePeriod(e.target.value)}>
+            {timePeriods.map((period) => (
+              <option key={period} value={period}>{period}</option>
+            ))}
+          </select>
+        </>
+      )}
 
       <label>Tables:</label>
-      <select disabled={!selectedDashboard || filteredTables.length === 0}>
-        <option value="">Select Table</option>
+      <select>
         {filteredTables.map((table) => (
           <option key={table.tableName} value={table.tableName}>{table.tableName}</option>
         ))}
