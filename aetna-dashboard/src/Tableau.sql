@@ -1,73 +1,68 @@
-import React, { useState } from "react";
-import * as Papa from "papaparse";
+import React, { useState, useEffect } from "react";
 
-const CSVUploader = () => {
-  const [parsedData, setParsedData] = useState([]);
+const data = [
+  { dashboard: "Sales", timePeriod: "AEP", tableName: "sales_q1" },
+  { dashboard: "Sales", timePeriod: "OEP", tableName: "sales_q2" },
+  { dashboard: "Marketing", timePeriod: "SEP", tableName: "marketing_q3" },
+  { dashboard: "Marketing", timePeriod: "", tableName: "marketing_overview" },
+  { dashboard: "Finance", timePeriod: "AEP", tableName: "finance_q1" },
+  { dashboard: "Finance", timePeriod: "OEP", tableName: "finance_q2" }
+];
 
-  const handleFileUpload = (event) => {
-    const files = event.target.files;
-    const fileDataArray = [];
+const CascadingDropdowns = () => {
+  const [selectedDashboard, setSelectedDashboard] = useState("");
+  const [selectedTimePeriod, setSelectedTimePeriod] = useState("");
+  const [filteredTables, setFilteredTables] = useState([]);
 
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const csvData = e.target.result;
-        Papa.parse(csvData, {
-          complete: (result) => {
-            if (result.data.length > 1) {
-              const headers = result.data[0];
-              const dataRows = result.data.slice(1);
+  useEffect(() => {
+    if (selectedDashboard) {
+      const tables = data.filter((item) => item.dashboard === selectedDashboard);
+      setFilteredTables(tables);
+    } else {
+      setFilteredTables([]);
+    }
+  }, [selectedDashboard]);
 
-              const structuredData = dataRows.map((row) => ({
-                name: row[headers.indexOf("column_name")],
-                type: row[headers.indexOf("data_type")],
-                is_nullable: row[headers.indexOf("is_nullable")],
-                is_partitioning: row[headers.indexOf("is_partioning")],
-                default: row[headers.indexOf("default")],
-                description: ""
-              }));
+  useEffect(() => {
+    if (selectedTimePeriod) {
+      setFilteredTables((prevTables) =>
+        prevTables.filter((item) =>
+          item.timePeriod === selectedTimePeriod || item.timePeriod === ""
+        )
+      );
+    }
+  }, [selectedTimePeriod]);
 
-              fileDataArray.push({ fileName: file.name, data: structuredData });
-              setParsedData((prev) => [...prev, { fileName: file.name, data: structuredData }]);
-              saveAsJson([...parsedData, { fileName: file.name, data: structuredData }]);
-            }
-          },
-          header: false,
-          skipEmptyLines: true
-        });
-      };
-      reader.readAsText(file);
-    });
-  };
-
-  const saveAsJson = (data) => {
-    const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(jsonBlob);
-    link.download = "parsedData.json";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const dashboards = [...new Set(data.map((item) => item.dashboard))];
+  const timePeriods = ["AEP", "OEP", "SEP", ""];
 
   return (
-    <div className="p-4">
-      <input type="file" multiple accept=".csv" onChange={handleFileUpload} />
-      <div className="mt-4">
-        {parsedData.map((file, fileIndex) => (
-          <div key={fileIndex} className="border p-2 mb-4">
-            <h3 className="font-bold">{file.fileName}</h3>
-            <ul>
-              {file.data.map((col, index) => (
-                <li key={index}>
-                  {col.name} - {col.type} - {col.is_nullable} - {col.is_partitioning} - {col.default} - {col.description}
-                </li>
-              ))}
-            </ul>
-          </div>
+    <div>
+      <label>Dashboard:</label>
+      <select onChange={(e) => { setSelectedDashboard(e.target.value); setSelectedTimePeriod(""); }}>
+        <option value="">Select Dashboard</option>
+        {dashboards.map((dashboard) => (
+          <option key={dashboard} value={dashboard}>{dashboard}</option>
         ))}
-      </div>
+      </select>
+
+      <label>Time Period:</label>
+      <select onChange={(e) => setSelectedTimePeriod(e.target.value)} disabled={!selectedDashboard}>
+        <option value="">Select Time Period</option>
+        {timePeriods.map((period) => (
+          <option key={period} value={period}>{period || "(Empty)"}</option>
+        ))}
+      </select>
+
+      <label>Tables:</label>
+      <select disabled={!selectedDashboard || filteredTables.length === 0}>
+        <option value="">Select Table</option>
+        {filteredTables.map((table) => (
+          <option key={table.tableName} value={table.tableName}>{table.tableName}</option>
+        ))}
+      </select>
     </div>
   );
 };
-export default CSVUploader;
+
+export default CascadingDropdowns;
