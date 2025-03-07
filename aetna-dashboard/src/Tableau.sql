@@ -54,22 +54,19 @@ if __name__ == '__main__':
 
 
 
-
 from google.cloud import storage
-from datetime import timedelta
 
-def upload_to_gcs(bucket_name, file_stream, destination_blob_name, expiration_hours=1):
+def upload_to_gcs(bucket_name, file_stream, destination_blob_name):
     """
-    Uploads a file stream to Google Cloud Storage and returns a signed URL.
+    Uploads a file stream to Google Cloud Storage and returns a public URL.
     
     Args:
         bucket_name (str): Name of the GCS bucket.
         file_stream (BinaryIO): The file stream to upload.
         destination_blob_name (str): The destination path in the bucket.
-        expiration_hours (int): Signed URL expiration time in hours.
 
     Returns:
-        str: Signed URL for the uploaded file.
+        str: Public URL of the uploaded file.
     """
     client = storage.Client()
     bucket = client.bucket(bucket_name)
@@ -77,9 +74,13 @@ def upload_to_gcs(bucket_name, file_stream, destination_blob_name, expiration_ho
     
     # Upload the file stream to GCS
     blob.upload_from_file(file_stream, content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    
-    # Generate a signed URL valid for expiration_hours
-    signed_url = blob.generate_signed_url(expiration=timedelta(hours=expiration_hours))
+
+    # Make the file public (so the URL will not expire)
+    blob.make_public()
+
+    # Return the permanent public URL
+    return blob.public_url
+
 
     return signed_url
 
