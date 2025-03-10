@@ -1,45 +1,16 @@
+def upload_to_gcs(bucket_name, file_stream, destination_blob_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blob = bucket.blob(destination_blob_name)
 
-import requests
+    # Upload file stream as binary
+    file_stream.seek(0)  # Ensure stream is at the beginning
+    blob.upload_from_file(file_stream, content_type='text/csv')
 
-def trigger_airflow_dag(dag_id, email, gcs_url):
-    airflow_api_url = f"http://your-airflow-host/api/v1/dags/{dag_id}/dagRuns"
-    headers = {"Content-Type": "application/json", "Authorization": "Bearer YOUR_AIRFLOW_TOKEN"}
-    
-    payload = {
-        "conf": {
-            "email": email,
-            "file_url": gcs_url
-        }
-    }
+    # Make the file public (Permanent URL)
+    blob.make_public()
 
-    response = requests.post(airflow_api_url, json=payload, headers=headers)
-    return response.json()
-
-
-from flask import Flask, request, jsonify
-
-app = Flask(__name__)
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['file']
-    email = request.form['email']
-    
-    if not file:
-        return jsonify({"error": "No file uploaded"}), 400
-
-    gcs_url = upload_to_gcs("your-bucket-name", file, file.filename)
-    dag_response = trigger_airflow_dag("your_dag_id", email, gcs_url)
-    
-    return jsonify({
-        "message": "File uploaded successfully!",
-        "file_url": gcs_url,
-        "dag_status": dag_response
-    })
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
+    return blob.public_url
 
 
 
