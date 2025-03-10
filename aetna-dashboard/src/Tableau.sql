@@ -1,17 +1,23 @@
-def upload_to_gcs(bucket_name, file_stream, destination_blob_name):
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(destination_blob_name)
+import subprocess
+import os
+from flask import Blueprint, jsonify
 
-    # Upload file stream as binary
-    file_stream.seek(0)  # Ensure stream is at the beginning
-    blob.upload_from_file(file_stream, content_type='text/csv')
+streamlit_bp = Blueprint("streamlit", __name__)
 
-    # Make the file public (Permanent URL)
-    blob.make_public()
+STREAMLIT_APP_PATH = os.path.abspath("StreamlitChatbot-EXL-main/app_v8.py")
 
-    return blob.public_url
+def run_streamlit():
+    subprocess.Popen(["python", STREAMLIT_APP_PATH])
 
+# Start Streamlit when Flask starts
+run_streamlit()
+
+@streamlit_bp.route("/status", methods=["GET"])
+def streamlit_status():
+    return jsonify({"status": "Streamlit is running"})
+
+
+    app.register_blueprint(streamlit_bp, url_prefix="/api/streamlit")
 
 
 from google.cloud import storage
