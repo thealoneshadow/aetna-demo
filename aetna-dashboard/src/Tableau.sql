@@ -76,40 +76,38 @@ def upload_to_gcs(bucket_name, file_stream, destination_blob_name):
 
 
 
-from google.cloud import orchestration_airflow
 
-def trigger_dag_with_params(project_id, location, composer_env_name, dag_id, email, link):
-    """
-    Triggers an Airflow DAG in Cloud Composer and passes parameters.
 
-    Args:
-        project_id (str): Google Cloud project ID.
-        location (str): Location of the Composer environment.
-        composer_env_name (str): Name of the Composer environment.
-        dag_id (str): DAG ID to trigger.
-        email (str): Email to pass to DAG.
-        link (str): Link to pass to DAG.
+row_ct = f"""{value}"""  
+        query_job = client.query(row_ct)
+        results = query_job.result()
 
-    Returns:
-        dict: Response from Google Cloud Composer.
-    """
-    client = orchestration_airflow.environments_v1.EnvironmentsClient()
+        # Create a BytesIO buffer to store CSV data before uploading
+        file_stream = io.BytesIO()
+        writer = csv.writer(file_stream)
 
-    # Construct the request with parameters
-    environment_path = client.environment_path(project_id, location, composer_env_name)
-    request = {
-        "environment": environment_path,
-        "dag_run_id": f"manual_{dag_id}",
-        "dag_id": dag_id,
-        "conf": {
-            "email": email,
-            "link": link
-        }
-    }
+        # Write column names
+        column_names = [field.name for field in results.schema]
+        writer.writerow(column_names)
 
-    # Trigger the DAG
-    operation = client.trigger_dag(request)
-    response = operation.result()
+        # Write rows
+        for row in query_job:
+            writer.writerow(row)
 
+        # Upload CSV to GCS
+        file_stream.seek(0)  # Reset buffer position
+        gcs_url = upload_to_gcs("your-bucket-name", file_stream, "exports/data.csv")
+
+        # Trigger the Airflow DAG with email and GCS link
+        trigger_dag_with_params(
+            project_id="your-gcp-project",
+            location="your-region",
+            composer_env_name="your-composer-env",
+            dag_id="your-dag-name",
+            email=email,
+            link=gcs_url
+        )
+
+        return jsonify({"message": "File streamed and uploaded", "url": gcs_url}), 200
 
 
