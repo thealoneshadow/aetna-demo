@@ -84,3 +84,43 @@ def upload_to_gcs(bucket_name, file_stream, destination_blob_name):
 
     return signed_url
 
+
+
+
+from google.cloud import orchestration_airflow
+
+def trigger_dag_with_params(project_id, location, composer_env_name, dag_id, email, link):
+    """
+    Triggers an Airflow DAG in Cloud Composer and passes parameters.
+
+    Args:
+        project_id (str): Google Cloud project ID.
+        location (str): Location of the Composer environment.
+        composer_env_name (str): Name of the Composer environment.
+        dag_id (str): DAG ID to trigger.
+        email (str): Email to pass to DAG.
+        link (str): Link to pass to DAG.
+
+    Returns:
+        dict: Response from Google Cloud Composer.
+    """
+    client = orchestration_airflow.environments_v1.EnvironmentsClient()
+
+    # Construct the request with parameters
+    environment_path = client.environment_path(project_id, location, composer_env_name)
+    request = {
+        "environment": environment_path,
+        "dag_run_id": f"manual_{dag_id}",
+        "dag_id": dag_id,
+        "conf": {
+            "email": email,
+            "link": link
+        }
+    }
+
+    # Trigger the DAG
+    operation = client.trigger_dag(request)
+    response = operation.result()
+
+    print("DAG triggered successfully:", response)
+    return response
