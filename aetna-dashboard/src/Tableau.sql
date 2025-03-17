@@ -1,6 +1,11 @@
-import sys
-import os
+import importlib.util
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "DB")))
+module_name = "DB.DatabaseConnection"
+module_path = "./DB/DatabaseConnection.py"
 
-from DatabaseConnection import SQLQuery
+spec = importlib.util.spec_from_file_location(module_name, module_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+
+# Now access SQLQuery
+SQLQuery = module.SQLQuery
