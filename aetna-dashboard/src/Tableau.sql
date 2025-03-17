@@ -29,3 +29,13 @@ const AutoExpandTextarea = () => {
     overflow: hidden; /* Hide scrollbars */
 }
 
+.auto-expand {
+    width: 100%;
+    min-height: 40px; /* Default height */
+    max-height: 200px; /* Restrict max height */
+    overflow-y: auto; /* Show vertical scroll when max height is reached */
+    padding: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    resize: none; /* Prevent manual resizing */
+}
