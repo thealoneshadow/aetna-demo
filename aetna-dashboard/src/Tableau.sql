@@ -1,44 +1,9 @@
-import React from "react";
-import Markdown from "markdown-to-jsx";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
-
-const markdownText = `
-\`\`\`sql
-SELECT * FROM users WHERE name='John';
-\`\`\`
-`;
-
-const MarkdownRenderer = () => {
-  return (
-    <div className="p-4 bg-gray-100 rounded-md">
-      <Markdown
-        options={{
-          overrides: {
-            code: {
-              component: ({ className, children }) => {
-                const language = className?.replace("lang-", "") || "sql";
-                return (
-                  <SyntaxHighlighter language={language} style={dracula}>
-                    {children}
-                  </SyntaxHighlighter>
-                );
-              },
-            },
-          },
-        }}
-      >
-        {markdownText}
-      </Markdown>
-    </div>
-  );
+const extractSQLQuery = (text) => {
+  // Regex pattern to capture SQL code inside triple backticks (```) or within SQL keywords
+  const regex = /```sql([\s\S]*?)```|SELECT[\s\S]*?;/gi;
+  const matches = text.match(regex);
+  return matches ? matches[0].trim() : "No SQL query found";
 };
-
-export default MarkdownRenderer;
-
-
-const language = className?.replace("lang-", "") || "sql";
-
 
 
 
