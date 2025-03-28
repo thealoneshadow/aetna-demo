@@ -1,21 +1,44 @@
-import google.generativeai as genai
+import React from "react";
+import Markdown from "markdown-to-jsx";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-# No need to manually configure API key
-genai.configure()
+const markdownText = `
+\`\`\`sql
+SELECT * FROM users WHERE name='John';
+\`\`\`
+`;
 
-# Initialize the Gemini model
-model = genai.GenerativeModel("gemini-pro")
+const MarkdownRenderer = () => {
+  return (
+    <div className="p-4 bg-gray-100 rounded-md">
+      <Markdown
+        options={{
+          overrides: {
+            code: {
+              component: ({ className, children }) => {
+                const language = className?.replace("lang-", "") || "sql";
+                return (
+                  <SyntaxHighlighter language={language} style={dracula}>
+                    {children}
+                  </SyntaxHighlighter>
+                );
+              },
+            },
+          },
+        }}
+      >
+        {markdownText}
+      </Markdown>
+    </div>
+  );
+};
 
-def generate_sql_gemini(question):
-    prompt = f"Given this database schema information:\n{answer}\nGenerate an SQL query for: {question}"
-    
-    response = model.generate_content(prompt)  
-    
-    return response.text  # Gemini returns text output
+export default MarkdownRenderer;
 
-# Example Usage
-sql_query = generate_sql_gemini("List all user emails")
-print("Generated SQL Query:\n", sql_query)
+
+const language = className?.replace("lang-", "") || "sql";
+
 
 
 
