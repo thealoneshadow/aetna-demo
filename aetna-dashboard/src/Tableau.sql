@@ -1,15 +1,11 @@
-const extractSQLQuery = (text) => {
-  // Regex pattern to capture SQL inside triple backticks or standalone queries
-  const regex = /```sql([\s\S]*?)```|SELECT[\s\S]*?;/gi;
-  const matches = text.match(regex);
+const extractColumnNames = (sql) => {
+  const match = sql.match(/SELECT (.*?) FROM/i); // Extract everything between SELECT and FROM
+  if (!match || match.length < 2) return [];
 
-  if (!matches) return "No SQL query found";
+  const columns = match[1]
+    .split(",") // Split columns by comma
+    .map(col => col.trim().split(" ")[0]) // Remove alias (AS) and extra spaces
+    .filter(col => col !== "*"); // Ignore "*" (if present)
 
-  let cleanedSQL = matches[0]
-    .replace(/```sql/g, "") // Remove ```sql
-    .replace(/```/g, "") // Remove ```
-    .replace(/\s+/g, " ") // Replace multiple spaces & newlines with a single space
-    .trim(); // Remove leading/trailing spaces
-
-  return cleanedSQL;
+  return columns;
 };
