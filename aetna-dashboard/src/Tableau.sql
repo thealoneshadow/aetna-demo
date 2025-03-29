@@ -1,11 +1,13 @@
-const extractColumnNames = (sql) => {
-  const match = sql.match(/SELECT (.*?) FROM/i); // Extract everything between SELECT and FROM
-  if (!match || match.length < 2) return [];
+const generateMarkdownTable = (data) => {
+  if (data.length === 0) return "No data available";
 
-  const columns = match[1]
-    .split(",") // Split columns by comma
-    .map(col => col.trim().split(" ")[0]) // Remove alias (AS) and extra spaces
-    .filter(col => col !== "*"); // Ignore "*" (if present)
+  const headers = Object.keys(data[0]).join(" | ");
+  const separator = Object.keys(data[0]).map(() => "---").join(" | ");
+  const rows = data.map(row => Object.values(row).join(" | ")).join("\n");
 
-  return columns;
+  return `
+| ${headers} |
+| ${separator} |
+${rows.split("\n").map(row => `| ${row} |`).join("\n")}
+`;
 };
