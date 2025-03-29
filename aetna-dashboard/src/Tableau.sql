@@ -1,13 +1,13 @@
-const generateMarkdownTable = (data) => {
-  if (data.length === 0) return "No data available";
+const extractColumnNames = (sql) => {
+  const match = sql.match(/SELECT (.*?) FROM/i);
+  if (!match || match.length < 2) return [];
 
-  const headers = Object.keys(data[0]).join(" | ");
-  const separator = Object.keys(data[0]).map(() => "---").join(" | ");
-  const rows = data.map(row => Object.values(row).join(" | ")).join("\n");
+  return match[1]
+    .split(",") // Split columns by comma
+    .map((col) => {
+      const aliasMatch = col.match(/AS\s+(\w+)/i); // Capture alias if present
+      if (aliasMatch) return aliasMatch[1].trim(); // Return alias if found
 
-  return `
-| ${headers} |
-| ${separator} |
-${rows.split("\n").map(row => `| ${row} |`).join("\n")}
-`;
+      return col.replace(/\(.*?\)/g, "").trim().split(" ")[0]; // Remove function calls & trim
+    });
 };
