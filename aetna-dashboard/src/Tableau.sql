@@ -3,10 +3,13 @@ const extractColumnNames = (sql) => {
   const match = sql.match(/SELECT([\s\S]*?)FROM/i);
   if (!match || match.length < 2) return [];
 
-  const selectClause = match[1];
+  let selectClause = match[1].trim();
+
+  // Handle case where only one column is selected (no commas)
+  if (!selectClause.includes(",")) selectClause = [selectClause];
+  else selectClause = selectClause.split(/,(?![^()]*\))/); // Split by commas, ignoring those inside parentheses
 
   return selectClause
-    .split(/,(?![^()]*\))/) // Split by commas, ignoring ones inside parentheses
     .map((col) => {
       col = col.trim(); // Remove spaces
 
@@ -14,9 +17,9 @@ const extractColumnNames = (sql) => {
       const aliasMatch = col.match(/AS\s+["']?(\w+)["']?/i);
       if (aliasMatch) return aliasMatch[1].trim(); // Use alias if found
 
-      // Remove expressions (COUNT(), LAG(), etc.) but keep their column references
+      // Remove function calls (COUNT(), LAG(), etc.) but keep column references
       const cleanedCol = col
-        .replace(/LAG\s*\(.*?\)|LEAD\s*\(.*?\)|COUNT\s*\(.*?\)|SUM\s*\(.*?\)|AVG\s*\(.*?\)|MIN\s*\(.*?\)|MAX\s*\(.*?\)/gi, "") // Remove function calls
+        .replace(/LAG\s*\(.*?\)|LEAD\s*\(.*?\)|COUNT\s*\(.*?\)|SUM\s*\(.*?\)|AVG\s*\(.*?\)|MIN\s*\(.*?\)|MAX\s*\(.*?\)/gi, "") // Remove functions
         .replace(/CASE\s+WHEN[\s\S]*?END/i, "") // Remove CASE WHEN expressions
         .replace(/\*|\+|\-|\/|\(|\)/g, " ") // Replace mathematical operators with spaces
         .trim();
