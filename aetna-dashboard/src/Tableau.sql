@@ -26,3 +26,18 @@ const extractColumnNames = (sql) => {
     })
     .filter(Boolean); // Remove empty values
 };
+
+
+
+ELECT 
+    calendar_year, 
+    COUNT(answered_call) AS total_answered_calls, 
+    ( 
+      COUNT(answered_call) - LAG(COUNT(answered_call), 1, 0) OVER (ORDER BY calendar_year) 
+    ) * 100.0 / LAG(COUNT(answered_call), 1, 1) OVER (ORDER BY calendar_year) AS yoy_growth 
+  FROM 
+    `anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP` 
+  WHERE answered_call IS NOT NULL 
+  GROUP BY 1 
+ORDER BY 
+  calendar_year; 
