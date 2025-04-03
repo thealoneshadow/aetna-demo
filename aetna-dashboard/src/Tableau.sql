@@ -6,38 +6,24 @@ const extractColumnNames = (sql) => {
   const selectClause = match[1];
 
   return selectClause
-    .split(/,(?![^()]*\))/) // Split by commas, but ignore commas inside parentheses
+    .split(/,(?![^()]*\))/) // Split by commas, ignoring ones inside parentheses
     .map((col) => {
       col = col.trim(); // Remove spaces
 
-      // Extract alias if present
+      // Extract alias if present (handles AS "alias" and AS alias)
       const aliasMatch = col.match(/AS\s+["']?(\w+)["']?/i);
-      if (aliasMatch) return aliasMatch[1].trim(); // Return alias if found
+      if (aliasMatch) return aliasMatch[1].trim(); // Use alias if found
 
-      // Handle cases where there's no alias
+      // Remove expressions (COUNT(), LAG(), etc.) but keep their column references
       const cleanedCol = col
-        .replace(/COUNT\s*\(.*?\)|SUM\s*\(.*?\)|AVG\s*\(.*?\)|MIN\s*\(.*?\)|MAX\s*\(.*?\)/gi, "") // Remove aggregate functions
-        .replace(/CASE\s+WHEN[\s\S]*?END/i, "") // Remove CASE WHEN statements
+        .replace(/LAG\s*\(.*?\)|LEAD\s*\(.*?\)|COUNT\s*\(.*?\)|SUM\s*\(.*?\)|AVG\s*\(.*?\)|MIN\s*\(.*?\)|MAX\s*\(.*?\)/gi, "") // Remove function calls
+        .replace(/CASE\s+WHEN[\s\S]*?END/i, "") // Remove CASE WHEN expressions
+        .replace(/\*|\+|\-|\/|\(|\)/g, " ") // Replace mathematical operators with spaces
         .trim();
 
-      // Extract the last valid part (handles expressions like "table.column AS alias")
+      // Extract the last meaningful word (handles "table.column AS alias")
       const parts = cleanedCol.split(/\s+/);
-      return parts[parts.length - 1]; // Return last meaningful word
+      return parts[parts.length - 1]; // Return last valid column part
     })
     .filter(Boolean); // Remove empty values
 };
-
-
-
-ELECT 
-    calendar_year, 
-    COUNT(answered_call) AS total_answered_calls, 
-    ( 
-      COUNT(answered_call) - LAG(COUNT(answered_call), 1, 0) OVER (ORDER BY calendar_year) 
-    ) * 100.0 / LAG(COUNT(answered_call), 1, 1) OVER (ORDER BY calendar_year) AS yoy_growth 
-  FROM 
-    `anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP` 
-  WHERE answered_call IS NOT NULL 
-  GROUP BY 1 
-ORDER BY 
-  calendar_year; 
