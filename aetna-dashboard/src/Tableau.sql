@@ -1,14 +1,23 @@
-const TableMarkdown = ({ data }) => {
-  // Convert array to Markdown table
-  const generateMarkdownTable = (arr) => {
-    if (!arr.length) return "No data available";
+const extractColumnNames = (sql) => {
+  const match = sql.match(/SELECT([\s\S]*?)FROM/i); // Match SELECT until FROM
+  if (!match || match.length < 2) return [];
 
-    const headers = Object.keys(arr[0]).join(" | ");
-    const separator = Object.keys(arr[0]).map(() => "---").join(" | ");
-    const rows = arr.map(row => Object.values(row).join(" | ")).join("\n");
+  const selectPart = match[1].trim(); // Extract the columns part
+  const columns = [];
+  
+  // Regex to extract column names with aliases
+  const regex = /(?:COUNT|SUM|AVG|MIN|MAX|CASE|IF|DISTINCT|\w+\(.*?\))?\s*(?:\((.*?)\))?\s*(?:AS\s+["']?(\w+)["']?)?/gi;
+  
+  let columnMatches;
+  while ((columnMatches = regex.exec(selectPart)) !== null) {
+    const [, expression, alias] = columnMatches;
 
-    return `| ${headers} |\n| ${separator} |\n${rows.split("\n").map(row => `| ${row} |`).join("\n")}`;
-  };
+    if (alias) {
+      columns.push(alias); // Use alias if available
+    } else if (expression) {
+      columns.push(expression.split(" ")[0]); // Extract first word (function-safe)
+    }
+  }
 
-  return <ReactMarkdown>{generateMarkdownTable(data)}</ReactMarkdown>;
+  return columns.filter(Boolean); // Remove empty values
 };
