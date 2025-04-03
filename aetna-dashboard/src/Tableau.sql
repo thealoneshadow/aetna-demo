@@ -1,22 +1,28 @@
 const extractColumnNames = (sql) => {
-  const match = sql.match(/SELECT([\s\S]*?)FROM/i); // Match SELECT part until FROM
+  // Extract the SELECT clause before FROM
+  const match = sql.match(/SELECT([\s\S]*?)FROM/i);
   if (!match || match.length < 2) return [];
 
-  return match[1]
-    .split(",") // Split by comma (handles basic cases)
+  const selectClause = match[1];
+
+  return selectClause
+    .split(/,(?![^()]*\))/) // Split by commas, but ignore commas inside parentheses
     .map((col) => {
       col = col.trim(); // Remove spaces
 
-      // Capture alias if present (supports "AS alias" and "AS 'alias name'")
+      // Extract alias if present
       const aliasMatch = col.match(/AS\s+["']?(\w+)["']?/i);
-      if (aliasMatch) return aliasMatch[1].trim(); // Return alias
+      if (aliasMatch) return aliasMatch[1].trim(); // Return alias if found
 
-      // Remove function calls, case expressions, and extract first valid column name
-      return col
-        .replace(/\(.*?\)/g, "") // Remove function parentheses
+      // Handle cases where there's no alias
+      const cleanedCol = col
+        .replace(/COUNT\s*\(.*?\)|SUM\s*\(.*?\)|AVG\s*\(.*?\)|MIN\s*\(.*?\)|MAX\s*\(.*?\)/gi, "") // Remove aggregate functions
         .replace(/CASE\s+WHEN[\s\S]*?END/i, "") // Remove CASE WHEN statements
-        .trim()
-        .split(" ")[0]; // Extract first word
+        .trim();
+
+      // Extract the last valid part (handles expressions like "table.column AS alias")
+      const parts = cleanedCol.split(/\s+/);
+      return parts[parts.length - 1]; // Return last meaningful word
     })
     .filter(Boolean); // Remove empty values
 };
