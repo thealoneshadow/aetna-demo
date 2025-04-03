@@ -1,13 +1,14 @@
-const extractColumnNames = (sql) => {
-  const match = sql.match(/SELECT (.*?) FROM/i);
-  if (!match || match.length < 2) return [];
+const TableMarkdown = ({ data }) => {
+  // Convert array to Markdown table
+  const generateMarkdownTable = (arr) => {
+    if (!arr.length) return "No data available";
 
-  return match[1]
-    .split(",") // Split columns by comma
-    .map((col) => {
-      const aliasMatch = col.match(/AS\s+(\w+)/i); // Capture alias if present
-      if (aliasMatch) return aliasMatch[1].trim(); // Return alias if found
+    const headers = Object.keys(arr[0]).join(" | ");
+    const separator = Object.keys(arr[0]).map(() => "---").join(" | ");
+    const rows = arr.map(row => Object.values(row).join(" | ")).join("\n");
 
-      return col.replace(/\(.*?\)/g, "").trim().split(" ")[0]; // Remove function calls & trim
-    });
+    return `| ${headers} |\n| ${separator} |\n${rows.split("\n").map(row => `| ${row} |`).join("\n")}`;
+  };
+
+  return <ReactMarkdown>{generateMarkdownTable(data)}</ReactMarkdown>;
 };
