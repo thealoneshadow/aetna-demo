@@ -22,23 +22,38 @@ const ChatApp = () => {
           <p>{msg.text}</p>
 
           {/* Feedback Section */}
-          {msg.feedback ? (
-            <p style={{ color: "green", fontWeight: "bold" }}>Feedback Submitted</p>
+         {msg.feedback ? (
+            <p style={{ color: "green", fontWeight: "bold" }}>Thank you for your feedback!</p>
           ) : (
-            <div style={{ display: "flex", gap: "10px", cursor: "pointer" }}>
-              <FaThumbsUp
-                color="green"
-                size={20}
-                onClick={() => handleFeedback(msg.id, "up")}
-              />
-              <FaThumbsDown
-                color="red"
-                size={20}
-                onClick={() => handleFeedback(msg.id, "down")}
-              />
+            <div style={{ marginTop: "5px" }}>
+              <p style={{ fontSize: "14px", marginBottom: "5px" }}>
+                Was this response helpful?
+              </p>
+              <button
+                onClick={() => handleFeedback(msg.id, "Yes")}
+                style={{
+                  padding: "5px 10px",
+                  marginRight: "10px",
+                  border: "1px solid #ccc",
+                  cursor: "pointer",
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => handleFeedback(msg.id, "No")}
+                style={{
+                  padding: "5px 10px",
+                  border: "1px solid #ccc",
+                  cursor: "pointer",
+                  backgroundColor: "#f0f0f0",
+                }}
+              >
+                No
+              </button>
             </div>
           )}
-        </div>
       ))}
     </div>
   );
