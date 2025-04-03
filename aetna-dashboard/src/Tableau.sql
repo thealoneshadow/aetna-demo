@@ -1,23 +1,22 @@
 const extractColumnNames = (sql) => {
-  const match = sql.match(/SELECT([\s\S]*?)FROM/i); // Match SELECT until FROM
+  const match = sql.match(/SELECT([\s\S]*?)FROM/i); // Match SELECT part until FROM
   if (!match || match.length < 2) return [];
 
-  const selectPart = match[1].trim(); // Extract the columns part
-  const columns = [];
-  
-  // Regex to extract column names with aliases
-  const regex = /(?:COUNT|SUM|AVG|MIN|MAX|CASE|IF|DISTINCT|\w+\(.*?\))?\s*(?:\((.*?)\))?\s*(?:AS\s+["']?(\w+)["']?)?/gi;
-  
-  let columnMatches;
-  while ((columnMatches = regex.exec(selectPart)) !== null) {
-    const [, expression, alias] = columnMatches;
+  return match[1]
+    .split(",") // Split by comma (handles basic cases)
+    .map((col) => {
+      col = col.trim(); // Remove spaces
 
-    if (alias) {
-      columns.push(alias); // Use alias if available
-    } else if (expression) {
-      columns.push(expression.split(" ")[0]); // Extract first word (function-safe)
-    }
-  }
+      // Capture alias if present (supports "AS alias" and "AS 'alias name'")
+      const aliasMatch = col.match(/AS\s+["']?(\w+)["']?/i);
+      if (aliasMatch) return aliasMatch[1].trim(); // Return alias
 
-  return columns.filter(Boolean); // Remove empty values
+      // Remove function calls, case expressions, and extract first valid column name
+      return col
+        .replace(/\(.*?\)/g, "") // Remove function parentheses
+        .replace(/CASE\s+WHEN[\s\S]*?END/i, "") // Remove CASE WHEN statements
+        .trim()
+        .split(" ")[0]; // Extract first word
+    })
+    .filter(Boolean); // Remove empty values
 };
