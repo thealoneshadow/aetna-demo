@@ -8,14 +8,11 @@
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
 
+ if (typeof sqlQuery !== 'string' || sqlQuery.trim() === '') {
+    return <div>No SQL query found.</div>;
+  }
 
-    function fixInnerQuotes(str) {
-  // Escape double quotes that are inside string values (but not keys)
-  return str.replace(/:\s*"((?:[^"\\]|\\.)*?)"/g, (match, value) => {
-    const escaped = value.replace(/"/g, '\\"');
-    return `: "${escaped}"`;
-  });
-}
+  const formattedMarkdown = `\`\`\`sql\n${sqlQuery}\n\`\`\``;
 
 function escapeInnerQuotes(jsonStr) {
   return jsonStr.replace(/"([^"]+)"\s*:\s*"([^"]*?)"/g, (match, key, value) => {
