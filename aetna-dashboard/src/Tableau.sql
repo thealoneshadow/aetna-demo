@@ -9,25 +9,15 @@
 
 
 
-    function fixMalformedJsonString(str) {
-  // 1. Escape inner quotes in values
-  const escaped = str.replace(/:\s*"((?:[^"\\]|\\.)*?)"/g, (match, p1) => {
-    const escapedValue = p1.replace(/"/g, '\\"');
-    return `: "${escapedValue}"`;
-  });
-
-  // 2. Remove quotes around keys
-  const unquotedKeys = escaped.replace(/"(\w+)"\s*:/g, '$1:');
-
-  return unquotedKeys;
+function escapeInnerQuotes(jsonStr) {
+  return jsonStr.replace(
+    /"((?:[^"\\]|\\.)*?)"\s*:\s*"((?:[^"\\]|\\.)*?)"/g,
+    (match, key, value) => {
+      const escapedValue = value.replace(/"/g, '\\"'); // escape inner quotes
+      return `"${key}": "${escapedValue}"`;
+    }
+  );
 }
-
-const brokenJson = `{"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase?"}`;
-
-const fixed = fixMalformedJsonString(brokenJson);
-
-console.log(fixed);
-
     
 function safelyFixMalformedJSON(badJsonString) {
   // Step 1: Fix quotes around values like "cool" inside other strings
