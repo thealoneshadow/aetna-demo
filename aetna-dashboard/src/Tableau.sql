@@ -9,6 +9,14 @@
 
 
 
+    function fixInnerQuotes(str) {
+  // Escape double quotes that are inside string values (but not keys)
+  return str.replace(/:\s*"((?:[^"\\]|\\.)*?)"/g, (match, value) => {
+    const escaped = value.replace(/"/g, '\\"');
+    return `: "${escaped}"`;
+  });
+}
+
 function escapeInnerQuotes(jsonStr) {
   return jsonStr.replace(/"([^"]+)"\s*:\s*"([^"]*?)"/g, (match, key, value) => {
     // Escape all inner double quotes in the value string
