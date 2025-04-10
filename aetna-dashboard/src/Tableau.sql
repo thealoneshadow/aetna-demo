@@ -14,11 +14,10 @@ function generateTitle(message) {
     .join(" ");
 }
 
-  .replace(/\btru\b/g, 'true')
-  .replace(/\bfal\b/g, 'false')
-  .replace(/\bnul\b/g, 'null')
-  .replace(/([,{]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":') // quote keys
-  .replace(/'([^']+)'/g, '"$1"'); /
+
+
+
+  {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
 
 -----------------------------
