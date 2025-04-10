@@ -12,7 +12,10 @@
     return <div>No SQL query found.</div>;
   }
 
-  const formattedMarkdown = `\`\`\`sql\n${sqlQuery}\n\`\`\``;
+   const formattedQuery = sqlQuery
+    .replace(/(SELECT|FROM|WHERE|GROUP BY|ORDER BY|LIMIT|JOIN|AND|OR|AS|ON)/gi, '\n$1') // newline before common clauses
+    .replace(/\s+/g, ' ') // remove extra spaces
+    .trim();
 
 function escapeInnerQuotes(jsonStr) {
   return jsonStr.replace(/"([^"]+)"\s*:\s*"([^"]*?)"/g, (match, key, value) => {
