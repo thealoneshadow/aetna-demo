@@ -7,10 +7,17 @@
 
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
-  return str.replace(/"(.*?)"\s*:\s*"([^"]*?)"/g, (match, key, val) => {
-    // Escape any unescaped " inside value
-    const fixedVal = val.replace(/(?<!\\)"/g, '\\"');
-    return `"${key}": "${fixedVal}"`;
+  const preservedKeys = ['question', 'answer', 'assumptions', 'explanation', 'logId', 'decision'];
+
+  // Regex to match all key-value pairs
+  return input.replace(/"(\w+)":\s*"([^"]*)"/g, (match, key, value) => {
+    if (preservedKeys.includes(key)) {
+      // Keep as is
+      return `"${key}": "${value.replace(/"/g, '\\"')}"`; // Escape inner quotes too
+    } else {
+      // Replace outer quotes with single quotes for non-important fields
+      return `'${key}': '${value.replace(/"/g, "'")}'`;
+    }
   });
 
     function escapeInnerQuotes(jsonStr) {
