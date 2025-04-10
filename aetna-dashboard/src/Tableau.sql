@@ -17,4 +17,31 @@
 }
 -----------------------------
 
+    function escapeInnerQuotes(jsonStr) {
+  let insideString = false;
+  let escaped = false;
+  let result = '';
+  
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i];
+
+    if (char === '"' && !escaped) {
+      // toggle if entering or exiting a string
+      insideString = !insideString;
+      result += char;
+    } else if (char === '"' && insideString && !escaped) {
+      // this is an unescaped quote inside a string → escape it
+      result += '\\"';
+    } else {
+      result += char;
+    }
+
+    // track escape character
+    escaped = char === '\\' && !escaped;
+  }
+
+  return result;
+}
+
+
 
