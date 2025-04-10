@@ -29,6 +29,12 @@
     const escapedValue = value.replace(/(?<!\\)"/g, '\\"');
     return `: "${escapedValue}"`;
   });
+
+    badJSON.replace(/:\s*"([^"]*?)"([^,}\]])/g, (match, p1, p2) => {
+      // Escape quotes inside the value
+      const escaped = p1.replace(/"/g, '\\"');
+      return `: "${escaped}"${p2}`;
+    });
     
    const keysToPreserve = ['question', 'answer', 'assumptions', 'explanation', 'logId', 'decision'];
 
