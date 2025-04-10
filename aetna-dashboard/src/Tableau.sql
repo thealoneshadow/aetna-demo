@@ -17,6 +17,22 @@
     .replace(/\s+/g, ' ') // remove extra spaces
     .trim();
 
+const keywords = [
+    'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT',
+    'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'ON',
+    'AND', 'OR', 'UNION', 'HAVING', 'AS'
+  ];
+
+  let formattedQuery = sqlQuery;
+
+  keywords.forEach(keyword => {
+    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+    formattedQuery = formattedQuery.replace(regex, `\n${keyword}`);
+  });
+
+  // Wrap in a Markdown-friendly SQL code block
+  const markdown = `\`\`\`sql\n${formattedQuery.trim()}\n\`\`\``;
+
 function escapeInnerQuotes(jsonStr) {
   return jsonStr.replace(/"([^"]+)"\s*:\s*"([^"]*?)"/g, (match, key, value) => {
     // Escape all inner double quotes in the value string
