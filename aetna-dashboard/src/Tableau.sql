@@ -1,65 +1,18 @@
-import React, { useState } from "react";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
+function isGreeting(message) {
+  const regex = /\b(hi|hello|hey|how are you|what'?s up|yo|good (morning|evening|afternoon))\b/i;
+  return regex.test(message.trim());
+}
 
-const ChatApp = () => {
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hello! How can I help you?", feedback: null },
-    { id: 2, text: "Sure, I can explain that!", feedback: null },
-  ]);
+function generateTitle(message) {
+  if (isGreeting(message)) return "New Chat";
 
-  const handleFeedback = (id, feedbackType) => {
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) =>
-        msg.id === id ? { ...msg, feedback: feedbackType } : msg
-      )
-    );
-  };
-
-  return (
-    <div className="chat-container" style={{ maxWidth: "600px", margin: "auto" }}>
-      {messages.map((msg) => (
-        <div key={msg.id} style={{ padding: "10px", borderBottom: "1px solid #ddd" }}>
-          <p>{msg.text}</p>
-
-          {/* Feedback Section */}
-         {msg.feedback ? (
-            <p style={{ color: "green", fontWeight: "bold" }}>Thank you for your feedback!</p>
-          ) : (
-            <div style={{ marginTop: "5px" }}>
-              <p style={{ fontSize: "14px", marginBottom: "5px" }}>
-                Was this response helpful?
-              </p>
-              <button
-                onClick={() => handleFeedback(msg.id, "Yes")}
-                style={{
-                  padding: "5px 10px",
-                  marginRight: "10px",
-                  border: "1px solid #ccc",
-                  cursor: "pointer",
-                  backgroundColor: "#f0f0f0",
-                }}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => handleFeedback(msg.id, "No")}
-                style={{
-                  padding: "5px 10px",
-                  border: "1px solid #ccc",
-                  cursor: "pointer",
-                  backgroundColor: "#f0f0f0",
-                }}
-              >
-                No
-              </button>
-            </div>
-          )}
-      ))}
-    </div>
-  );
-};
-
-export default ChatApp;
+  return message
+    .trim()
+    .split(" ")
+    .slice(0, 5)
+    .map(word => word[0].toUpperCase() + word.slice(1))
+    .join(" ");
+}
 
 
 -----------------------------
