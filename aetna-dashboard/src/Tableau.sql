@@ -8,22 +8,25 @@
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
 
- if (typeof sqlQuery !== 'string' || sqlQuery.trim() === '') {
-    return <div>No SQL query found.</div>;
-  }
+const isSQLQuery = (input) => {
+  if (typeof input !== 'string') return false;
 
-   const formattedQuery = sqlQuery
-    .replace(/(SELECT|FROM|WHERE|GROUP BY|ORDER BY|LIMIT|JOIN|AND|OR|AS|ON)/gi, '\n$1') // newline before common clauses
-    .replace(/\s+/g, ' ') // remove extra spaces
-    .trim();
-
-const keywords = [
-    'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'ORDER BY', 'LIMIT',
-    'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'ON',
-    'AND', 'OR', 'UNION', 'HAVING', 'AS'
+  const sqlKeywords = [
+    'SELECT', 'INSERT', 'UPDATE', 'DELETE',
+    'CREATE', 'DROP', 'ALTER', 'FROM',
+    'WHERE', 'JOIN', 'GROUP BY', 'ORDER BY',
+    'LIMIT', 'HAVING', 'VALUES', 'INTO'
   ];
 
-  let formattedQuery = sqlQuery;
+  const upperInput = input.toUpperCase();
+
+  // Check if at least 2 SQL keywords are present
+  const matches = sqlKeywords.filter(keyword =>
+    upperInput.includes(keyword)
+  );
+
+  return matches.length >= 2;
+};
 
   keywords.forEach(keyword => {
     const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
