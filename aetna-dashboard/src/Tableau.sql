@@ -10,13 +10,11 @@
 
 
 function escapeInnerQuotes(jsonStr) {
-  return jsonStr.replace(
-    /"((?:[^"\\]|\\.)*?)"\s*:\s*"((?:[^"\\]|\\.)*?)"/g,
-    (match, key, value) => {
-      const escapedValue = value.replace(/"/g, '\\"'); // escape inner quotes
-      return `"${key}": "${escapedValue}"`;
-    }
-  );
+  return jsonStr.replace(/"([^"]+)"\s*:\s*"([^"]*?)"/g, (match, key, value) => {
+    // Escape all inner double quotes in the value string
+    const escapedValue = value.replace(/"/g, '\\"');
+    return `"${key}": "${escapedValue}"`;
+  });
 }
     
 function safelyFixMalformedJSON(badJsonString) {
