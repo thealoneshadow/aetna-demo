@@ -14,9 +14,11 @@ function generateTitle(message) {
     .join(" ");
 }
 
-   .replace(/\btru\b/g, 'true')
+  .replace(/\btru\b/g, 'true')
   .replace(/\bfal\b/g, 'false')
-  .replace(/\bnul\b/g, 'null');
+  .replace(/\bnul\b/g, 'null')
+  .replace(/([,{]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":') // quote keys
+  .replace(/'([^']+)'/g, '"$1"'); /
 
 
 -----------------------------
