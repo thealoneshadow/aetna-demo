@@ -14,6 +14,10 @@ function generateTitle(message) {
     .join(" ");
 }
 
+   .replace(/\btru\b/g, 'true')
+  .replace(/\bfal\b/g, 'false')
+  .replace(/\bnul\b/g, 'null');
+
 
 -----------------------------
 
