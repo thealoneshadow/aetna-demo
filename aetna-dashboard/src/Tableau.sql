@@ -8,6 +8,22 @@
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
 
+    function safeJSONParse(str) {
+  try {
+    // Step 1: Escape double quotes inside values
+    const fixed = str.replace(/"([^"]*?)"\s*:\s*"((?:[^"\\]|\\.)*?)"/g, (match, key, val) => {
+      const escaped = val.replace(/"/g, '\\"');
+      return `"${key}":"${escaped}"`;
+    });
+
+    // Step 2: Parse
+    return JSON.parse(fixed);
+  } catch (e) {
+    console.error("Failed to parse:", str);
+    return null;
+  }
+}
+
 
      return input.replace(/:\s*"((?:[^"\\]|\\.)*)"/g, (match, value) => {
     const escapedValue = value.replace(/(?<!\\)"/g, '\\"');
