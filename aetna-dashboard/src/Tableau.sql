@@ -7,6 +7,13 @@
 
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
+
+
+     return input.replace(/:\s*"((?:[^"\\]|\\.)*)"/g, (match, value) => {
+    const escapedValue = value.replace(/(?<!\\)"/g, '\\"');
+    return `: "${escapedValue}"`;
+  });
+    
    const keysToPreserve = ['question', 'answer', 'assumptions', 'explanation', 'logId', 'decision'];
 
   return input.replace(/"(\w+)":\s*"([^"]*?)"/g, (match, key, value) => {
