@@ -7,16 +7,15 @@
 
     {"question": "cool", "answer": "I'm not sure what information you're looking for with the word "cool". Can you please rephrase your query or tell me what you'd like to know?", "decision": "[Clarify]", "explanation": "The user query "cool" is vague and doesn't provide any context.  Clarification is needed to understand the user's intent.", "logId": "05bcf825-7b63-47b1-9816-36b80b6047df"}
 
-  const preservedKeys = ['question', 'answer', 'assumptions', 'explanation', 'logId', 'decision'];
+   const keysToPreserve = ['question', 'answer', 'assumptions', 'explanation', 'logId', 'decision'];
 
-  // Regex to match all key-value pairs
-  return input.replace(/"(\w+)":\s*"([^"]*)"/g, (match, key, value) => {
-    if (preservedKeys.includes(key)) {
-      // Keep as is
-      return `"${key}": "${value.replace(/"/g, '\\"')}"`; // Escape inner quotes too
+  return input.replace(/"(\w+)":\s*"([^"]*?)"/g, (match, key, value) => {
+    if (keysToPreserve.includes(key)) {
+      // Escape quotes inside the value ONLY if it's not already escaped
+      const escapedValue = value.replace(/(?<!\\)"/g, '\\"');
+      return `"${key}": "${escapedValue}"`;
     } else {
-      // Replace outer quotes with single quotes for non-important fields
-      return `'${key}': '${value.replace(/"/g, "'")}'`;
+      return match; // Leave other parts untouched
     }
   });
 
