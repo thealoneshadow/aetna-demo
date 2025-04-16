@@ -1,14 +1,26 @@
 const grouped = [];
-const map = new Map();
+  const map = {};
 
-input.forEach(({ question, answer, feedback }) => {
-  if (feedback !== "positive") return; // ❌ Skip non-positive
+  for (let i = 0; i < input.length; i++) {
+    const item = input[i];
 
-  if (map.has(question)) {
-    map.get(question).answers.push(answer);
-  } else {
-    const entry = { question, answers: [answer] };
-    map.set(question, entry);
-    grouped.push(entry);
+    if (item.feedback.toLowerCase() !== "positive") continue;
+
+    if (map[item.question]) {
+      map[item.question].push(item.answer);
+    } else {
+      map[item.question] = [item.answer];
+    }
   }
-});
+
+  // Convert map to final array
+  const result = [];
+
+  for (const question in map) {
+    result.push({
+      question: question,
+      answers: map[question]
+    });
+  }
+
+  return result;
