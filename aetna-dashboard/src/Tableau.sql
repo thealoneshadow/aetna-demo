@@ -1,26 +1,17 @@
-const grouped = [];
-  const map = {};
-
-  for (let i = 0; i < input.length; i++) {
-    const item = input[i];
-
-    if (item.feedback.toLowerCase() !== "positive") continue;
-
-    if (map[item.question]) {
-      map[item.question].push(item.answer);
-    } else {
-      map[item.question] = [item.answer];
+function areStringsSame(str1, str2) {
+  const clean = str => {
+    if (!str) return '';
+    str = str.trim();
+    
+    // Remove starting and ending quotes if same
+    const first = str[0];
+    const last = str[str.length - 1];
+    if ((first === last) && (`'"``".includes(first))) {
+      str = str.slice(1, -1);
     }
-  }
 
-  // Convert map to final array
-  const result = [];
+    return str.trim();
+  };
 
-  for (const question in map) {
-    result.push({
-      question: question,
-      answers: map[question]
-    });
-  }
-
-  return result;
+  return clean(str1) === clean(str2) ? "yes" : "no";
+}
