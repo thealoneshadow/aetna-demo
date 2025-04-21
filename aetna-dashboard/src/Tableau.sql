@@ -1,29 +1,59 @@
-function areStringsSame(str1, str2) {
-  const clean = str => {
-    if (!str) return '';
+import React, { useState } from "react";
+import * as XLSX from "xlsx";
 
-    // Trim spaces and convert to lowercase (optional, if case-insensitive)
-    str = str.trim();
+export default function ExcelUploader() {
+  const [data, setData] = useState([]);
 
-    // Remove ```sql or ``` if present at start and end
-    if (str.startsWith('```sql')) {
-      str = str.slice(6);
-    } else if (str.startsWith('```')) {
-      str = str.slice(3);
-    }
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
 
-    if (str.endsWith('```')) {
-      str = str.slice(0, -3);
-    }
+    if (!file) return;
 
-    // Remove any surrounding quotes or backticks
-    const quotes = [`"`, `'`, '`'];
-    while (quotes.includes(str[0]) && quotes.includes(str[str.length - 1])) {
-      str = str.slice(1, -1).trim();
-    }
+    const reader = new FileReader();
 
-    return str.trim().toLowerCase(); // toLowerCase is optional
+    reader.onload = (evt) => {
+      const binaryStr = evt.target.result;
+      const workbook = XLSX.read(binaryStr, { type: "binary" });
+
+      // Get first worksheet
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      // Convert to JSON
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      // Extract question and query columns
+      const formattedData = jsonData.map((row) => ({
+        question: row.question || row.Question || "", // case-insensitive fallback
+        query: row.query || row.Query || "",
+      }));
+
+      setData(formattedData);
+      console.log("Formatted Data:", formattedData);
+    };
+
+    reader.readAsBinaryString(file);
   };
 
-  return clean(str1) === clean(str2) ? "yes" : "no";
+  return (
+    <div className="p-4">
+      <input
+        type="file"
+        accept=".xlsx, .xls"
+        onChange={handleFileUpload}
+        className="mb-4"
+      />
+
+      {data.length > 0 && (
+        <ul>
+          {data.map((item, idx) => (
+            <li key={idx} className="mb-2">
+              <strong>Q:</strong> {item.question} <br />
+              <strong>Query:</strong> {item.query}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
