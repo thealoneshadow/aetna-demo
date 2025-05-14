@@ -1,118 +1,72 @@
-const handleCopy = () => {
-    const header = columns.map(col => col.title).join('\t');
-    const rows = dataSource.map(row =>
-      columns.map(col => row[col.dataIndex]).join('\t')
-    );
-    const textToCopy = [header, ...rows].join('\n');
+function splitSQLQueries(sqlString) {
+  const queries = [];
+  let currentQuery = '';
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+  let parenthesesDepth = 0;
 
-    navigator.clipboard.writeText(textToCopy).then(() => {
-      alert('Table copied to clipboard!');
-    });
-  };
+  for (let i = 0; i < sqlString.length; i++) {
+    const char = sqlString[i];
+    const nextChar = sqlString[i + 1];
 
- const handleCopy = () => {
-    navigator.clipboard.writeText(code.trim());
-    alert('Copied to clipboard!');
-  };
-
-
-
-
-
-
-import React, { useState } from 'react';
-import { Table, Button, Space, message } from 'antd';
-import { CopyOutlined, FileExcelOutlined } from '@ant-design/icons';
-import * as XLSX from 'xlsx';
-
-// Sample table data
-const dataSource = Array.from({ length: 1000 }).map((_, i) => ({
-  key: i,
-  name: `User ${i + 1}`,
-  age: 20 + (i % 30),
-  email: `user${i + 1}@example.com`,
-}));
-
-const columns = [
-  { title: 'Name', dataIndex: 'name' },
-  { title: 'Age', dataIndex: 'age' },
-  { title: 'Email', dataIndex: 'email' },
-];
-
-const MyTable = () => {
-  const [copying, setCopying] = useState(false);
-  const [exporting, setExporting] = useState(false);
-
-  // Copy handler
-  const handleCopy = async () => {
-    setCopying(true);
-    try {
-      const header = columns.map(col => col.title).join('\t');
-      const rows = dataSource.map(row =>
-        columns.map(col => row[col.dataIndex]).join('\t')
-      );
-      const textToCopy = [header, ...rows].join('\n');
-
-      await navigator.clipboard.writeText(textToCopy);
-      message.success('Copied to clipboard!');
-    } catch (err) {
-      message.error('Failed to copy.');
+    // Handle -- line comment
+    if (!inSingleQuote && !inDoubleQuote && !inBlockComment && char === '-' && nextChar === '-') {
+      inLineComment = true;
     }
-    setCopying(false);
-  };
 
-  // Export to Excel handler
-  const handleExport = () => {
-    setExporting(true);
-    try {
-      const exportData = dataSource.map(row => {
-        const newRow = {};
-        columns.forEach(col => {
-          newRow[col.title] = row[col.dataIndex];
-        });
-        return newRow;
-      });
-
-      const worksheet = XLSX.utils.json_to_sheet(exportData);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-      XLSX.writeFile(workbook, 'table-data.xlsx');
-
-      message.success('Exported to Excel!');
-    } catch (err) {
-      message.error('Failed to export.');
+    // End of line comment
+    if (inLineComment && (char === '\n' || char === '\r')) {
+      inLineComment = false;
     }
-    setExporting(false);
-  };
 
-  return (
-    <>
-      <Space style={{ marginBottom: 16 }}>
-        <Button
-          icon={<CopyOutlined />}
-          loading={copying}
-          onClick={handleCopy}
-        >
-          {copying ? 'Copying...' : 'Copy Table'}
-        </Button>
+    // Handle /* block comment */
+    if (!inSingleQuote && !inDoubleQuote && !inLineComment && char === '/' && nextChar === '*') {
+      inBlockComment = true;
+    }
 
-        <Button
-          icon={<FileExcelOutlined />}
-          loading={exporting}
-          onClick={handleExport}
-        >
-          {exporting ? 'Exporting...' : 'Export to Excel'}
-        </Button>
-      </Space>
+    // End of block comment */
+    if (inBlockComment && char === '*' && nextChar === '/') {
+      inBlockComment = false;
+      currentQuery += '*/'; // include end of comment
+      i++;
+      continue;
+    }
 
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        pagination={{ pageSize: 20 }}
-        scroll={{ y: 400 }}
-      />
-    </>
-  );
-};
+    // Ignore characters inside comments
+    if (inLineComment || inBlockComment) {
+      currentQuery += char;
+      continue;
+    }
 
-export default MyTable;
+    // Handle quote toggling
+    if (char === "'" && !inDoubleQuote) {
+      inSingleQuote = !inSingleQuote;
+    } else if (char === '"' && !inSingleQuote) {
+      inDoubleQuote = !inDoubleQuote;
+    }
+
+    // Track parentheses depth (used in functions, subqueries)
+    if (!inSingleQuote && !inDoubleQuote) {
+      if (char === '(') parenthesesDepth++;
+      if (char === ')') parenthesesDepth--;
+    }
+
+    // Detect query delimiter (;) safely
+    if (char === ';' && !inSingleQuote && !inDoubleQuote && parenthesesDepth === 0) {
+      if (currentQuery.trim()) {
+        queries.push(currentQuery.trim());
+      }
+      currentQuery = '';
+    } else {
+      currentQuery += char;
+    }
+  }
+
+  if (currentQuery.trim()) {
+    queries.push(currentQuery.trim());
+  }
+
+  return queries;
+}
