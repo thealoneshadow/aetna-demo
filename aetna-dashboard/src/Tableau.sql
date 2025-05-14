@@ -11,49 +11,52 @@ function splitSQLQueries(sqlString) {
     const char = sqlString[i];
     const nextChar = sqlString[i + 1];
 
-    // Handle -- line comment
+    // Detect line comment --
     if (!inSingleQuote && !inDoubleQuote && !inBlockComment && char === '-' && nextChar === '-') {
       inLineComment = true;
+      i++; // skip nextChar to avoid adding --
+      continue;
     }
 
     // End of line comment
     if (inLineComment && (char === '\n' || char === '\r')) {
       inLineComment = false;
+      continue;
     }
 
-    // Handle /* block comment */
+    // Detect block comment /*
     if (!inSingleQuote && !inDoubleQuote && !inLineComment && char === '/' && nextChar === '*') {
       inBlockComment = true;
+      i++; // skip nextChar to avoid adding /*
+      continue;
     }
 
     // End of block comment */
     if (inBlockComment && char === '*' && nextChar === '/') {
       inBlockComment = false;
-      currentQuery += '*/'; // include end of comment
-      i++;
+      i++; // skip nextChar
       continue;
     }
 
-    // Ignore characters inside comments
+    // Skip characters inside comments
     if (inLineComment || inBlockComment) {
-      currentQuery += char;
       continue;
     }
 
-    // Handle quote toggling
+    // Toggle quotes
     if (char === "'" && !inDoubleQuote) {
       inSingleQuote = !inSingleQuote;
     } else if (char === '"' && !inSingleQuote) {
       inDoubleQuote = !inDoubleQuote;
     }
 
-    // Track parentheses depth (used in functions, subqueries)
+    // Parentheses tracking
     if (!inSingleQuote && !inDoubleQuote) {
       if (char === '(') parenthesesDepth++;
       if (char === ')') parenthesesDepth--;
     }
 
-    // Detect query delimiter (;) safely
+    // Semicolon at top level = query separator
     if (char === ';' && !inSingleQuote && !inDoubleQuote && parenthesesDepth === 0) {
       if (currentQuery.trim()) {
         queries.push(currentQuery.trim());
