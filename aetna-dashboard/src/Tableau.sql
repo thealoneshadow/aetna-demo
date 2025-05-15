@@ -1,7 +1,20 @@
-function extractBigQueries(text) {
-  const regex = /(?=SELECT\b)[\s\S]*?(?=(?=SELECT\b)|$)/gi;
-  const matches = text.match(regex) || [];
+function extractBigQueries(inputText) {
+  // Normalize the input by replacing line breaks with spaces
+  const normalizedText = inputText.replace(/\n/g, ' ').replace(/\s+/g, ' ');
 
-  // Clean each match by trimming and collapsing whitespace
-  return matches.map(q => q.trim().replace(/\s+/g, ' ')).filter(q => q.length > 0);
+  // Match queries starting with SELECT and ending at the nearest semicolon or new SELECT (lookahead)
+  const regex = /\bSELECT\b[\s\S]*?(?=(?:\bSELECT\b|$))/gi;
+
+  // Extract matches
+  const queries = [];
+  let match;
+
+  while ((match = regex.exec(normalizedText)) !== null) {
+    const query = match[0].trim();
+    if (query.length > 10) {
+      queries.push(query);
+    }
+  }
+
+  return queries;
 }
