@@ -1,49 +1,54 @@
-function splitAndCleanSQLQueries(rawSQL) {
+function extractBigQueryStatements(text) {
   const queries = [];
   let current = '';
   let inSingleQuote = false;
-  let inDoubleQuote = false;
   let inLineComment = false;
   let inBlockComment = false;
 
-  for (let i = 0; i < rawSQL.length; i++) {
-    const char = rawSQL[i];
-    const nextChar = rawSQL[i + 1];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
 
-    // Line comments --
-    if (!inSingleQuote && !inDoubleQuote && !inBlockComment && char === '-' && nextChar === '-') {
+    // Start of line comment --
+    if (!inSingleQuote && !inLineComment && !inBlockComment && char === '-' && nextChar === '-') {
       inLineComment = true;
-      i++;
+      i++; // Skip nextChar
       continue;
     }
+
+    // End of line comment
     if (inLineComment && (char === '\n' || char === '\r')) {
       inLineComment = false;
       continue;
     }
 
-    // Block comments /* ... */
-    if (!inSingleQuote && !inDoubleQuote && !inLineComment && char === '/' && nextChar === '*') {
+    // Inside line comment, skip characters
+    if (inLineComment) continue;
+
+    // Start of block comment /*
+    if (!inSingleQuote && !inBlockComment && char === '/' && nextChar === '*') {
       inBlockComment = true;
-      i++;
+      i++; // Skip *
       continue;
     }
+
+    // End of block comment */
     if (inBlockComment && char === '*' && nextChar === '/') {
       inBlockComment = false;
-      i++;
+      i++; // Skip /
       continue;
     }
 
-    if (inLineComment || inBlockComment) continue;
+    // Inside block comment, skip characters
+    if (inBlockComment) continue;
 
-    // Quotes
-    if (char === "'" && !inDoubleQuote) {
+    // Toggle single quote
+    if (char === "'") {
       inSingleQuote = !inSingleQuote;
-    } else if (char === '"' && !inSingleQuote) {
-      inDoubleQuote = !inDoubleQuote;
     }
 
-    // Semicolon (safe split)
-    if (char === ';' && !inSingleQuote && !inDoubleQuote) {
+    // Semicolon ends a statement (outside quotes)
+    if (char === ';' && !inSingleQuote) {
       if (current.trim()) {
         queries.push(current.trim());
       }
@@ -53,9 +58,10 @@ function splitAndCleanSQLQueries(rawSQL) {
     }
   }
 
+  // Push last query if not terminated with semicolon
   if (current.trim()) {
     queries.push(current.trim());
   }
 
-  return queries.map(q => q.replace(/\s+/g, ' ').trim()); // Clean up whitespace
+  return queries;
 }
