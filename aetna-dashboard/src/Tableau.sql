@@ -1,66 +1,43 @@
-function extractBigQueryStatements(text) {
+function extractBigQueryStatements(rawText) {
+  // Clean up common junk first
+  const normalizedText = rawText
+    .replace(/\n/g, ' ')               // Convert all newlines to spaces
+    .replace(/\s+/g, ' ')              // Collapse multiple spaces
+    .replace(/["“”]/g, '"')            // Normalize quotes
+    .replace(/[‘’]/g, "'")             // Normalize single quotes
+    .trim();
+
   const queries = [];
-  let current = '';
+  let buffer = '';
   let inSingleQuote = false;
-  let inLineComment = false;
-  let inBlockComment = false;
+  let inDoubleQuote = false;
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const nextChar = text[i + 1];
+  for (let i = 0; i < normalizedText.length; i++) {
+    const char = normalizedText[i];
+    const nextChar = normalizedText[i + 1];
 
-    // Start of line comment --
-    if (!inSingleQuote && !inLineComment && !inBlockComment && char === '-' && nextChar === '-') {
-      inLineComment = true;
-      i++; // Skip nextChar
-      continue;
-    }
+    // Toggle quote states
+    if (char === "'" && !inDoubleQuote) inSingleQuote = !inSingleQuote;
+    if (char === '"' && !inSingleQuote) inDoubleQuote = !inDoubleQuote;
 
-    // End of line comment
-    if (inLineComment && (char === '\n' || char === '\r')) {
-      inLineComment = false;
-      continue;
-    }
+    // Add char to buffer
+    buffer += char;
 
-    // Inside line comment, skip characters
-    if (inLineComment) continue;
-
-    // Start of block comment /*
-    if (!inSingleQuote && !inBlockComment && char === '/' && nextChar === '*') {
-      inBlockComment = true;
-      i++; // Skip *
-      continue;
-    }
-
-    // End of block comment */
-    if (inBlockComment && char === '*' && nextChar === '/') {
-      inBlockComment = false;
-      i++; // Skip /
-      continue;
-    }
-
-    // Inside block comment, skip characters
-    if (inBlockComment) continue;
-
-    // Toggle single quote
-    if (char === "'") {
-      inSingleQuote = !inSingleQuote;
-    }
-
-    // Semicolon ends a statement (outside quotes)
-    if (char === ';' && !inSingleQuote) {
-      if (current.trim()) {
-        queries.push(current.trim());
+    // Only split if outside quotes
+    if ((char === ';' || (char.toUpperCase() === 'S' && normalizedText.slice(i, i + 6).toUpperCase() === 'SELECT'))
+        && !inSingleQuote && !inDoubleQuote && buffer.trim().toUpperCase().endsWith('SELECT')) {
+      // Push previous if exists
+      if (buffer.trim()) {
+        const maybeQuery = buffer.trim().replace(/^SELECT/i, ''); // remove SELECT from start
+        if (maybeQuery) queries.push('SELECT' + maybeQuery);
       }
-      current = '';
-    } else {
-      current += char;
+      buffer = '';
     }
   }
 
-  // Push last query if not terminated with semicolon
-  if (current.trim()) {
-    queries.push(current.trim());
+  // Add any remaining query
+  if (buffer.trim()) {
+    queries.push(buffer.trim());
   }
 
   return queries;
