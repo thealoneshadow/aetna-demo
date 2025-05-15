@@ -1,43 +1,42 @@
-function extractBigQueryStatements(rawText) {
-  // Clean up common junk first
-  const normalizedText = rawText
-    .replace(/\n/g, ' ')               // Convert all newlines to spaces
-    .replace(/\s+/g, ' ')              // Collapse multiple spaces
-    .replace(/["“”]/g, '"')            // Normalize quotes
-    .replace(/[‘’]/g, "'")             // Normalize single quotes
-    .trim();
-
+function extractBigQueries(text) {
   const queries = [];
-  let buffer = '';
-  let inSingleQuote = false;
-  let inDoubleQuote = false;
+  const lines = text.split(/\r?\n/);
 
-  for (let i = 0; i < normalizedText.length; i++) {
-    const char = normalizedText[i];
-    const nextChar = normalizedText[i + 1];
+  let currentQuery = '';
+  let insideQuery = false;
 
-    // Toggle quote states
-    if (char === "'" && !inDoubleQuote) inSingleQuote = !inSingleQuote;
-    if (char === '"' && !inSingleQuote) inDoubleQuote = !inDoubleQuote;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
 
-    // Add char to buffer
-    buffer += char;
+    // Skip empty or comment lines
+    if (!line || line.startsWith('--')) continue;
 
-    // Only split if outside quotes
-    if ((char === ';' || (char.toUpperCase() === 'S' && normalizedText.slice(i, i + 6).toUpperCase() === 'SELECT'))
-        && !inSingleQuote && !inDoubleQuote && buffer.trim().toUpperCase().endsWith('SELECT')) {
-      // Push previous if exists
-      if (buffer.trim()) {
-        const maybeQuery = buffer.trim().replace(/^SELECT/i, ''); // remove SELECT from start
-        if (maybeQuery) queries.push('SELECT' + maybeQuery);
+    // Start of a new query
+    if (/^SELECT\b/i.test(line)) {
+      // Save the previous query if any
+      if (currentQuery.trim()) {
+        queries.push(currentQuery.trim());
+        currentQuery = '';
       }
-      buffer = '';
+      insideQuery = true;
+    }
+
+    // Append the line if inside a query
+    if (insideQuery) {
+      currentQuery += (currentQuery ? ' ' : '') + line;
+
+      // If next line is not SELECT and this is the last line
+      const nextLine = lines[i + 1]?.trim() || '';
+      if (!/^SELECT\b/i.test(nextLine) && i + 1 === lines.length - 1) {
+        queries.push(currentQuery.trim());
+        currentQuery = '';
+      }
     }
   }
 
-  // Add any remaining query
-  if (buffer.trim()) {
-    queries.push(buffer.trim());
+  // Push last one if any
+  if (currentQuery.trim()) {
+    queries.push(currentQuery.trim());
   }
 
   return queries;
