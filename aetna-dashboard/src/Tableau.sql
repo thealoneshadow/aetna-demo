@@ -18,3 +18,7 @@ function extractBigQueries(inputText) {
 
   return queries;
 }
+
+Valid months for the AEP period are October , November, and December
+
+Rephrase by aggregating calls and grouping by lead type, exclude not applicable for lead type. Not applicable is not a valid lead _type
