@@ -1,193 +1,418 @@
-"Syntax error: Expected end of input but got identifier \"You\" [at 1:87]\n...Marketing Performance\" , value = \"{\'promptMain\': \"You are an expert with o...\n                                                     ^"
+import json
+import re
+import uuid
+from urllib.parse import unquote
+from werkzeug.exceptions import Unauthorized
+from flask import jsonify, request, render_template, redirect, make_response
+import sys
+from .blueprints import module_blueprints
+from langgraph.graph import StateGraph , END
+
+from langchain_community.vectorstores import FAISS
+from langchain.tools import tool
+import pandas as pd
+import os
+ 
+from typing_extensions import TypedDict , Optional
+ 
+from langchain_core.documents import Document
+from langchain_core.outputs import LLMResult, Generation
+from vertexai.language_models import TextEmbedding
+
+ 
+from google.cloud import aiplatform
+import vertexai
+from vertexai.generative_models import GenerativeModel, Part, SafetySetting, FinishReason
+
+from vertexai.language_models import TextEmbeddingModel
+from langgraph.graph import StateGraph, END
+from langchain_core.language_models import BaseLLM
+from langchain_core.embeddings import Embeddings
+from langchain_core.callbacks import CallbackManagerForLLMRun
+from langchain_core.outputs import LLMResult, Generation
+from typing import Any , List   , Optional, Dict, Union
+from langchain_community.vectorstores import FAISS 
+import google.auth 
+from google.cloud  import aiplatform
 
 
- let value = {
-            promptMain:`You are an expert with over 10 years of domain and techincal experience as a principal data scienitst
-            designed to provide accurate, high-quality, mindful responses related to Medicare insurance data.
-     
-            Your step by step task is as below:
-           
-            1. Analyze the previously generated pseudo BigQuery and original user question.
-            2. Analyze the database schema and find the columns which are relevant to answer user's question.
-            3. Now write the Bigquery.
-            4. Validate the final generated_big_Query against the database schema provided and user's original question.
-            5. Based on final query generated please write brief explanation of it, assumptions,python list of columns used in select clause only to create an accurate table.
-     
-     
-            [BIG QUERY DATABASE SCHEMA]
-     
-            PROJECT: 'anbc-hcb-prod'
-            DATASET: 'msa_share_mcr_hcb_prod'
-            TABLE:   'MMPD_CONSUMPTION_CURR_PREV_AEP'
-            
-     
-            Decision Guidelines:
-            - All STRING comparisons or operations should be in UPPER case. Also comparing any string values to a column should be in upper case.
-            - Apply UPPER function while comparing any STRING with a column.
-            - If generating big query then generate optimized big query enclosed in triple backticks with proper formating and indentation.
-            - Dont assume anything by yourself there is proper definition of every column in the BIG Query DATABASE Schema.
-            - Always take reference from business calculations below if you need.
-            - Whenever you response is bigquery then also write a brief explation that what this query will fetch and also include the column name while explaining.
-            - If it is a bigquery then always show only upto 1000 rows(LIMIT 1000)
-            - If the user has not explicitly mentioned any timeframe , always consider the latest AEP in timing for all calculation.
-            - If user has asked just for AEP without mentioning any year, always consider the latest AEP in timing for all the calculation.
-            - If the question explicitly mention any month name or month name and date then identify the latest year found in the res_date column as default. For example , if the years are 2024 and 2023, all summaries, filters and insights should default to 2024 unless explicitly told otherwise  
-            - If user has explicitly mentioned the timing like AEP2025 then no need to calculate latest AEP, directly set value for timing like timing = AEPYYYY
-            - If user has explicitly mentioned the month and year then no need to calculate timing, directly set value for res_date
-            - The final query must be validated against the database schema and should follow all the instructions.
-            - Please validate the final bigquery response against the database schema provided to you and the instructions and assumptions provided to you.
-            - Always use safe divide function to handle divison by 0 cases in the final query generated.
-            - When answering questions, do not use the intrctn_src and partner column unless the question specifically asks for a filter or grouping on their exact distinct values. If there's no such request, ignore this column in all calculations    
-            - Telesales is combination of vendor and internal telesales.
-            - Answer all the telesales related questions without using the sales_chnl_cd_std column in any calculations. Base your answer only on the other available data and explain your steps clearly
-            - Answer all the telesales related questions for calls without using the lead_type and lead_type_grouping column in any calculations. Base your answer only on the other available data and explain your steps clearly
-            - If user has asked just for AEP without mentioning any year, always consider the latest AEP in timing for all the calculation.
-            - If today's month and date between October 1 and December 31 then Current AEP or Latest AEP should always be calculated on timing column like this:
-                -------------
-                timing = (
-                    SELECT
-                        distinct timing
-                        FROM
-                        \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\` ORDER BY timing desc limit 1)
-                ---------------
-             - If today's month and date not between October 1 and December 31  then Current AEP or Latest AEP or last AEP should always be calculated on timing column like this:
-                -------------
-                timing = (
-                    SELECT
-                        distinct timing
-                        FROM
-                        \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\` ORDER BY timing desc limit 1)
-                ---------------
-               
-            - If today's month and date between October 1 and December 31  then Last AEP or STLY AEP or previous year AEP or prior year AEP should always be on timing column like this:
-                -------------
-                timing = (
-                    SELECT
-                        distinct timing
-                        FROM
-                        \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\` ORDER BY timing asc limit 1)
-                ---------------
-             - If today's month and date is not between October 1 and December 31  then Last AEP or STLY AEP or previous year AEP or prior year AEP should always be on timing column like this:
-                -------------
-                timing = (
-                    SELECT
-                        distinct timing
-                        FROM
-                        \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\` ORDER BY timing desc limit 1)
-                ---------------
-             - If today's month and date is not between October 1 and December 31  then last to last should always be on timing column like this:
-                -------------
-                timing = (
-                    SELECT
-                        distinct timing
-                        FROM
-                        \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\` ORDER BY timing asc limit 1)
-                ---------------
-            - If the question explicitly mention any month name or month name and date then identify the latest year found in the res_date column as default. For example , if the years are 2024 and 2023, all summaries, filters and insights should default to 2024 unless explicitly told otherwise  
-            - If user has explicitly mentioned the timing like AEP2025 then no need to calculate latest AEP, directly set value for timing like timing = AEPYYYY
-           
+base_dir = os.path.dirname(os.path.abspath("BRDTest.txt"))
+path = os.path.join(base_dir, "BRDTest.txt")
+
+myproject="anbc-dev-growth-anlyt",
+mylocation="us-central1",
+myapi_endpoint="us-central1-aiplatform.googleapis.com"
+default_timing = "AEP2025"
+latest_aep = "AEP2025"
+pre_aep = "AEP2024"
+
+def get_formated_history(history):
+        recent_history = history
+        print(recent_history)
+        return "\n".join([f"{msg['role']}:{msg['content']}" for msg in recent_history])
+
+def chunk_text(text, chunk_size =100, overlap = 15):
+        words = text.split()
+        chunks = []
+        for i in range(0,len(words), chunk_size - overlap): # type: ignore
+            chunk = " ".join(words[i:i+chunk_size])
+            chunks.append(chunk)
+        
+        return chunks
+
+class CustomVertexAILLM(BaseLLM):
+    generation_config: Dict = {
+        # "max_output_tokens": 8192,
+        "temperature":0,
+        "top_p": 0.95,
+        "seed":0
+    }
+
+    safety_settings: List[SafetySetting] = [
+
+        SafetySetting(category = "HARM_CATEGORY_HATE_SPEECH",threshold = "BLOCK_MEDIUM_AND_ABOVE"), # type: ignore
+
+        SafetySetting(category = "HARM_CATEGORY_DANGEROUS_CONTENT",threshold = "BLOCK_MEDIUM_AND_ABOVE"), # type: ignore
+
+        SafetySetting(category = "HARM_CATEGORY_SEXUALLY_EXPLICIT",threshold = "BLOCK_MEDIUM_AND_ABOVE"), # type: ignore
+
+        SafetySetting(category = "HARM_CATEGORY_HARASSMENT",threshold = "BLOCK_MEDIUM_AND_ABOVE") # type: ignore
+
+    ]
+ 
+
+    def _generate(
+        self,
+        prompts: List[str],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+        ) -> LLMResult:
+        vertexai.init(
+        project="anbc-dev-growth-anlyt",
+        location="us-central1",
+        api_endpoint="us-central1-aiplatform.googleapis.com"
+        )
+        model = GenerativeModel('gemini-1.5-pro-002')
+        generations = []
+        for prompt in prompts:
+            response = model.generate_content(
+                    prompt,
+                    generation_config=self.generation_config,
+                    safety_settings = self.safety_settings,
+                    stream=False,
+            )
+            text = response.text if hasattr(response,'text') else str(response)
+            generations.append([Generation(text = text)])
+        return LLMResult(generations=generations)
+    @property
+    def _llm_type(self) -> str:
+        return "custom_vertexai"
     
-                                                                             
-                                                                             
-     
-            Business Calculations:
-            1. Conversion Rate:  \`\`\`sum(CASE WHEN collection_channel = 'NON_DIGITAL' then leads else 0 end)/SUM(calls) * 100 \`\`\`
-             3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
-            4. STLY: full form  is 'Same Time Last Year' user uses this term when he wants to compare any value from given date to the value exactly one year back.
-            5. Always apply Round function for showing calculated values upto 2 decimal places. 
-           
-            Example User Question: Calls comparison with actual vs STLY for AEP?
-            Example BigQuery:
-            -----------
-            SELECT
-                this_year.actual_calls,
-                last_year.planned_calls AS last_year_calls
-            FROM
-                (
-                SELECT
-                    timing,
-                    SUM(calls) AS actual_calls
-                    FROM
-                    \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\`
-                    WHERE timing = 'AEP2025'
-                    GROUP BY 1
-                ) AS this_year
-                LEFT JOIN (
-                SELECT
-                    timing,
-                    SUM(calls) AS planned_calls
-                    FROM
-                    \`anbc-hcb-prod.msa_share_mcr_hcb_prod.MMPD_CONSUMPTION_CURR_PREV_AEP\`
-                    WHERE timing = 'AEP2024'
-                    GROUP BY 1
-                ) AS last_year ON 1=1
-           
-            ----------------------------
-            Provide your response in this exact format:
-            <decision>[BIGQuery|Clarify]</decision>
-            <response>
-                    Your full response here...
-            </response>
-            <brief-explanation>
-                    Your Brief Explanation here...
-            </brief-explanation>
-            <assumptions>
-                    Your Assumptions here...
-            </assumptions>
-            <columns>
-            
-            </columns>`,
-            prompt_clarification:`You are a BigQuery request evaluator assistant. The user will give queries, and you will check if the user query is clear or needs clarification based on data dictionary and set of rules.
+
+class CustomVertexAIEmbeddings(Embeddings):
+    model_name: str = "text-embedding-004"
+    def __init__(self, **kwargs: Any):
+        super().__init__(**kwargs)
+        vertexai.init(
+            project="anbc-dev-growth-anlyt",
+            location="us-central1",
+            api_endpoint="us-central1-aiplatform.googleapis.com"
+        )
+        self.model = TextEmbeddingModel.from_pretrained(self.model_name)
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        try:
+            embeddings = self.model.get_embeddings(texts) # type: ignore
+            return [embedding.values for embedding in embeddings]
+        except Exception as e:
+            return [[] for _ in texts]
+    def embed_query(self,text: str) -> List[float]:
+        try:
+            embeddings = self.model.get_embeddings([text])
+            return embeddings[0].values
+        except Exception as e:
+            return []
+    @property
+    def _embedding_type(self) -> str:
+        return "custom_vertexai_embeddings"
+    
+class BusinessAssistantBackend:
+    def __init__(self):
+        vertexai.init(
+            project="anbc-dev-growth-anlyt",
+            location="us-central1",
+            api_endpoint="us-central1-aiplatform.googleapis.com"
+        )
+        self.credentials, self.project = google.auth.default()
+        aiplatform.init(project=self.project,credentials=self.credentials) # type: ignore
+
+        self.llm = CustomVertexAILLM()
+        self.embeddings = CustomVertexAIEmbeddings()
+        # self.chat_history = ChathistoryManager()
+        self.load_documents()
+
+
+
+    def load_documents(self):
+        with open("/app/./src/controllers/BRDTest.txt",'r') as f:
+            text = f.read()
+        chunks = chunk_text(text, chunk_size =60, overlap =15)   
+        docs = [Document(page_content=chunk) for chunk in chunks]
+        self.vector_store = FAISS.from_documents(docs,embedding = self.embeddings)
+
+    def llm_call(self,query):
+        return self.llm.generate([query]).generations[0][0].text
+
+
+    def bd_answer(self,query):
+        docs = self.vector_store.similarity_search(query,k = 2)
+        bd_context = "\n".join(d.page_content for d in docs)
+        query = ""
    
-            [DISCLAIMER]: You have to only answer those requests which is related to data dictionary and BigQuery SQL otherwise say "I can not take this request,Thanks. I am only allowed to help with BigQuery Table".
+        PROMPT = f"""
+        You are an expert in extracting information from Business Documents. You will be provided some context from business document.
+        Your task is to provide an answer of a user's question based on given context.
+ 
+        User Question: {query}
+        Business Context: {bd_context}
+ 
+        Please Follow Below Guidelines while answering:
+        1. If the answer is not found in the context, respond with:
+            Answer: [NOT_FOUND]
+        2. If the answer is found in the context, respond with:
+            Answer: <your answer here>
+        """
+ 
+        response = self.llm.generate([PROMPT]).generations[0][0].text
+        # response = call_custom_endpoint(PROMPT)
+        # response = call_custom_endpoint(PROMPT)
+        # print("------------------------")
+        # print(response)
+        # print("------------")
+        return response
+ 
+ # - Calls leads and sales can only be used with sum function in a Big Query
+    
+
+    def generate_response(self,query:str) -> tuple[str,str]:
+        # self.chat_history.add_message("user",query)
+        bd_response = self.bd_answer(query)
+        data_dict_str = pd.read_excel("/app/./src/controllers/MMPDNew.xlsx").to_markdown()
+ 
+        # history_context = get_formated_history(historyList)
+        prompt = f""" 
+        {promptMain.mmpdMain}
+        """
+        # print(history_context)
+        
+   
          
-            Rules:
-                1. Properly analyze the user request dont ask clarification question untill there is any ambiguity.
-                2. Don't ask unnecessary question only ask relevant question.
-                3. Before deciding which column to use. Check the literal value against distinct values of all columns. In case, you get multiple columns, do not assume, instead ask the user which column should you use.
-                4. If multiple columns qualify to answer user request then ask user to choose which column.  
-                5. If user does not mention anything about timing then always use default timing:{}
-                6. If user mentions latest AEP then use latest timing:{}
-                7. If user mentions about last or previous AEP then use previous AEP:{}
-                8. Strictly dont ask any question about timing because timing related information is already given to you and based on that use the timing.
-                10. Channels means different marketing platforms.
-                11. If any confusion first try to understand the definition of columns given in data dictionary and if still confused or there is conflict among more than two columns then clearly ask user by giving proper options: 1. Option A, 2. Option B.
-                12. When answering questions, do not use the intrctn_src and partner column unless the question specifically asks for a filter or grouping on their exact distinct values. If there's no such request, ignore this column in all calculations    
-                16. If user is asking something related to calls ,sales and leads then use the columns calls,sales and leads until user specifically ask about special kidn of calls, sales and leads. There are direct columns for sales, calls and leads
-                17. Conversion rate is generally reffered as the rati*100 of any  two metrices by default we reffer conversion rate as business calculation 1 but sometimes user want to know some other convers
-                18.Channel can refer to only one of the following column: collection_channel, routing_channel, sub_channel, tfn_collection_channel, derived_media_channel
-                19. If user requests is about channel apart from media channel then ask which column to choose for channel but if user mentios media channel it  means "derived media channel".
-                20. If user request mentions about place(city state etc) dont guess the column, do below steps:
-                        - First go through that what are  the columns that contains this value.
-                        - If more than one column contains this value then ask user which column to consider.
-                21. Valid months for AEP period are October , November, and December.
-                
-               
-                   
-               
-                Business Calculations:
-                1. Conversion Rate when metrices not mentioned in request:  \`\`\`sum(CASE WHEN collection_channel = 'NON_DIGITAL' then leads else 0 end)/SUM(calls) * 100 \`\`\`.
-                     3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
-                4. STLY: full form  is 'Same Time Last Year' user uses this term when he wants to compare any value from given date to the value exactly one year back.
+        full_response = self.llm.generate([prompt]).generations[0][0].text
+        decision = full_response.split("<decision>")[1].split("</decision>")[0].strip()
+        response = full_response.split("<response>")[1].split("</response>")[0].strip()
+        explanation = full_response.split("<brief-explanation>")[1].split("</brief-explanation>")[0].strip()
+        assumptions = full_response.split("<assumptions>")[1].split("</assumptions>")[0].strip()
+        columns = full_response.split("<columns>")[1].split("</columns>")[0].strip()
+        decision = """PROJECT: 'anbc-hcb-prod'
+                        DATASET: 'msa_share_mcr_hcb_prod'
+                        TABLE:   'MMPD_CONSUMPTION_CURR_PREV_AEP' """
+        # self.chat_history.add_message("assistant",response)
+        #print(history_context)
+        if "NOT_FOUND" not in bd_response:
+            explanation = "BD_Response: "+bd_response+"\n"+explanation
+        return decision, response, explanation, assumptions, columns # type: ignore
+        # self.chat_history.add_message("user",query)
+
+
+    def generate_response_mc(self,query:str) -> tuple[str,str]:
+        # self.chat_history.add_message("user",query)
+        # bd_response = self.bd_answer(query)
+        # data_dict_str = pd.read_excel("/app/./src/controllers/MMPDNew 1.xlsx").to_markdown()
+        data_dict1 = pd.read_excel(r'/app/./src/controllers/hotspot.xlsx').to_markdown()
+        data_dict2 = pd.read_excel(r'/app/./src/controllers/DOL_AEP.xlsx').to_markdown()
+ 
+        # history_context = get_formated_history(historyList)
+        prompt = f"""  {promptMain.mcMain} """
+        # print(history_context)
+        
+   
          
+        full_response = self.llm.generate([prompt]).generations[0][0].text
+        decision = full_response.split("<decision>")[1].split("</decision>")[0].strip()
+        response = full_response.split("<response>")[1].split("</response>")[0].strip()
+        explanation = full_response.split("<brief-explanation>")[1].split("</brief-explanation>")[0].strip()
+        assumptions = full_response.split("<assumptions>")[1].split("</assumptions>")[0].strip()
+        columns = full_response.split("<columns>")[1].split("</columns>")[0].strip()
+        # decision = """PROJECT: 'anbc-hcb-prod'
+        #                 DATASET: 'msa_share_mcr_hcb_prod'
+        #                 TABLE:   'MMPD_CONSUMPTION_CURR_PREV_AEP' """
+        # self.chat_history.add_message("assistant",response)
+        # #print(history_context)
+        # if "NOT_FOUND" not in bd_response:
+        #     explanation = "BD_Response: "+bd_response+"\n"+explanation
+        return decision, response, explanation, assumptions, columns # type: ignore
+       
+prompt_clari_MMPD = f"""
+    {promptMain.mmpdClarification}
+    """
+
+prompt_clari_MC = f"""
+    {promptMain.mcClarification}
+    """
+
+ 
+def format_conversation_history(history:list)-> str:
+    conversation = ""
+    for turn in history:
+        if turn['role'] == 'user':
+            conversation+=f"\nUser: {turn['content']}"
+        elif turn['role'] == "Agent":
+            conversation+=f"\nAssistant: {turn['content']}"
+    # conversation+="\nAssistant: "
+    print(conversation.strip())
+    return conversation.strip()
+
+# 1. If user request does not say anything about timing then always consider default timing= {default_period}
+#         2. If user request mention latest AEP then use timing: {current_AEP}
+#         3. If user request mentions last or previous AEP then use timing: {last_AEP}
+#         4. If user request mentions last lockin or previous lockin then use timing: {last_lockin}
+# 9. Dont ask silly questions, if user is asking about calls then do need to ask which calls directly use calls column likewise for leads and market ask well.
+
+def remove_query_ready_flag(text):
+    try:
+        pattern = r'\[?\s*query_ready\s*:\s*(True|False)\s*\]?'
+        cleaned_text = re.sub(pattern,'',text)
+        return re.sub(r'\s{2,}',' ',cleaned_text).strip()
+    except Exception as e:
+        return text
+ 
+
+def build_prompt_with_history(history:list,data_dict:str) -> str:
+    prompt =""
+    if table == "Medicare Marketing Performance":
+        prompt = prompt_clari_MMPD.format(default_timing,latest_aep,pre_aep,data_dict,format_conversation_history(history))
+        print(prompt)
+        return prompt.strip()
+    if table == "Mission Control":
+        data_dict1 = pd.read_excel(r'/app/./src/controllers/hotspot.xlsx').to_markdown()
+        data_dict2 = pd.read_excel(r'/app/./src/controllers/DOL_AEP.xlsx').to_markdown()
+        prompt = prompt_clari_MC.format(format_conversation_history(history),data_dict1,data_dict2)
+        print(prompt)
+        return prompt.strip()
+    else: 
+        print("I am in else one")
+        return "Dummy test"
+
+
+#---------------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------
+
+def getBackend():
+    return BusinessAssistantBackend()
+
+
+
+def chat_history_str(chat_list):
+    res = ""
+    for turn in chat_list:
+        role = turn.get("role","unknown")
+        content = turn.get("content","")
+        res+=f"{role}: {content}\n"
+    return res.strip()
+
+def response_format(full_response):
+    try:
+
+        response = full_response.split("<response>")[1].split("</response>")[0].strip()
+        explanation = full_response.split("<brief-explanation>")[1].split("</brief-explanation>")[0].strip()
+        assumptions = full_response.split("<assumptions>")[1].split("</assumptions>")[0].strip()
+        
+        return response,explanation,assumptions
+    except:
+        return full_response,"None","None"
+
+
+def conversBiDevDb():
+    try:
+        
+        data = request.get_json()
+        print(data)
+ 
+        backend = getBackend()
                
-         
+        prompt = data['value']
+        history = data['history']
+        global table
+        table = data['table'] 
+
+        global promptMain
+
+        json_str = data['prompt'].decode('utf-8')
+        print(json_str)
+        promptMain = json.loads(json_str)
+        print(promptMain)
+
+
+       
+
+        print(table)
+        global historyList
+        historyList = history
+        global data_dict_str
+        data_dict_str = pd.read_excel("/app/./src/controllers/MMPDNew.xlsx").to_markdown()
+        
+        historyList.append({"role":"user","content":prompt})
+        # historyList.insert(0, {"role":"user","content":prompt})
+        print(historyList)
+
+        prompt1 = build_prompt_with_history(historyList,data_dict_str)
+
+        result = backend.llm_call(prompt1)
+        
+
+        if ("True"  in result) and table == "Medicare Marketing Performance":
+            result = remove_query_ready_flag(result)
+            decision, response, explanation, assumptions, columns = backend.generate_response(result) # type: ignore
+            
+            final = json.dumps(response)
+            newExplanation = json.dumps(explanation)
+            newDecision = json.dumps(decision)
+            newColumns = json.dumps(columns)
+            
+            return jsonify({"message": "AI result Fetched Successfully","data":final, "explanation":newExplanation, "decision":newDecision, "assumptions":assumptions, "columns":newColumns}), 200  
+
+        elif ("True"  in result) and table == "Mission Control":
+            result = remove_query_ready_flag(result)
+            decision, response, explanation, assumptions, columns = backend.generate_response_mc(result) # type: ignore
            
-            --------Here is the data dictionary---------
-            PROJECT: 'anbc-hcb-prod'
-            DATASET: 'msa_share_mcr_hcb_prod'
-            TABLE:   'MMPD_CONSUMPTION_CURR_PREV_AEP'
-         
-            {}
-            --------------------------------------------
-            Once you have enough information to generate bigquery then please provide a summary which includes origianl question, columns to be used and pseudo BigQuery.
-            Respond Only in plain string format like below:
-            - clarifying questions(if any and give options . clarification question must be short and consize)
-            - [query_ready: True/False]
-         
-            If query is ambiguous, clearly ask for missing details. Maintain context through the conversation.Once there is no ambiguity then set query_ready:True otherwise query_ready:False
-            Once the query is ready then only provide the pseudo bigquery otherwise do not provide pseudo query.
-         
-            ------- Conversation History--------
-            {}`,
-        }
+            final = json.dumps(response)
+            newExplanation = json.dumps(explanation)
+            newDecision = json.dumps(decision)
+            newColumns = json.dumps(columns)
+            
+            return jsonify({"message": "AI result Fetched Successfully","data":final, "explanation":newExplanation, "decision":newDecision, "assumptions":assumptions, "columns":newColumns}), 200  
+     
+        else:
+            result = remove_query_ready_flag(result)
+            final = json.dumps(result)
+            newAssumptions = json.dumps("None")
+            newExplanation = json.dumps("None")
+            newDecision = json.dumps("None")
+            newColumns = json.dumps("[]")
+
+    
+            return jsonify({"message": "AI result Fetched Successfully","data":final, "explanation":newExplanation, "decision":newDecision, "assumptions":newAssumptions, "columns":newColumns}), 200  
+    
+
+    
+
+       
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Internal server error'}), 500
+   
+   
+@module_blueprints.route('/conversational-bi-dev-db', methods=['POST']) # type: ignore
+def converse_bi_dev_db():
+    result = conversBiDevDb()
+    return result
