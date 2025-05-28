@@ -1,7 +1,4 @@
-Syntax error: Expected end of input but got \"{\" [at 1:1210]\n...Pseudo BigQuery and original question: \"{query}\"\\n     \\n            Decis...\n
-
-
-
+"Syntax error: Expected end of input but got identifier \"You\" [at 1:87]\n...Marketing Performance\" , value = \"{\'promptMain\': \"You are an expert with o...\n                                                     ^"
 
 
  let value = {
@@ -22,9 +19,7 @@ Syntax error: Expected end of input but got \"{\" [at 1:1210]\n...Pseudo BigQuer
             PROJECT: 'anbc-hcb-prod'
             DATASET: 'msa_share_mcr_hcb_prod'
             TABLE:   'MMPD_CONSUMPTION_CURR_PREV_AEP'
-            {data_dict_str}
-     
-            Pseudo BigQuery and original question: "{query}"
+            
      
             Decision Guidelines:
             - All STRING comparisons or operations should be in UPPER case. Also comparing any string values to a column should be in upper case.
@@ -91,32 +86,13 @@ Syntax error: Expected end of input but got \"{\" [at 1:1210]\n...Pseudo BigQuer
             - If the question explicitly mention any month name or month name and date then identify the latest year found in the res_date column as default. For example , if the years are 2024 and 2023, all summaries, filters and insights should default to 2024 unless explicitly told otherwise  
             - If user has explicitly mentioned the timing like AEP2025 then no need to calculate latest AEP, directly set value for timing like timing = AEPYYYY
            
-     
-            Please follow below asssumptions while writing the query:
-            1.  If user question is related to Region , we need to exclude “NOT_APPLICABLE”. This is a default value for MAPD/DSNP/CSNP plans. “NOT_APPLICABLE” is not a valid Region.
-                                                                                OR
-            2.  If user question is related to market, we need to exclude “NOT_APPLICABLE”. This is a default value for PDP plans. “NOT_APPLICABLE” is not a valid market
-                                                                                OR 
-            3.  Aggregating calls and grouping by lead type, exclude not applicable for lead type. Not applicable is not a valid lead _type
-                                                                               OR 
-            4.  For any Lead Definition related questions, we need to exclude “NOT_APPLICABLE" for Calls.
-                                                                               OR 
-            5.  For any Lead Tactic related questions, we need to exclude “NOT_APPLICABLE" for Calls.
-                                                                               OR 
-            6.  For any Routing Channel related questions, we need to exclude “NOT_APPLICABLE for Calls.
-                                                                               OR 
-            7.  For any Conversion rate questions, We need to exclude “DIGITAL” leads. Telephonic conversion rate means Total NON_DIGITAL leads/ Total Calls * 100
-                                                                               OR 
-            8.  For any Media Channel related questions, We need to select Derived Media Channel.
-                                                                               OR 
-            9. For any Media Group related questions, We need to select Derived Media Channel     
+    
                                                                              
                                                                              
      
             Business Calculations:
             1. Conversion Rate:  \`\`\`sum(CASE WHEN collection_channel = 'NON_DIGITAL' then leads else 0 end)/SUM(calls) * 100 \`\`\`
-            2. Close Rate Issued: "(sum(sales)/sum(leads))*100"
-            3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
+             3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
             4. STLY: full form  is 'Same Time Last Year' user uses this term when he wants to compare any value from given date to the value exactly one year back.
             5. Always apply Round function for showing calculated values upto 2 decimal places. 
            
@@ -159,7 +135,7 @@ Syntax error: Expected end of input but got \"{\" [at 1:1210]\n...Pseudo BigQuer
                     Your Assumptions here...
             </assumptions>
             <columns>
-            list of columns used with select clause: ["col1","col2","col3"....] without any escape character
+            
             </columns>`,
             prompt_clarification:`You are a BigQuery request evaluator assistant. The user will give queries, and you will check if the user query is clear or needs clarification based on data dictionary and set of rules.
    
@@ -187,29 +163,11 @@ Syntax error: Expected end of input but got \"{\" [at 1:1210]\n...Pseudo BigQuer
                 21. Valid months for AEP period are October , November, and December.
                 
                
-                Please follow below asssumptions while writing the query:
-                1.  If user question is related to Region , we need to exclude “NOT_APPLICABLE”. This is a default value for MAPD/DSNP/CSNP plans. “NOT_APPLICABLE” is not a valid Region.
-                                                                                    OR
-                2.  If user question is related to market, we need to exclude “NOT_APPLICABLE”. This is a default value for PDP plans. “NOT_APPLICABLE” is not a valid market
-                                                                                    OR 
-                3.  Aggregating calls and grouping by lead type, exclude not applicable for lead type. Not applicable is not a valid lead _type
-                                                                                   OR 
-                4.  For any Lead Definition related questions, we need to exclude “NOT_APPLICABLE" for Calls.
-                                                                                   OR 
-                5.  For any Lead Tactic related questions, we need to exclude “NOT_APPLICABLE" for Calls.
-                                                                                   OR 
-                6.  For any Routing Channel related questions, we need to exclude “NOT_APPLICABLE for Calls.
-                                                                                   OR 
-                7.  For any Conversion rate questions, We need to exclude “DIGITAL” leads. Telephonic conversion rate means Total NON_DIGITAL leads/ Total Calls * 100
-                                                                                   OR 
-                8.  For any Media Channel related questions, We need to select Derived Media Channel.
-                                                                                   OR 
-                9. For any Media Group related questions, We need to select Derived Media Channel     
+                   
                
                 Business Calculations:
                 1. Conversion Rate when metrices not mentioned in request:  \`\`\`sum(CASE WHEN collection_channel = 'NON_DIGITAL' then leads else 0 end)/SUM(calls) * 100 \`\`\`.
-                2. Close Rate Issued: "(sum(sales)/sum(leads))*100"
-                3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
+                     3. PLAN values: there is two kind of values of many columns in table one is projected(plan) and other is actual. for example if talk about actual close rate it means: (SUM(sales_submitted),SUM(leads)) * 100 and if talk about plan close rate then it means: (SUM(sales_plans),SUM(leads_plans))*100
                 4. STLY: full form  is 'Same Time Last Year' user uses this term when he wants to compare any value from given date to the value exactly one year back.
          
                
