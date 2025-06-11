@@ -29,17 +29,26 @@ export default function App() {
   const chartRef = useRef(null);
   const ChartToRender = chartComponents[selectedChart];
 
+  // ✅ Export as PDF
   const downloadPDF = async () => {
-    const canvas = await html2canvas(chartRef.current);
+    const canvas = await html2canvas(chartRef.current, { scale: 2 }); // sharper render
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({
       orientation: 'landscape',
       unit: 'px',
       format: [canvas.width, canvas.height]
     });
-
     pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
     pdf.save(`${selectedChart}_chart.pdf`);
+  };
+
+  // ✅ Export as PNG
+  const downloadPNG = async () => {
+    const canvas = await html2canvas(chartRef.current, { scale: 2 });
+    const link = document.createElement('a');
+    link.download = `${selectedChart}_chart.png`;
+    link.href = canvas.toDataURL('image/png', 1.0); // highest quality
+    link.click();
   };
 
   return (
@@ -62,9 +71,14 @@ export default function App() {
         <ChartToRender />
       </div>
 
-      <button onClick={downloadPDF} style={{ padding: '10px 20px' }}>
-        Download as PDF
-      </button>
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button onClick={downloadPDF} style={{ padding: '10px 20px' }}>
+          Download as PDF
+        </button>
+        <button onClick={downloadPNG} style={{ padding: '10px 20px' }}>
+          Download as PNG
+        </button>
+      </div>
     </div>
   );
 }
