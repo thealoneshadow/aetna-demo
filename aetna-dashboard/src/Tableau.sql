@@ -1,12 +1,15 @@
-const totals = {};
-
-  arr.forEach(obj => {
-    Object.entries(obj).forEach(([key, value]) => {
-      if (value !== "") {
-        totals[key] = (totals[key] || 0) + Number(value);
+const options = {
+    responsive: true,
+    maintainAspectRatio: false, // Important for height control
+    scales: {
+      x: {
+        beginAtZero: true
+      },
+      y: {
+        beginAtZero: true
       }
-    });
-  });
+    }
+  };
 
-  const labels = Object.keys(totals);
-  const dataValues = Object.values(totals);
+  return (
+    <div style={{ width: '100%', height: '500px' }}>
