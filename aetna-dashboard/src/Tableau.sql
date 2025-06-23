@@ -1,43 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Collapse } from 'antd';
 
 const { Panel } = Collapse;
 
 const App = () => {
-  const [arr, setArr] = useState(['Dog', 'Cat', 'Elephant']);
+  const [chats, setChats] = useState([
+    { id: 1, sender: 'User', message: 'Hi' },
+    { id: 2, sender: 'Bot', message: 'Hello!' },
+    { id: 3, sender: 'User', message: 'What’s up?' },
+  ]);
+
   const [activeKeys, setActiveKeys] = useState([]);
 
-  // Prepare preprocessed items with keys and labels
-  const panels = arr.map((val, index) => ({
-    key: `panel-${index}`,
-    header: `Panel ${index + 1}`,
-    content: `${val} is an animal`
-  }));
-
-  // Only run when arr changes
+  // Open only the last chat when chats change
   useEffect(() => {
-    const lastKey = panels[panels.length - 1]?.key;
-    setActiveKeys(lastKey ? [lastKey] : []);
-  }, [arr]);
+    if (chats.length > 0) {
+      const lastKey = chats[chats.length - 1].id.toString();
+      setActiveKeys([lastKey]);
+    }
+  }, [chats]);
 
   const handleChange = (panelKey) => {
     setActiveKeys((prevKeys) =>
       prevKeys.includes(panelKey)
-        ? prevKeys.filter((key) => key !== panelKey)
-        : [...prevKeys, panelKey]
+        ? prevKeys.filter((key) => key !== panelKey) // close
+        : [...prevKeys, panelKey] // open
     );
   };
 
   return (
     <>
-      {panels.map((panel) => (
+      {chats.map((chat) => (
         <Collapse
-          key={panel.key}
-          activeKey={activeKeys.includes(panel.key) ? [panel.key] : []}
-          onChange={() => handleChange(panel.key)}
+          key={chat.id}
+          activeKey={activeKeys.includes(chat.id.toString()) ? [chat.id.toString()] : []}
+          onChange={() => handleChange(chat.id.toString())}
         >
-          <Panel header={panel.header} key={panel.key}>
-            <p>{panel.content}</p>
+          <Panel header={`${chat.sender} said:`} key={chat.id.toString()}>
+            <p>{chat.message}</p>
           </Panel>
         </Collapse>
       ))}
