@@ -7,39 +7,40 @@ const App = () => {
   const [arr, setArr] = useState(['Dog', 'Cat', 'Elephant']);
   const [activeKeys, setActiveKeys] = useState([]);
 
-  // When array changes, open only the last
+  // Prepare preprocessed items with keys and labels
+  const panels = arr.map((val, index) => ({
+    key: `panel-${index}`,
+    header: `Panel ${index + 1}`,
+    content: `${val} is an animal`
+  }));
+
+  // Only run when arr changes
   useEffect(() => {
-    const lastKey = `panel-${arr.length - 1}`;
-    setActiveKeys([lastKey]);
+    const lastKey = panels[panels.length - 1]?.key;
+    setActiveKeys(lastKey ? [lastKey] : []);
   }, [arr]);
 
-  const handleChange = (key, index) => {
-    setActiveKeys((prevKeys) => {
-      const panelKey = `panel-${index}`;
-      if (prevKeys.includes(panelKey)) {
-        return prevKeys.filter(k => k !== panelKey); // close
-      } else {
-        return [...prevKeys, panelKey]; // open
-      }
-    });
+  const handleChange = (panelKey) => {
+    setActiveKeys((prevKeys) =>
+      prevKeys.includes(panelKey)
+        ? prevKeys.filter((key) => key !== panelKey)
+        : [...prevKeys, panelKey]
+    );
   };
 
   return (
     <>
-      {arr.map((val, index) => {
-        const panelKey = `panel-${index}`;
-        return (
-          <Collapse
-            key={panelKey}
-            activeKey={activeKeys.includes(panelKey) ? [panelKey] : []}
-            onChange={() => handleChange(panelKey, index)}
-          >
-            <Panel header={`Panel ${index + 1}`} key={panelKey}>
-              <p>{val} is an animal</p>
-            </Panel>
-          </Collapse>
-        );
-      })}
+      {panels.map((panel) => (
+        <Collapse
+          key={panel.key}
+          activeKey={activeKeys.includes(panel.key) ? [panel.key] : []}
+          onChange={() => handleChange(panel.key)}
+        >
+          <Panel header={panel.header} key={panel.key}>
+            <p>{panel.content}</p>
+          </Panel>
+        </Collapse>
+      ))}
     </>
   );
 };
