@@ -5,30 +5,41 @@ const { Panel } = Collapse;
 
 const App = () => {
   const [arr, setArr] = useState(['Dog', 'Cat', 'Elephant']);
-  const [activeKeyList, setActiveKeyList] = useState([]);
+  const [activeKeys, setActiveKeys] = useState([]);
 
+  // When array changes, open only the last
   useEffect(() => {
-    // Always keep only the last one open
-    const newActiveKeyList = arr.map((_, i) => (i === arr.length - 1 ? `panel-${i}` : null)).filter(Boolean);
-    setActiveKeyList(newActiveKeyList);
+    const lastKey = `panel-${arr.length - 1}`;
+    setActiveKeys([lastKey]);
   }, [arr]);
+
+  const handleChange = (key, index) => {
+    setActiveKeys((prevKeys) => {
+      const panelKey = `panel-${index}`;
+      if (prevKeys.includes(panelKey)) {
+        return prevKeys.filter(k => k !== panelKey); // close
+      } else {
+        return [...prevKeys, panelKey]; // open
+      }
+    });
+  };
 
   return (
     <>
-      {arr.map((val, index) => (
-        <Collapse
-          key={index}
-          activeKey={activeKeyList.includes(`panel-${index}`) ? [`panel-${index}`] : []}
-          onChange={(keys) => {
-            // Optional: Handle manual toggle if needed
-            setActiveKeyList(keys);
-          }}
-        >
-          <Panel header={`This is panel header ${index + 1}`} key={`panel-${index}`}>
-            <p>{val} is an animal</p>
-          </Panel>
-        </Collapse>
-      ))}
+      {arr.map((val, index) => {
+        const panelKey = `panel-${index}`;
+        return (
+          <Collapse
+            key={panelKey}
+            activeKey={activeKeys.includes(panelKey) ? [panelKey] : []}
+            onChange={() => handleChange(panelKey, index)}
+          >
+            <Panel header={`Panel ${index + 1}`} key={panelKey}>
+              <p>{val} is an animal</p>
+            </Panel>
+          </Collapse>
+        );
+      })}
     </>
   );
 };
