@@ -1,26 +1,36 @@
-const sortInsightsCall = async () => {
-  try {
-    const raw = localStorage.getItem("insight");
-    if (!raw) return; // nothing to parse
+import React, { useState, useEffect } from 'react';
+import { Collapse } from 'antd';
 
-    const data = JSON.parse(raw);
+const { Panel } = Collapse;
 
-    if (data && data.insight !== "") {
-      setInsightSQLQuery(data.query ? data.query : "No Query");
-      setVertical("Mission Control");
-      setIsModalOpen(false);
-      setText(data.insight);
-      setLoading(false);
+const App = () => {
+  const [arr, setArr] = useState(['Dog', 'Cat', 'Elephant']);
+  const [activeKeyList, setActiveKeyList] = useState([]);
 
-      setTimeout(() => {
-        handleSubmit(data.insight);
-      }, 0); // delay of 0ms — executes after current event loop
+  useEffect(() => {
+    // Always keep only the last one open
+    const newActiveKeyList = arr.map((_, i) => (i === arr.length - 1 ? `panel-${i}` : null)).filter(Boolean);
+    setActiveKeyList(newActiveKeyList);
+  }, [arr]);
 
-      localStorage.removeItem("insight");
-    } else {
-      return;
-    }
-  } catch (err) {
-    console.error("Error in sortInsightsCall:", err);
-  }
+  return (
+    <>
+      {arr.map((val, index) => (
+        <Collapse
+          key={index}
+          activeKey={activeKeyList.includes(`panel-${index}`) ? [`panel-${index}`] : []}
+          onChange={(keys) => {
+            // Optional: Handle manual toggle if needed
+            setActiveKeyList(keys);
+          }}
+        >
+          <Panel header={`This is panel header ${index + 1}`} key={`panel-${index}`}>
+            <p>{val} is an animal</p>
+          </Panel>
+        </Collapse>
+      ))}
+    </>
+  );
 };
+
+export default App;
