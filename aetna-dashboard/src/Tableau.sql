@@ -1,23 +1,11 @@
-<ReactMarkdown
-      children={markdownText}
-      components={{
-        code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || '');
+  useEffect(() => {
+    const newActiveKeys = {};
+    const lastIndex = [...data].reverse().findIndex(d => d?.showCollapse);
+    const trueIndex = lastIndex === -1 ? -1 : data.length - 1 - lastIndex;
 
-          return !inline && match ? (
-            <SyntaxHighlighter
-              style={oneDark}
-              language={match[1]}
-              PreTag="div"
-              {...props}
-            >
-              {String(children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
-          ) : (
-            <code className={className} {...props}>
-              {children}
-            </code>
-          );
-        },
-      }}
-    />
+    if (trueIndex !== -1) {
+      newActiveKeys[trueIndex] = ['2']; // Open 2nd panel of last valid collapse
+    }
+
+    setActiveKeys(newActiveKeys);
+  }, [data]);
