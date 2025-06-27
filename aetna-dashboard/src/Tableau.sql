@@ -1,15 +1,24 @@
-const newColumns = columns.map((item) => {
-  const withSearch = {
-    ...item,
-    ...getSearchProps(item.dataIndex), // Add search functionality
-    hidden: !checkedList.includes(item.key), // Control visibility
+const getColumnSearchAndFilterProps = (dataIndex, dataSource) => {
+  // 1. Get unique values from data
+  const uniqueValues = Array.from(
+    new Set(dataSource.map(row => row[dataIndex]))
+  ).filter(v => v !== undefined && v !== null);
+
+  return {
+    filters: uniqueValues.map(value => ({
+      text: String(value),
+      value: value,
+    })),
+    onFilter: (value, record) => String(record[dataIndex]) === String(value),
+    filterSearch: true, // allows search within filter dropdown
+    // Optional: column search box can be added below
+    render: (text) => text,
   };
-  return withSearch;
-});
+};
 
 
-const newColumns = columns.map((item) => ({
+const newColumns = columns.map(item => ({
   ...item,
-  ...getSearchProps(item.dataIndex),
+  ...getColumnSearchAndFilterProps(item.dataIndex, data), // ⬅️ here
   hidden: !checkedList.includes(item.key),
 }));
