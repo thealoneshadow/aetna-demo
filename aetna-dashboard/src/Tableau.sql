@@ -22,3 +22,14 @@ const newColumns = columns.map(item => ({
   ...getColumnSearchAndFilterProps(item.dataIndex, data), // ⬅️ here
   hidden: !checkedList.includes(item.key),
 }));
+
+
+const newColumns = useMemo(() => {
+  if (!data.length) return [];
+
+  return columns.map(item => ({
+    ...item,
+    ...getColumnSearchAndFilterProps(item.dataIndex, data),
+    hidden: !checkedList.includes(item.key),
+  }));
+}, [columns, checkedList, data]);
