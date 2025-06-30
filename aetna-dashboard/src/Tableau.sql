@@ -1,24 +1,22 @@
-npm install react-markdown rehype-sanitize rehype-raw rehype-highlight remark-gfm
+function formatAIResponse(content: string): string {
+  if (!content) return '';
 
-
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import rehypeSanitize from 'rehype-sanitize';
-import rehypeHighlight from 'rehype-highlight';
-import remarkGfm from 'remark-gfm';
-
-import 'highlight.js/styles/github.css'; // You can use other themes too
-
-const MarkdownRenderer = ({ content }) => {
   return (
-    <div className="markdown-body">
-      <ReactMarkdown
-        children={content}
-        rehypePlugins={[rehypeRaw, rehypeSanitize, rehypeHighlight]}
-        remarkPlugins={[remarkGfm]}
-      />
-    </div>
-  );
-};
+    content
+      // Convert stringified \n to real line breaks
+      .replace(/\\n/g, '\n')
 
-export default MarkdownRenderer;
+      // Fix broken code blocks
+      .replace(/```([^\n])/g, '```\n$1') // start block properly
+      .replace(/([^`])```/g, '$1\n```') // end block properly
+
+      // Ensure all code blocks are surrounded by line breaks
+      .replace(/```/g, '\n```\n')
+
+      // Normalize multiple newlines
+      .replace(/\n{3,}/g, '\n\n')
+
+      // Trim extra spaces at start/end
+      .trim()
+  );
+}
