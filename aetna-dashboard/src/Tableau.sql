@@ -1,37 +1,31 @@
-import React, { useState, useEffect, useMemo } from 'react';
+prompt = f"""
+You are an expert data analyst and visualization consultant.
 
-const MyTable = () => {
-  const [data, setData] = useState([]);
-  const [checkedList, setCheckedList] = useState(['name', 'age']); // example
-  const columns = [
-    { title: 'Name', dataIndex: 'name', key: '0' },
-    { title: 'Age', dataIndex: 'age', key: '1' },
-    { title: 'Address', dataIndex: 'address', key: '2' },
-  ];
+Given a JSON dataset, your task is to recommend the **most suitable chart type** from this list based on the **structure, semantics, and nature of the data**:
 
-  const getColumnSearchAndFilterProps = (dataIndex) => {
-    const uniqueValues = Array.from(new Set(data.map(d => d[dataIndex])));
+["bar", "line", "pie", "donut", "radar", "scatter", "histogram", "bubble", "heatmap", "area", "table"]
 
-    return {
-      filters: uniqueValues.map(v => ({ text: v, value: v })),
-      onFilter: (value, record) => record[dataIndex] === value,
-    };
-  };
+Be diverse and insightful — do not default to "bar" unless the data **truly warrants** it.  
+You must infer intent from:
+- Value types (e.g., categorical vs numerical vs date)
+- Dimensionality (1D, 2D, 3D)
+- Data volume and aggregation needs
+- Label/value pairing
+- Use-case patterns like comparison, distribution, part-to-whole, time series, or correlation
 
-  // ✅ useMemo must be called inside a React component, not inside map
-  const newColumns = useMemo(() => {
-    return columns.map(item => ({
-      ...item,
-      ...getColumnSearchAndFilterProps(item.dataIndex),
-      hidden: !checkedList.includes(item.dataIndex),
-    }));
-  }, [columns, checkedList, data]);
+### Instructions:
+- Return exactly **one** chart type name from the list above.
+- Do **not** repeat "bar" unless it's clearly the only match.
+- For part-to-whole data → prefer "pie", "donut", or "radar".
+- For time series → prefer "line" or "area".
+- For distributions → prefer "histogram" or "box".
+- For correlations → prefer "scatter" or "bubble".
+- For multivariate or matrix data → prefer "heatmap".
+- If it’s raw tabular data with no apparent chart fit, return "table".
+- If the data is invalid or cannot be interpreted, return "invalid".
+- Do not explain anything — only return the chart type name.
 
-  return (
-    <Table
-      dataSource={data}
-      columns={newColumns.filter(col => !col.hidden)}
-      rowKey="key"
-    />
-  );
-};
+### Data:
+{data_str}
+"""
+
