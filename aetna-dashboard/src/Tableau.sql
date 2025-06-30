@@ -1,16 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Table } from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const MyTable = () => {
-  const [data, setData] = useState([
-    { key: '1', name: 'John', age: 30, address: 'NY' },
-    { key: '2', name: 'Jane', age: 25, address: 'London' },
-    { key: '3', name: 'Jake', age: 30, address: 'NY' },
-  ]);
-
-  const [checkedList, setCheckedList] = useState(['name', 'age']);
-  const [newColumns, setNewColumns] = useState([]);
-
+  const [data, setData] = useState([]);
+  const [checkedList, setCheckedList] = useState(['name', 'age']); // example
   const columns = [
     { title: 'Name', dataIndex: 'name', key: '0' },
     { title: 'Age', dataIndex: 'age', key: '1' },
@@ -18,45 +10,28 @@ const MyTable = () => {
   ];
 
   const getColumnSearchAndFilterProps = (dataIndex) => {
-    const uniqueValues = Array.from(
-      new Set(data.map((d) => d[dataIndex]))
-    ).filter(v => v !== undefined && v !== null);
+    const uniqueValues = Array.from(new Set(data.map(d => d[dataIndex])));
 
     return {
-      filters: uniqueValues.map((v) => ({ text: String(v), value: v })),
-      onFilter: (value, record) =>
-        String(record[dataIndex]) === String(value),
-      filterSearch: true,
-      render: (text) => text,
+      filters: uniqueValues.map(v => ({ text: v, value: v })),
+      onFilter: (value, record) => record[dataIndex] === value,
     };
   };
 
-  // 🧠 useEffect to build newColumns only when data is ready
-  useEffect(() => {
-    if (!data.length) return;
-
-    const updatedColumns = columns.map((item) => ({
+  // ✅ useMemo must be called inside a React component, not inside map
+  const newColumns = useMemo(() => {
+    return columns.map(item => ({
       ...item,
       ...getColumnSearchAndFilterProps(item.dataIndex),
       hidden: !checkedList.includes(item.dataIndex),
     }));
-
-    setNewColumns(updatedColumns);
-  }, [data, checkedList]);
+  }, [columns, checkedList, data]);
 
   return (
-    <>
-      {newColumns.length > 0 ? (
-        <Table
-          dataSource={data}
-          columns={newColumns.filter((col) => !col.hidden)}
-          rowKey="key"
-        />
-      ) : (
-        <div>Loading table...</div>
-      )}
-    </>
+    <Table
+      dataSource={data}
+      columns={newColumns.filter(col => !col.hidden)}
+      rowKey="key"
+    />
   );
 };
-
-export default MyTable;
