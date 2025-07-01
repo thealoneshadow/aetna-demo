@@ -1,22 +1,28 @@
-function formatAIResponse(content: string): string {
-  if (!content) return '';
+const getColumnSearchAndFilterProps = (dataIndex) => {
+  const uniqueValues = Array.from(new Set(data.map(d => d[dataIndex]))).filter(v => v != null);
 
-  return (
-    content
-      // Convert stringified \n to real line breaks
-      .replace(/\\n/g, '\n')
+  return {
+    filters: uniqueValues.map(v => ({ text: String(v), value: v })),
+    onFilter: (value, record) => String(record[dataIndex]) === String(value),
+    filterSearch: true,
 
-      // Fix broken code blocks
-      .replace(/```([^\n])/g, '```\n$1') // start block properly
-      .replace(/([^`])```/g, '$1\n```') // end block properly
+    // ✅ Add sorter
+    sorter: (a, b) => {
+      const aVal = a[dataIndex];
+      const bVal = b[dataIndex];
 
-      // Ensure all code blocks are surrounded by line breaks
-      .replace(/```/g, '\n```\n')
+      // If both are numbers, sort numerically
+      if (!isNaN(aVal) && !isNaN(bVal)) return aVal - bVal;
 
-      // Normalize multiple newlines
-      .replace(/\n{3,}/g, '\n\n')
+      // Else, sort lexically
+      return String(aVal).localeCompare(String(bVal));
+    },
 
-      // Trim extra spaces at start/end
-      .trim()
-  );
-}
+    // Optional: default sort order
+    // sortOrder: 'ascend', // or 'descend'
+
+    // Optional extras
+    ellipsis: true,
+    align: 'left',
+  };
+};
