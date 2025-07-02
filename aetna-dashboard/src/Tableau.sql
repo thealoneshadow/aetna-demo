@@ -1,28 +1,24 @@
-const getColumnSearchAndFilterProps = (dataIndex) => {
-  const uniqueValues = Array.from(new Set(data.map(d => d[dataIndex]))).filter(v => v != null);
+import json
+import re
 
-  return {
-    filters: uniqueValues.map(v => ({ text: String(v), value: v })),
-    onFilter: (value, record) => String(record[dataIndex]) === String(value),
-    filterSearch: true,
+def extract_json_from_markdown(markdown_string):
+    # Remove the ```json and ``` code block
+    cleaned = re.sub(r"^```json\s*|\s*```$", "", markdown_string.strip(), flags=re.DOTALL)
 
-    // ✅ Add sorter
-    sorter: (a, b) => {
-      const aVal = a[dataIndex];
-      const bVal = b[dataIndex];
+    # Fix unescaped control characters (e.g., real line breaks inside strings)
+    cleaned = cleaned.replace('\n', '\\n').replace('\r', '\\r')
 
-      // If both are numbers, sort numerically
-      if (!isNaN(aVal) && !isNaN(bVal)) return aVal - bVal;
+    # Now parse
+    return json.loads(cleaned)
 
-      // Else, sort lexically
-      return String(aVal).localeCompare(String(bVal));
-    },
+# Example use
+raw_string = """```json
+{
+  "query": "SELECT * FROM users
+WHERE age > 25",
+  "valid": true
+}
+```"""
 
-    // Optional: default sort order
-    // sortOrder: 'ascend', // or 'descend'
-
-    // Optional extras
-    ellipsis: true,
-    align: 'left',
-  };
-};
+parsed = extract_json_from_markdown(raw_string)
+print(parsed)
