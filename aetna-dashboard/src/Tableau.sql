@@ -11,21 +11,26 @@ Given a JSON dataset, your task is to:
    - **x-axis**
    - **y-axis**
 
+4. Return the **final rendered HTML code** for this chart, using real HTML `<canvas>` and `<script>` elements as necessary. The chart should use `Chart.js` directly in JavaScript (not React or JSX).
+
 ### Guidelines:
-- Be diverse and thoughtful — do **not default to bar** unless it's the only reasonable option.
-- For comparisons → prefer "bar", "radar"
-- For part-to-whole → prefer "pie", "donut"
-- For time series → prefer "line", "area"
-- For correlation → prefer "scatter", "bubble"
-- For distribution → prefer "histogram"
-- For categorical matrix → prefer "heatmap"
-- If no clear visualization fits, return "table"
-- If the data is invalid or cannot be interpreted, return "invalid"
+- Do **not** use `react-chartjs-2`. Use plain HTML + JavaScript via Chart.js.
+- The HTML must contain:
+  - A `<canvas>` element
+  - A `<script>` that initializes Chart.js with data extracted from the JSON
+- Do **not** return JSX or React code.
+- The `<script>` must use inline JavaScript and be self-contained.
+- Output valid, rendered HTML that can be inserted into the DOM using `dangerouslySetInnerHTML`.
 
 ### Output format (JSON):
-```json
+json
 {{
   "chartType": "<chart_type>",
   "xAxis": "<field_for_x_axis>",
-  "yAxis": "<field_for_y_axis>"
+  "yAxis": "<field_for_y_axis>",
+  "code": "<escaped HTML string with canvas + script to render chart>"
 }}
+
+### Example:
+"code": "<canvas id='myChart'></canvas><script>new Chart(document.getElementById('myChart'), {{ type: 'bar', data: ... }});</script>"
+"""
