@@ -1,33 +1,23 @@
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+const [labels, setLabels] = useState(null);
 
-const downloadChartAsPDF = async () => {
-  if (!chartRef.current) return;
+  // Poll every 3s until localStorage value exists
+  if (!labels) {
+    const pollForLabels = () => {
+      const val = localStorage.getItem("finalLabel");
+      if (val) {
+        try {
+          setLabels(JSON.parse(val));
+        } catch (err) {
+          console.error("Invalid JSON in finalLabel");
+        }
+      } else {
+        setTimeout(pollForLabels, 3000); // try again in 3s
+      }
+    };
 
-  const canvas = await html2canvas(chartRef.current, {
-    scale: 2,
-    useCORS: true,
-    windowWidth: chartRef.current.scrollWidth,
-    windowHeight: chartRef.current.scrollHeight,
-  });
+    pollForLabels(); // Start polling immediately
+  }
 
-  const imgData = canvas.toDataURL("image/png");
-
-  const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
-
-  // ✅ Match PDF size to canvas size in pixels
-  const pdf = new jsPDF({
-    orientation: canvasWidth > canvasHeight ? "landscape" : "portrait",
-    unit: "px",
-    format: [canvasWidth, canvasHeight],
-  });
-
-  // ✅ Fill the entire page with the captured image
-  pdf.addImage(imgData, "PNG", 0, 0, canvasWidth, canvasHeight);
-
-  // ✅ Save the PDF
-  pdf.save("chart_full.pdf");
-
-  console.log("Canvas size:", canvasWidth, canvasHeight);
-};
+  if (!labels) {
+    return <p>Waiting for chart data...</p>;
+  }
