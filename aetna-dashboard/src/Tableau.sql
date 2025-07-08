@@ -14,3 +14,7 @@
     link.download = "chart_screenshot.png";
     link.click();
   };
+
+
+  windowWidth: chartRef.current.scrollWidth,
+  windowHeight: chartRef.current.scrollHeight
