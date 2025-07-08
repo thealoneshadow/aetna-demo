@@ -1,33 +1,34 @@
-function extractJsonObjects(rawString) {
-  // Step 1: Clean up invalid characters (e.g., I", |, etc.)
-  const cleaned = rawString
-    .replace(/[|`\\n\\r]/g, "")             // remove | ` \n \r
-    .replace(/I"?/g, '"')                   // replace I" or I with "
-    .replace(/([a-zA-Z0-9])"([a-zA-Z0-9])/g, '$1:$2') // ensure colons stay correct
-    .replace(/([a-zA-Z0-9])"([,}])/g, '$1"$2');       // close keys properly
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
-  // Step 2: Extract JSON objects with regex
-  const matches = cleaned.match(/{[^}]*}/g);
+const downloadPDF = async () => {
+  if (!chartRef.current) return;
 
-  if (!matches) return [];
+  // 1. Use html2canvas with proper scale for sharpness
+  const canvas = await html2canvas(chartRef.current, {
+    scale: 2,           // Increase for higher resolution
+    useCORS: true       // Needed if using external fonts/images
+  });
 
-  // Step 3: Parse each JSON safely
-  return matches
-    .map((str) => {
-      try {
-        return JSON.parse(str);
-      } catch (err) {
-        console.warn("Invalid JSON skipped:", str);
-        return null;
-      }
-    })
-    .filter(Boolean); // remove nulls
-}
+  const imgData = canvas.toDataURL('image/png');
 
+  // 2. Get actual size of canvas in pixels
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
 
-.replace(/[|`]/g, "")           // remove pipe and backtick
-    .replace(/\n/g, "")             // remove newlines
-    .replace(/\r/g, "")             // remove carriage returns
-    .replace(/I"?/g, '"')           // replace I" or I with "
-    .replace(/([a-zA-Z0-9])"([a-zA-Z0-9])/g, '$1:$2') // fix missing colons
-    .replace(/([a-zA-Z0-9])"([,}])/g, '$1"$2'); 
+  // 3. Create PDF with same dimensions in px units
+  const pdf = new jsPDF({
+    orientation: 'landscape',
+    unit: 'px',
+    format: [canvasWidth, canvasHeight] // Match to canvas
+  });
+
+  // 4. Add image to PDF at full size
+  pdf.addImage(imgData, 'PNG', 0, 0, canvasWidth, canvasHeight);
+
+  // 5. Save the file
+  pdf.save(`${selectedChart}_chart.pdf`);
+
+  // Optional: log for debug
+  console.log('Canvas size:', canvasWidth, canvasHeight);
+};
