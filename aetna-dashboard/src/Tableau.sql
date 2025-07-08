@@ -1,36 +1,25 @@
-prompt = f"""
-You are an expert data analyst and visualization consultant.
+function extractJsonObjects(rawString) {
+  // Step 1: Clean up invalid characters (e.g., I", |, etc.)
+  const cleaned = rawString
+    .replace(/[|`\\n\\r]/g, "")             // remove | ` \n \r
+    .replace(/I"?/g, '"')                   // replace I" or I with "
+    .replace(/([a-zA-Z0-9])"([a-zA-Z0-9])/g, '$1:$2') // ensure colons stay correct
+    .replace(/([a-zA-Z0-9])"([,}])/g, '$1"$2');       // close keys properly
 
-Given a JSON dataset, your task is to:
-1. Analyze the structure and intent of the data.
-2. Recommend the **most suitable chart type** from the following list:
+  // Step 2: Extract JSON objects with regex
+  const matches = cleaned.match(/{[^}]*}/g);
 
-["bar", "line", "pie", "donut", "radar", "scatter", "histogram", "bubble", "heatmap", "area", "table", "invalid"]
+  if (!matches) return [];
 
-3. Based on your chosen chart, suggest the best field for:
-   - **x-axis**
-   - **y-axis**
-
-4. Return the **final rendered HTML code** for this chart, using real HTML `<canvas>` and `<script>` elements as necessary. The chart should use `Chart.js` directly in JavaScript (not React or JSX).
-
-### Guidelines:
-- Do **not** use `react-chartjs-2`. Use plain HTML + JavaScript via Chart.js.
-- The HTML must contain:
-  - A `<canvas>` element
-  - A `<script>` that initializes Chart.js with data extracted from the JSON
-- Do **not** return JSX or React code.
-- The `<script>` must use inline JavaScript and be self-contained.
-- Output valid, rendered HTML that can be inserted into the DOM using `dangerouslySetInnerHTML`.
-
-### Output format (JSON):
-json
-{{
-  "chartType": "<chart_type>",
-  "xAxis": "<field_for_x_axis>",
-  "yAxis": "<field_for_y_axis>",
-  "code": "<escaped HTML string with canvas + script to render chart>"
-}}
-
-### Example:
-"code": "<canvas id='myChart'></canvas><script>new Chart(document.getElementById('myChart'), {{ type: 'bar', data: ... }});</script>"
-"""
+  // Step 3: Parse each JSON safely
+  return matches
+    .map((str) => {
+      try {
+        return JSON.parse(str);
+      } catch (err) {
+        console.warn("Invalid JSON skipped:", str);
+        return null;
+      }
+    })
+    .filter(Boolean); // remove nulls
+}
