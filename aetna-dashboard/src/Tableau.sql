@@ -23,3 +23,11 @@ function extractJsonObjects(rawString) {
     })
     .filter(Boolean); // remove nulls
 }
+
+
+.replace(/[|`]/g, "")           // remove pipe and backtick
+    .replace(/\n/g, "")             // remove newlines
+    .replace(/\r/g, "")             // remove carriage returns
+    .replace(/I"?/g, '"')           // replace I" or I with "
+    .replace(/([a-zA-Z0-9])"([a-zA-Z0-9])/g, '$1:$2') // fix missing colons
+    .replace(/([a-zA-Z0-9])"([,}])/g, '$1"$2'); 
