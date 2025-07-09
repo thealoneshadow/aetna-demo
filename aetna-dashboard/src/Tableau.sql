@@ -1,12 +1,28 @@
-const normalizeValue = (input) => {
-  if (Array.isArray(input)) {
-    return input.length > 0 ? input[0] : ''; // return first if array
-  } else if (typeof input === 'string') {
-    return input; // return as-is
-  } else {
-    return ''; // fallback
-  }
-};
+function getRandomItemsPerVertical(data, count = 2) {
+  const grouped = {};
 
-// ✅ Usage:
-const value = normalizeValue(myVar);
+  // Step 1: Group by 'vertical'
+  for (const item of data) {
+    const key = item.vertical;
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(item);
+  }
+
+  // Step 2: Pick random items
+  const result = [];
+  for (const key in grouped) {
+    const items = grouped[key];
+
+    // Shuffle items
+    const shuffled = [...items].sort(() => Math.random() - 0.5);
+
+    // Pick 'count' items (or fewer if not enough)
+    result.push(...shuffled.slice(0, count));
+  }
+
+  return result;
+}
+
+// ✅ Usage
+const selected = getRandomItemsPerVertical(data);
+console.log(selected);
