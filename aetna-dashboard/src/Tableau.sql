@@ -1,42 +1,44 @@
 // useFilteredGeoData.js
-import { useEffect, useState } from "react";
-import * as topojson from "topojson-client";
+import { useEffect, useState } from 'react';
+import * as topojson from 'topojson-client';
 
-export const useFilteredGeoData = (mapGeoKeys = []) => {
+export const useChoroplethGeoData = ({ countryList = [], valueMap = {} }) => {
   const [geoData, setGeoData] = useState(null);
 
   useEffect(() => {
-    const fetchAndFilterGeoData = async () => {
-      const res = await fetch("https://unpkg.com/world-atlas@2.0.2/countries-50m.json");
-      const topo = await res.json();
+    const fetchGeoData = async () => {
+      const topoRes = await fetch(
+        'https://unpkg.com/world-atlas@2.0.2/countries-50m.json'
+      );
+      const topoJson = await topoRes.json();
 
-      const fullGeoJSON = topojson.feature(topo, topo.objects.countries);
+      const worldGeo = topojson.feature(topoJson, topoJson.objects.countries);
 
-      // You will also need country names mapped
-      const countryNames = await fetch(
-        "https://unpkg.com/world-atlas@2.0.2/countries-50m.json"
-      )
-        .then((res) => res.json())
-        .then((topo) => {
-          return topo.objects.countries.geometries.map((g) => g.properties.name);
-        });
-
-      // Filter features based on passed keys
       const filtered = {
-        ...fullGeoJSON,
-        features: fullGeoJSON.features.filter((f) =>
-          mapGeoKeys.includes(f.properties.name)
-        ),
+        ...worldGeo,
+        features: worldGeo.features
+          .map((feature) => {
+            const name = feature.properties.name;
+            return {
+              ...feature,
+              properties: {
+                ...feature.properties,
+                value: valueMap[name] ?? 0,
+              },
+            };
+          })
+          .filter((f) => countryList.includes(f.properties.name)),
       };
 
       setGeoData(filtered);
     };
 
-    fetchAndFilterGeoData();
-  }, [mapGeoKeys]);
+    fetchGeoData();
+  }, [countryList, valueMap]);
 
   return geoData;
 };
+
 
 
 import { MapChart } from './MapChart';
