@@ -41,15 +41,64 @@ export const useChoroplethGeoData = ({ countryList = [], valueMap = {} }) => {
 
 
 
-import { MapChart } from './MapChart';
-import { useFilteredGeoData } from './useFilteredGeoData';
+import { ChoroplethChart, GeoFeature } from 'chartjs-chart-geo';
+import { Chart as ChartJS } from 'chart.js';
 
-const YourComponent = () => {
-  const mapGeoKeys = ['India', 'United States']; // from AI response
-  const geoData = useFilteredGeoData(mapGeoKeys);
+ChartJS.register(ChoroplethChart, GeoFeature);
+
+export const MapChart = ({ geoData }) => {
+  if (!geoData) return <p>Loading...</p>;
+
+  const data = {
+    labels: geoData.features.map(f => f.properties.name),
+    datasets: [
+      {
+        label: 'Country Metric',
+        data: geoData.features.map(f => ({
+          feature: f,
+          value: f.properties.value || 0,
+        })),
+      },
+    ],
+  };
+
+  const options = {
+    showOutline: true,
+    showGraticule: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) =>
+            `${ctx.raw.feature.properties.name}: ${ctx.raw.value.toFixed(2)}`,
+        },
+      },
+    },
+  };
+
+  return <ChoroplethChart data={data} options={options} />;
+};
+
+
+
+
+import { useChoroplethGeoData } from './useChoroplethGeoData';
+import { MapChart } from './MapChart';
+
+const countryList = ['India', 'United States', 'Germany'];
+const valueMap = {
+  India: 120,
+  'United States': 300,
+  Germany: 180,
+};
+
+export const App = () => {
+  const geoData = useChoroplethGeoData({ countryList, valueMap });
 
   return <MapChart geoData={geoData} />;
 };
+
+
 
 
 geoData.features = geoData.features.map((f) => ({
