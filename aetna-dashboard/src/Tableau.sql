@@ -22,3 +22,7 @@ function getTwoPerRuleId(data) {
 
   return updatedList;
 }
+
+modalRender={(node) => (
+    <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>{node}</div>
+  )}
