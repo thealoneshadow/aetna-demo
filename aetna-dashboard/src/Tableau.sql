@@ -1,28 +1,24 @@
-function getTwoPerRuleId(data) {
-  const grouped = {};
-
-  // Group by ruleId
-  data.forEach(item => {
-    if (!grouped[item.ruleId]) grouped[item.ruleId] = [];
-    grouped[item.ruleId].push(item);
-  });
-
-  const updatedList = [];
-
-  // For each group, pick 2 random items
-  for (const ruleId in grouped) {
-    const items = grouped[ruleId];
-
-    // Shuffle
-    const shuffled = items.sort(() => Math.random() - 0.5);
-
-    // Pick 2 (or less if not enough)
-    updatedList.push(...shuffled.slice(0, 2));
-  }
-
-  return updatedList;
-}
-
-modalRender={(node) => (
-    <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>{node}</div>
-  )}
+import React, { useState } from 'react';
+import { Input } from 'antd';
+const { TextArea } = Input;
+const App = () => {
+  const [value, setValue] = useState('');
+  return (
+    <>
+      <TextArea placeholder="Autosize height based on content lines" autoSize />
+      <div style={{ margin: '24px 0' }} />
+      <TextArea
+        placeholder="Autosize height with minimum and maximum number of lines"
+        autoSize={{ minRows: 2, maxRows: 6 }}
+      />
+      <div style={{ margin: '24px 0' }} />
+      <TextArea
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        placeholder="Controlled autosize"
+        autoSize={{ minRows: 3, maxRows: 5 }}
+      />
+    </>
+  );
+};
+export default App;
