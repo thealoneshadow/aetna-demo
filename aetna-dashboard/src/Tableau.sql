@@ -1,24 +1,56 @@
-import React, { useState } from 'react';
-import { Input } from 'antd';
-const { TextArea } = Input;
-const App = () => {
-  const [value, setValue] = useState('');
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+
+const SlidingText = () => {
+  const [x, setX] = useState(0);
+  const intervalRef = useRef(null);
+  const pausedRef = useRef(false);
+
+  // Start interval
+  useEffect(() => {
+    startSliding();
+
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+  }, []);
+
+  const startSliding = () => {
+    intervalRef.current = setInterval(() => {
+      if (!pausedRef.current) {
+        setX((prev) => (prev <= -100 ? 0 : prev - 1)); // Looping slide
+      }
+    }, 16); // ~60 FPS
+  };
+
+  const handleMouseEnter = () => {
+    pausedRef.current = true;
+  };
+
+  const handleMouseLeave = () => {
+    pausedRef.current = false;
+  };
+
   return (
-    <>
-      <TextArea placeholder="Autosize height based on content lines" autoSize />
-      <div style={{ margin: '24px 0' }} />
-      <TextArea
-        placeholder="Autosize height with minimum and maximum number of lines"
-        autoSize={{ minRows: 2, maxRows: 6 }}
-      />
-      <div style={{ margin: '24px 0' }} />
-      <TextArea
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        placeholder="Controlled autosize"
-        autoSize={{ minRows: 3, maxRows: 5 }}
-      />
-    </>
+    <div
+      style={{
+        overflow: "hidden",
+        width: "100%",
+        whiteSpace: "nowrap"
+      }}
+    >
+      <motion.div
+        style={{
+          x: `${x}%`,
+          display: "inline-block"
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        👉 Sliding Text 👉 Sliding Text 👉 Sliding Text 👉
+      </motion.div>
+    </div>
   );
 };
-export default App;
+
+export default SlidingText;
