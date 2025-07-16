@@ -1,56 +1,36 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-const SlidingText = () => {
+const TextSlider = () => {
   const [x, setX] = useState(0);
-  const intervalRef = useRef(null);
-  const pausedRef = useRef(false);
+  const paused = useRef(false); // Pause flag
 
-  // Start interval
   useEffect(() => {
-    startSliding();
-
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  const startSliding = () => {
-    intervalRef.current = setInterval(() => {
-      if (!pausedRef.current) {
-        setX((prev) => (prev <= -100 ? 0 : prev - 1)); // Looping slide
+    const interval = setInterval(() => {
+      if (!paused.current) {
+        setX((prev) => (prev <= -100 ? 0 : prev - 1));
       }
     }, 16); // ~60 FPS
-  };
 
-  const handleMouseEnter = () => {
-    pausedRef.current = true;
-  };
-
-  const handleMouseLeave = () => {
-    pausedRef.current = false;
-  };
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div
-      style={{
-        overflow: "hidden",
-        width: "100%",
-        whiteSpace: "nowrap"
-      }}
+      style={{ overflow: "hidden", width: "100%", whiteSpace: "nowrap" }}
+      onMouseEnter={() => (paused.current = true)}
+      onMouseLeave={() => (paused.current = false)}
     >
-      <motion.div
-        style={{
-          x: `${x}%`,
-          display: "inline-block"
-        }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        👉 Sliding Text 👉 Sliding Text 👉 Sliding Text 👉
-      </motion.div>
+      <AnimatePresence>
+        <motion.div
+          key="slider"
+          style={{ x: `${x}%`, display: "inline-block" }}
+        >
+          👉 Sliding Text 👉 Sliding Text 👉 Sliding Text 👉
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };
 
-export default SlidingText;
+export default TextSlider;
