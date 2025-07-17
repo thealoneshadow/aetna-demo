@@ -1,36 +1,16 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+const text = "This leads to a thoughtdriving approach that improves collaboration.";
 
-const TextSlider = () => {
-  const [x, setX] = useState(0);
-  const paused = useRef(false); // Pause flag
+const keyword = "thoughtdriving";
+const keywordIndex = text.indexOf(keyword);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!paused.current) {
-        setX((prev) => (prev <= -100 ? 0 : prev - 1));
-      }
-    }, 16); // ~60 FPS
+const before = text.slice(0, keywordIndex);
+const boldPart = text.slice(keywordIndex, keywordIndex + keyword.length);
+const after = text.slice(keywordIndex + keyword.length);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <div
-      style={{ overflow: "hidden", width: "100%", whiteSpace: "nowrap" }}
-      onMouseEnter={() => (paused.current = true)}
-      onMouseLeave={() => (paused.current = false)}
-    >
-      <AnimatePresence>
-        <motion.div
-          key="slider"
-          style={{ x: `${x}%`, display: "inline-block" }}
-        >
-          👉 Sliding Text 👉 Sliding Text 👉 Sliding Text 👉
-        </motion.div>
-      </AnimatePresence>
-    </div>
-  );
-};
-
-export default TextSlider;
+return (
+  <p>
+    {before}
+    <strong>{boldPart}</strong>
+    {after}
+  </p>
+);
