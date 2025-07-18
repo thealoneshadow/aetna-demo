@@ -1,16 +1,59 @@
-const text = "This leads to a thoughtdriving approach that improves collaboration.";
+import React from "react";
 
-const keyword = "thoughtdriving";
-const keywordIndex = text.indexOf(keyword);
+const App = () => {
+  return (
+    <div>
+      {/* Fixed Header */}
+      <div style={styles.header}>Fixed Header</div>
 
-const before = text.slice(0, keywordIndex);
-const boldPart = text.slice(keywordIndex, keywordIndex + keyword.length);
-const after = text.slice(keywordIndex + keyword.length);
+      {/* Scrollable Content */}
+      <div style={styles.content}>
+        {Array.from({ length: 100 }, (_, i) => (
+          <p key={i}>Scrollable content line {i + 1}</p>
+        ))}
+      </div>
 
-return (
-  <p>
-    {before}
-    <strong>{boldPart}</strong>
-    {after}
-  </p>
-);
+      {/* Fixed Footer */}
+      <div style={styles.footer}>Fixed Footer</div>
+    </div>
+  );
+};
+
+const styles = {
+  header: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: "50px",
+    backgroundColor: "#333",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  content: {
+    marginTop: "50px", // space for header
+    marginBottom: "50px", // space for footer
+    padding: "20px",
+    height: "calc(100vh - 100px)", // full height minus fixed header and footer
+    overflowY: "auto",
+    backgroundColor: "#f0f0f0",
+  },
+  footer: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: "50px",
+    backgroundColor: "#333",
+    color: "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+};
+
+export default App;
