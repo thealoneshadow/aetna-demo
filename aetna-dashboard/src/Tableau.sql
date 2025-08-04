@@ -1,5 +1,8 @@
-I hope this email finds you well.
+const membershipMatch = query.match(/membership\s*(>=|<=|=|>|<)\s*(\d+)/i);
 
-We are currently facing persistent timeout issues with our "Magic Portal" application, specifically in the development environment.
+// Match LIMIT value
+const limitMatch = query.match(/LIMIT\s+(\d+)/i);
 
-To help us investigate and resolve this, could you please provide the pod configuration details for the "Magic Portal" from both the QA and Production servers? We would like to compare the configurations to identify any potential discrepancies that might be contributing to the performance problems.
+// Extract values
+const membershipValue = membershipMatch ? parseInt(membershipMatch[2], 10) : null;
+const limitValue = limitMatch ? parseInt(limitMatch[1], 10) : null;
