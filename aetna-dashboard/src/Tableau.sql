@@ -1,32 +1,47 @@
 function filterLatestByYear(objects) {
-  const map = new Map();
+  const grouped = {};
 
   for (const obj of objects) {
-    const [year, dashboard] = obj.path;
+    const path = obj.path || [];
 
-    // if year is a number (string) and dashboard exists
-    if (year && dashboard && !isNaN(year)) {
-      const existing = map.get(dashboard);
+    // Rule 3: keep empty paths as-is
+    if (path.length === 0) {
+      if (!grouped["__empty__"]) grouped["__empty__"] = [];
+      grouped["__empty__"].push(obj);
+      continue;
+    }
 
-      if (!existing || parseInt(year) > parseInt(existing.path[0])) {
-        map.set(dashboard, obj);
-      }
+    const [year, dashboard] = path;
+
+    // If year is valid
+    if (year && !isNaN(year) && dashboard) {
+      if (!grouped[dashboard]) grouped[dashboard] = [];
+      grouped[dashboard].push(obj);
     } else {
-      // If no valid year, store directly with unique key
-      map.set(JSON.stringify(obj.path), obj);
+      // If year missing or not valid, just store with unique key
+      const key = JSON.stringify(path);
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(obj);
     }
   }
 
-  return Array.from(map.values());
+  const result = [];
+
+  for (const key in grouped) {
+    if (key === "__empty__") {
+      result.push(...grouped[key]); // keep all empty path objects
+      continue;
+    }
+
+    // find latest year among objects of this dashboard
+    const objs = grouped[key];
+    const maxYear = Math.max(
+      ...objs.map(o => parseInt(o.path[0])).filter(y => !isNaN(y))
+    );
+
+    // keep only objects with the latest year
+    result.push(...objs.filter(o => parseInt(o.path[0]) === maxYear));
+  }
+
+  return result;
 }
-
-// Example
-const data = [
-  { id: 1, path: ["2023", "MMPd"] },
-  { id: 2, path: ["2024", "MMPd"] },
-  { id: 3, path: ["", "OtherDashboard"] },
-  { id: 4, path: ["2022", "Sales"] },
-  { id: 5, path: ["2021", "Sales"] },
-];
-
-console.log(filterLatestByYear(data));
