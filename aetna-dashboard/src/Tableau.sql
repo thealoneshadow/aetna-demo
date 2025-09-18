@@ -4,16 +4,16 @@ const data = [
   { response: "C", time: "1min 59.8second" }
 ];
 
-// function to parse "Xmin Ysecond" into total seconds
 function parseTime(str) {
-  const minMatch = str.match(/(\d+)min/);
-  const secMatch = str.match(/([\d.]+)second/);
+  const minMatch = str.match(/(\d+)\s*(?:minutes?|min)/i);
+  const secMatch = str.match(/(\d+(?:\.\d+)?)\s*seconds?/i);
 
   const minutes = minMatch ? parseInt(minMatch[1], 10) : 0;
   const seconds = secMatch ? parseFloat(secMatch[1]) : 0;
 
   return minutes * 60 + seconds;
 }
+
 
 // sum all times in seconds
 let totalSeconds = data.reduce((sum, item) => sum + parseTime(item.time), 0);
