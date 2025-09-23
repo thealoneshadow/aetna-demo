@@ -1,14 +1,17 @@
 function extractValue(str) {
-  let regexIssue = /\(BOP_MEMBERSHIP_ISSUE\)\s*>\s*(\d+)/;
-  let regexMembership = /\(BOP_MEMBERSHIP\)\s*>\s*(\d+)/;
+  // Regex for ISSUE first (either (BOP_MEMBERSHIP_ISSUE) or SUM(T.BOP_MEMBERSHIP_ISSUE))
+  let regexIssue = /\b(?:SUM\s*\(T\.\s*BOP_MEMBERSHIP_ISSUE\)|\(BOP_MEMBERSHIP_ISSUE\))\s*>\s*(\d+)/i;
 
-  // Check for ISSUE first
+  // Regex for MEMBERSHIP
+  let regexMembership = /\b(?:SUM\s*\(T\.\s*BOP_MEMBERSHIP\)|\(BOP_MEMBERSHIP\))\s*>\s*(\d+)/i;
+
+  // Priority: ISSUE first
   let match = str.match(regexIssue);
   if (match) {
     return parseInt(match[1], 10);
   }
 
-  // Fallback to MEMBERSHIP
+  // Fallback: MEMBERSHIP
   match = str.match(regexMembership);
   if (match) {
     return parseInt(match[1], 10);
@@ -16,8 +19,3 @@ function extractValue(str) {
 
   return null; // nothing found
 }
-
-// Examples
-console.log(extractValue("(BOP_MEMBERSHIP_ISSUE) > 500")); // 500
-console.log(extractValue("(BOP_MEMBERSHIP) > 300"));       // 300
-console.log(extractValue("RANDOM_TEXT > 200"));            // null
