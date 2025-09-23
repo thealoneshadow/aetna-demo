@@ -1,7 +1,7 @@
 function extractValue(str) {
   // Regex for ISSUE first (either (BOP_MEMBERSHIP_ISSUE) or SUM(T.BOP_MEMBERSHIP_ISSUE))
-  let regexIssue = /\b(?:SUM\s*\(T\.\s*BOP_MEMBERSHIP_ISSUE\)|\(BOP_MEMBERSHIP_ISSUE\))\s*>\s*(\d+)/i;
-
+let regexIssue = /\b(?:SUM\s*\(\s*[\w.]*BOP[\s_]*MEMBERSHIP[\s_]*ISSUE[D]?\s*\)|\(BOP_MEMBERSHIP_ISSUE\))\s*>\s*(\d+)/i;
+ 
   // Regex for MEMBERSHIP
   let regexMembership = /\b(?:SUM\s*\(T\.\s*BOP_MEMBERSHIP\)|\(BOP_MEMBERSHIP\))\s*>\s*(\d+)/i;
 
