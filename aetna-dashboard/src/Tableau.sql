@@ -1,28 +1,23 @@
-const data = [
-  { response: "A", time: "5min 10.5second" },
-  { response: "B", time: "2min 3.25second" },
-  { response: "C", time: "1min 59.8second" }
-];
+function extractValue(str) {
+  let regexIssue = /\(BOP_MEMBERSHIP_ISSUE\)\s*>\s*(\d+)/;
+  let regexMembership = /\(BOP_MEMBERSHIP\)\s*>\s*(\d+)/;
 
-function parseTime(str) {
-  const minMatch = str.match(/(\d+)\s*(?:minutes?|min)/i);
-  const secMatch = str.match(/(\d+(?:\.\d+)?)\s*seconds?/i);
+  // Check for ISSUE first
+  let match = str.match(regexIssue);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
 
-  const minutes = minMatch ? parseInt(minMatch[1], 10) : 0;
-  const seconds = secMatch ? parseFloat(secMatch[1]) : 0;
+  // Fallback to MEMBERSHIP
+  match = str.match(regexMembership);
+  if (match) {
+    return parseInt(match[1], 10);
+  }
 
-  return minutes * 60 + seconds;
+  return null; // nothing found
 }
 
-
-// sum all times in seconds
-let totalSeconds = data.reduce((sum, item) => sum + parseTime(item.time), 0);
-
-// convert back to minutes + seconds
-let finalMinutes = Math.floor(totalSeconds / 60);
-let finalSeconds = (totalSeconds % 60).toFixed(2);
-
-let finalTime = `${finalMinutes} minutes ${finalSeconds} seconds`;
-
-console.log(finalTime);
-// 👉 "9 minutes 13.55 seconds"
+// Examples
+console.log(extractValue("(BOP_MEMBERSHIP_ISSUE) > 500")); // 500
+console.log(extractValue("(BOP_MEMBERSHIP) > 300"));       // 300
+console.log(extractValue("RANDOM_TEXT > 200"));            // null
