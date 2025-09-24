@@ -1,21 +1,13 @@
-function extractValue(str) {
-  // Regex for ISSUE first (either (BOP_MEMBERSHIP_ISSUE) or SUM(T.BOP_MEMBERSHIP_ISSUE))
-let regexIssue = /\b(?:SUM\s*\(\s*[\w.]*BOP[\s_]*MEMBERSHIP[\s_]*ISSUE[D]?\s*\)|\(BOP_MEMBERSHIP_ISSUE\))\s*>\s*(\d+)/i;
- 
-  // Regex for MEMBERSHIP
-  let regexMembership = /\b(?:SUM\s*\(T\.\s*BOP_MEMBERSHIP\)|\(BOP_MEMBERSHIP\))\s*>\s*(\d+)/i;
-
-  // Priority: ISSUE first
-  let match = str.match(regexIssue);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-
-  // Fallback: MEMBERSHIP
-  match = str.match(regexMembership);
-  if (match) {
-    return parseInt(match[1], 10);
-  }
-
-  return null; // nothing found
-}
+SELECT t.Rule_ID,
+       t.Question,
+       t.Query,
+       t.Insight,
+       t.Dashboard,
+       t.TeamS,
+       t.Last_Update_dt
+FROM anbc-hcb-dev.growth_anlyt_hcb_dev.magicAI_insights t
+WHERE t.Last_Update_dt = (
+  SELECT MAX(s.Last_Update_dt)
+  FROM anbc-hcb-dev.growth_anlyt_hcb_dev.magicAI_insights s
+  WHERE s.Dashboard = t.Dashboard
+);
