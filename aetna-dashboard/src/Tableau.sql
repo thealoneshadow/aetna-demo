@@ -2,6 +2,31 @@ import React, { useState, useMemo } from 'react';
 import { Input, Collapse, Badge, Empty } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
+const data = [
+  { id: 1, vertical: 'Electronics', question: 'Laptop', category: 'Electronics' },
+  { id: 2, vertical: 'Electronics', question: 'Smartphone', category: 'Electronics' },
+  { id: 3, vertical: 'Electronics', question: 'Headphones', category: 'Electronics' },
+  { id: 4, vertical: 'Electronics', question: 'Tablet', category: 'Electronics' },
+  { id: 5, vertical: 'Furniture', question: 'Chair', category: 'Furniture' },
+  { id: 6, vertical: 'Furniture', question: 'Table', category: 'Furniture' }
+];
+
+const result = Object.values(
+  data.reduce((acc, { id, question, category }) => {
+    if (!acc[category]) {
+      acc[category] = {
+        key: category,
+        title: category,
+        items: []
+      };
+    }
+    acc[category].items.push({ id, question });
+    return acc;
+  }, {})
+);
+
+console.log(result);
+
 const { Search } = Input;
 const { Panel } = Collapse;
 
