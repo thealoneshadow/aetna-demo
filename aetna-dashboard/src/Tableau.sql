@@ -1,90 +1,179 @@
 import React, { useState, useMemo } from 'react';
-import { Input, Collapse, Badge, Empty } from 'antd';
+import { Input, Collapse, Badge, Empty, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-
-const data = [
-  { id: 1, vertical: 'Electronics', question: 'Laptop', category: 'Electronics' },
-  { id: 2, vertical: 'Electronics', question: 'Smartphone', category: 'Electronics' },
-  { id: 3, vertical: 'Electronics', question: 'Headphones', category: 'Electronics' },
-  { id: 4, vertical: 'Electronics', question: 'Tablet', category: 'Electronics' },
-  { id: 5, vertical: 'Furniture', question: 'Chair', category: 'Furniture' },
-  { id: 6, vertical: 'Furniture', question: 'Table', category: 'Furniture' }
-];
-
-const result = Object.values(
-  data.reduce((acc, { id, question, category }) => {
-    if (!acc[category]) {
-      acc[category] = {
-        key: category,
-        title: category,
-        items: []
-      };
-    }
-    acc[category].items.push({ id, question });
-    return acc;
-  }, {})
-);
-
-console.log(result);
 
 const { Search } = Input;
 const { Panel } = Collapse;
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSection, setSelectedSection] = useState('all');
 
-  // Sample data for categories
-  const categoriesData = [
-    {
-      key: '1',
-      title: 'Electronics',
-      items: [
-        { id: 1, name: 'Laptop', description: 'High performance laptop with 16GB RAM' },
-        { id: 2, name: 'Smartphone', description: 'Latest 5G enabled smartphone' },
-        { id: 3, name: 'Headphones', description: 'Wireless noise-cancelling headphones' },
-        { id: 4, name: 'Tablet', description: '10-inch tablet with stylus support' },
-      ]
-    },
-    {
-      key: '2',
-      title: 'Clothing',
-      items: [
-        { id: 5, name: 'T-Shirt', description: 'Cotton comfortable t-shirt' },
-        { id: 6, name: 'Jeans', description: 'Classic blue denim jeans' },
-        { id: 7, name: 'Jacket', description: 'Waterproof winter jacket' },
-        { id: 8, name: 'Sneakers', description: 'Running sneakers with cushioning' },
-      ]
-    },
-    {
-      key: '3',
-      title: 'Books',
-      items: [
-        { id: 9, name: 'Fiction Novel', description: 'Bestselling mystery thriller' },
-        { id: 10, name: 'Science Book', description: 'Introduction to quantum physics' },
-        { id: 11, name: 'Biography', description: 'Life story of a famous inventor' },
-        { id: 12, name: 'Cookbook', description: 'Healthy recipes for beginners' },
-      ]
-    },
-    {
-      key: '4',
-      title: 'Home & Garden',
-      items: [
-        { id: 13, name: 'Sofa', description: 'Comfortable 3-seater sofa' },
-        { id: 14, name: 'Plant Pot', description: 'Ceramic decorative plant pot' },
-        { id: 15, name: 'Lamp', description: 'Modern LED desk lamp' },
-        { id: 16, name: 'Rug', description: 'Soft wool area rug' },
-      ]
-    }
+  // Sample data organized by sections
+  const allData = {
+    all: [
+      {
+        key: '1',
+        title: 'Electronics',
+        items: [
+          { id: 1, name: 'Laptop', description: 'High performance laptop with 16GB RAM' },
+          { id: 2, name: 'Smartphone', description: 'Latest 5G enabled smartphone' },
+          { id: 3, name: 'Headphones', description: 'Wireless noise-cancelling headphones' },
+          { id: 4, name: 'Tablet', description: '10-inch tablet with stylus support' },
+        ]
+      },
+      {
+        key: '2',
+        title: 'Clothing',
+        items: [
+          { id: 5, name: 'T-Shirt', description: 'Cotton comfortable t-shirt' },
+          { id: 6, name: 'Jeans', description: 'Classic blue denim jeans' },
+          { id: 7, name: 'Jacket', description: 'Waterproof winter jacket' },
+          { id: 8, name: 'Sneakers', description: 'Running sneakers with cushioning' },
+        ]
+      },
+      {
+        key: '3',
+        title: 'Books',
+        items: [
+          { id: 9, name: 'Fiction Novel', description: 'Bestselling mystery thriller' },
+          { id: 10, name: 'Science Book', description: 'Introduction to quantum physics' },
+          { id: 11, name: 'Biography', description: 'Life story of a famous inventor' },
+          { id: 12, name: 'Cookbook', description: 'Healthy recipes for beginners' },
+        ]
+      },
+      {
+        key: '4',
+        title: 'Home & Garden',
+        items: [
+          { id: 13, name: 'Sofa', description: 'Comfortable 3-seater sofa' },
+          { id: 14, name: 'Plant Pot', description: 'Ceramic decorative plant pot' },
+          { id: 15, name: 'Lamp', description: 'Modern LED desk lamp' },
+          { id: 16, name: 'Rug', description: 'Soft wool area rug' },
+        ]
+      }
+    ],
+    trending: [
+      {
+        key: '1',
+        title: 'Popular Electronics',
+        items: [
+          { id: 2, name: 'Smartphone', description: 'Latest 5G enabled smartphone - Trending Now!' },
+          { id: 3, name: 'Headphones', description: 'Wireless noise-cancelling headphones - Best Seller' },
+        ]
+      },
+      {
+        key: '2',
+        title: 'Fashion Trends',
+        items: [
+          { id: 5, name: 'T-Shirt', description: 'Cotton comfortable t-shirt - Summer Collection' },
+          { id: 8, name: 'Sneakers', description: 'Running sneakers with cushioning - Hot Item' },
+        ]
+      },
+      {
+        key: '3',
+        title: 'Bestselling Books',
+        items: [
+          { id: 9, name: 'Fiction Novel', description: 'Bestselling mystery thriller - #1 on charts' },
+          { id: 12, name: 'Cookbook', description: 'Healthy recipes for beginners - Most Popular' },
+        ]
+      },
+      {
+        key: '4',
+        title: 'Home Favorites',
+        items: [
+          { id: 13, name: 'Sofa', description: 'Comfortable 3-seater sofa - Customer Favorite' },
+          { id: 15, name: 'Lamp', description: 'Modern LED desk lamp - Design Award Winner' },
+        ]
+      }
+    ],
+    new: [
+      {
+        key: '1',
+        title: 'New Electronics',
+        items: [
+          { id: 1, name: 'Laptop', description: 'High performance laptop with 16GB RAM - Just Released' },
+          { id: 4, name: 'Tablet', description: '10-inch tablet with stylus support - New Arrival' },
+        ]
+      },
+      {
+        key: '2',
+        title: 'New Clothing',
+        items: [
+          { id: 6, name: 'Jeans', description: 'Classic blue denim jeans - Fresh Stock' },
+          { id: 7, name: 'Jacket', description: 'Waterproof winter jacket - Winter 2025 Collection' },
+        ]
+      },
+      {
+        key: '3',
+        title: 'New Books',
+        items: [
+          { id: 10, name: 'Science Book', description: 'Introduction to quantum physics - Published 2025' },
+          { id: 11, name: 'Biography', description: 'Life story of a famous inventor - New Release' },
+        ]
+      },
+      {
+        key: '4',
+        title: 'New Home Items',
+        items: [
+          { id: 14, name: 'Plant Pot', description: 'Ceramic decorative plant pot - Spring Collection' },
+          { id: 16, name: 'Rug', description: 'Soft wool area rug - Latest Design' },
+        ]
+      }
+    ],
+    featured: [
+      {
+        key: '1',
+        title: 'Featured Electronics',
+        items: [
+          { id: 1, name: 'Laptop', description: 'High performance laptop with 16GB RAM - Editor\'s Choice' },
+          { id: 3, name: 'Headphones', description: 'Wireless noise-cancelling headphones - Premium Pick' },
+        ]
+      },
+      {
+        key: '2',
+        title: 'Featured Fashion',
+        items: [
+          { id: 7, name: 'Jacket', description: 'Waterproof winter jacket - Staff Recommended' },
+        ]
+      },
+      {
+        key: '3',
+        title: 'Featured Books',
+        items: [
+          { id: 9, name: 'Fiction Novel', description: 'Bestselling mystery thriller - Must Read' },
+          { id: 10, name: 'Science Book', description: 'Introduction to quantum physics - Featured Selection' },
+        ]
+      },
+      {
+        key: '4',
+        title: 'Featured Home',
+        items: [
+          { id: 13, name: 'Sofa', description: 'Comfortable 3-seater sofa - Premium Quality' },
+          { id: 15, name: 'Lamp', description: 'Modern LED desk lamp - Designer Choice' },
+        ]
+      }
+    ]
+  };
+
+  const sections = [
+    { key: 'all', label: 'All Products' },
+    { key: 'trending', label: 'Trending' },
+    { key: 'new', label: 'New Arrivals' },
+    { key: 'featured', label: 'Featured' }
   ];
+
+  // Get current section data
+  const currentData = allData[selectedSection] || allData.all;
 
   // Filter categories based on search term
   const filteredCategories = useMemo(() => {
     if (!searchTerm.trim()) {
-      return categoriesData;
+      return currentData;
     }
 
     const term = searchTerm.toLowerCase();
-    return categoriesData
+    return currentData
       .map(category => ({
         ...category,
         items: category.items.filter(item =>
@@ -93,10 +182,15 @@ const App = () => {
         )
       }))
       .filter(category => category.items.length > 0);
-  }, [searchTerm]);
+  }, [searchTerm, currentData]);
 
   const handleSearch = (value) => {
     setSearchTerm(value);
+  };
+
+  const handleSectionChange = (sectionKey) => {
+    setSelectedSection(sectionKey);
+    setSearchTerm(''); // Optional: clear search when switching sections
   };
 
   return (
@@ -112,6 +206,28 @@ const App = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
         />
+      </div>
+
+      {/* Section Buttons */}
+      <div style={{ 
+        marginBottom: 24, 
+        display: 'flex', 
+        gap: 12, 
+        flexWrap: 'wrap' 
+      }}>
+        {sections.map(section => (
+          <Button
+            key={section.key}
+            type={selectedSection === section.key ? 'primary' : 'default'}
+            size="large"
+            onClick={() => handleSectionChange(section.key)}
+            style={{
+              fontWeight: selectedSection === section.key ? 600 : 400,
+            }}
+          >
+            {section.label}
+          </Button>
+        ))}
       </div>
 
       {filteredCategories.length > 0 ? (
