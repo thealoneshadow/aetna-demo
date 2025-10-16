@@ -208,25 +208,29 @@ const App = () => {
         />
       </div>
 
-      {/* Section Buttons */}
-      <div style={{ 
+    <div style={{ 
         marginBottom: 24, 
         display: 'flex', 
-        gap: 12, 
-        flexWrap: 'wrap' 
+        gap: 32,
+        borderBottom: '2px solid #f0f0f0'
       }}>
         {sections.map(section => (
-          <Button
+          <div
             key={section.key}
-            type={selectedSection === section.key ? 'primary' : 'default'}
-            size="large"
             onClick={() => handleSectionChange(section.key)}
             style={{
+              padding: '12px 4px',
+              fontSize: 16,
               fontWeight: selectedSection === section.key ? 600 : 400,
+              color: selectedSection === section.key ? '#1890ff' : '#595959',
+              borderBottom: selectedSection === section.key ? '3px solid #1890ff' : '3px solid transparent',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              marginBottom: '-2px'
             }}
           >
             {section.label}
-          </Button>
+          </div>
         ))}
       </div>
 
