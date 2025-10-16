@@ -1,3 +1,39 @@
+from flask import Blueprint, request, jsonify
+import json
+
+blueprint = Blueprint("blueprint", __name__)
+
+@blueprint.route('/get-ai-response-feedback-all', methods=["POST"])
+def get_response_feedback_all():
+    try:
+        query = """
+            SELECT id, value, userId, threadId, feedback, comment, created_at
+            FROM responseFeedback
+            ORDER BY created_at DESC
+        """
+
+        with spannerDb.snapshot() as snapshot:
+            result = snapshot.execute_sql(query)
+            rows = []
+            for row in result:
+                row_dict = dict(row)
+                # Convert created_at if it exists
+                if "created_at" in row_dict and row_dict["created_at"] is not None:
+                    row_dict["created_at"] = row_dict["created_at"].isoformat()
+                rows.append(row_dict)
+
+        return jsonify({
+            "message": "Chat Fetched Successfully",
+            "data": rows
+        }), 200
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": str(e)}), 508
+
+
+
+
 import React, { useState, useMemo } from 'react';
 import { Input, Collapse, Badge, Empty, Button } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
