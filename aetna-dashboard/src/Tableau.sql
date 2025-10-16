@@ -15,12 +15,14 @@ def get_response_feedback_all():
         with spannerDb.snapshot() as snapshot:
             result = snapshot.execute_sql(query)
             rows = []
+            columns = [field.name for field in result.fields]
+            rows = []
             for row in result:
-                row_dict = dict(row)
-                # Convert created_at if it exists
-                if "created_at" in row_dict and row_dict["created_at"] is not None:
+                row_dict = dict(zip(columns, row))
+                if "created_at" in row_dict and row_dict["created_at"]:
                     row_dict["created_at"] = row_dict["created_at"].isoformat()
                 rows.append(row_dict)
+
 
         return jsonify({
             "message": "Chat Fetched Successfully",
