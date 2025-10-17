@@ -1,37 +1,39 @@
-from flask import Blueprint, request, jsonify
-import json
+function convertToAllDataFormat(data) {
+  // Create an object to store the result
+  const result = {};
 
-blueprint = Blueprint("blueprint", __name__)
+  // Group data by vertical and query (title)
+  data.forEach(item => {
+    const { id, vertical, question, query } = item;
 
-@blueprint.route('/get-ai-response-feedback-all', methods=["POST"])
-def get_response_feedback_all():
-    try:
-        query = """
-            SELECT id, value, userId, threadId, feedback, comment, created_at
-            FROM responseFeedback
-            ORDER BY created_at DESC
-        """
+    // Initialize vertical array if it doesn't exist
+    if (!result[vertical]) {
+      result[vertical] = [];
+    }
 
-        with spannerDb.snapshot() as snapshot:
-            result = snapshot.execute_sql(query)
-            rows = []
-            columns = [field.name for field in result.fields]
-            rows = []
-            for row in result:
-                row_dict = dict(zip(columns, row))
-                if "created_at" in row_dict and row_dict["created_at"]:
-                    row_dict["created_at"] = row_dict["created_at"].isoformat()
-                rows.append(row_dict)
+    // Find if a category (query) already exists in this vertical
+    let category = result[vertical].find(cat => cat.title === query);
 
+    // If category doesn't exist, create it
+    if (!category) {
+      category = {
+        key: String(result[vertical].length + 1),
+        title: query,
+        items: []
+      };
+      result[vertical].push(category);
+    }
 
-        return jsonify({
-            "message": "Chat Fetched Successfully",
-            "data": rows
-        }), 200
+    // Add the item to the category
+    category.items.push({
+      id: id,
+      name: question,
+      description: `Description for ${question}` // You can modify this as needed
+    });
+  });
 
-    except Exception as e:
-        print("Error:", e)
-        return jsonify({"error": str(e)}), 508
+  return result;
+}
 
 
 
