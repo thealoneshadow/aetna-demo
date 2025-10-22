@@ -1,3 +1,28 @@
+
+
+
+
+<Search
+          placeholder="Search products by name or description..."
+          allowClear
+          enterButton={
+            <span style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              backgroundColor: '#1890ff',
+              padding: '4px'
+            }}>
+              <SearchOutlined style={{ color: '#fff' }} />
+            </span>
+          }
+          size="large"
+          onSearch={handleSearch}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchTerm}
+        />
+
+
 function convertToAllDataFormat(data) {
   // Create an object to store the result
   const result = {};
